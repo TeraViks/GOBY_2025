@@ -71,7 +71,7 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
-    configureButtonBindings();
+    configureBindings();
 
     m_robotDrive.setDefaultCommand(
       // The left stick controls translation of the robot.
@@ -96,7 +96,7 @@ public class RobotContainer {
     m_robotDrive.setPIDSlotID(slotID);
   }
 
-  private void configureButtonBindings() {
+  private void configureBindings() {
     new JoystickButton(m_driverController, OIConstants.kZeroGyro)
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(Commands.runOnce(() -> {

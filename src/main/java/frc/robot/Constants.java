@@ -200,6 +200,7 @@ public final class Constants {
     public static final int kRightJoyYAxis = 5;
 
     public static final int kZeroGyro = kStart;
+    public static final int kFaceReef = kY;
     
     public static final double kDebounceSeconds = 0.01;
 
@@ -238,6 +239,10 @@ public final class Constants {
     );
   }
 
+  public static final class ReefConstants {
+    public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
+  }
+
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
       final AprilTagFieldLayout rawLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
@@ -272,5 +277,27 @@ public final class Constants {
       loadTransformedAprilTagFieldLayout();
 
     public static final double kMaxX = kAprilTagFieldLayout.getFieldLength();
+
+    private static Translation2d getAprilTagTranslation(AprilTagFieldLayout fieldLayout, int aprilTagID) {
+      for (AprilTag aprilTag : fieldLayout.getTags()) {
+        if (aprilTag.ID == aprilTagID) {
+          return new Translation2d(aprilTag.pose.getX(), aprilTag.pose.getY());
+        }
+      }
+      assert(false);
+      return new Translation2d();
+    }
+
+    // The two april tag ID's used have to be across from eachother with different x coordinates
+    private static Translation2d calculateReefCenter(int aprilTagID1, int aprilTagID2) {
+      Translation2d aprilTag1 = getAprilTagTranslation(kAprilTagFieldLayout, aprilTagID1);
+      Translation2d aprilTag2 = getAprilTagTranslation(kAprilTagFieldLayout, aprilTagID2);
+      Translation2d centerOfReef = new Translation2d(
+        (aprilTag1.getX() + aprilTag2.getX()) / 2.0, (aprilTag1.getY() + aprilTag2.getY()) / 2.0);
+      return centerOfReef;
+    }
+    
+    public static final Translation2d kBlueReef = calculateReefCenter(18, 21);
+    public static final Translation2d kRedReef = calculateReefCenter(10, 7);
   }
 }

@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.FaceReef;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -103,6 +104,13 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
+    
+    new JoystickButton(m_driverController, OIConstants.kFaceReef)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(new FaceReef(
+        m_robotDrive, 
+        () -> getXSpeedInput(),
+        () -> getYSpeedInput()));
   }
 
   public Command getAutonomousCommand() {

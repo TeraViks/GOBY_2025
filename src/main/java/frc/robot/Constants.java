@@ -16,10 +16,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
@@ -238,6 +238,10 @@ public final class Constants {
     );
   }
 
+  public static final class StationConstants {
+    public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
+  }
+
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
       final AprilTagFieldLayout rawLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
@@ -272,5 +276,12 @@ public final class Constants {
       loadTransformedAprilTagFieldLayout();
 
     public static final double kMaxX = kAprilTagFieldLayout.getFieldLength();
+
+    
+    public static final Translation2d kBlueCoralStation1 = new Translation2d(); // TODO: calculate pose
+    public static final Translation2d kBlueCoralStation2 = new Translation2d(); // TODO: calculate pose
+
+    public static final Translation2d kRedCoralStation1 = new Translation2d(); // TODO: calculate pose
+    public static final Translation2d kRedCoralStation2 = new Translation2d(); // TODO: calculate pose
   }
 }

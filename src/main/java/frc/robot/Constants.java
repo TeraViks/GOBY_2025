@@ -53,11 +53,11 @@ public final class Constants {
 
     public static final boolean kFrontLeftDriveReversed = true; //Q1
     public static final boolean kRearLeftDriveReversed = true; //Q2
-    public static final boolean kRearRightDriveReversed = true; //Q3
+    public static final boolean kRearRightDriveReversed = false; //Q3
     public static final boolean kFrontRightDriveReversed = true; //Q4
 
     public static final boolean kFrontLeftTurningMotorReversed = true; //Q1
-    public static final boolean kRearLeftTurningMotorReversed = true; //Q2
+    public static final boolean kRearLeftTurningMotorReversed = false; //Q2
     public static final boolean kRearRightTurningMotorReversed = true; //Q3
     public static final boolean kFrontRightTurningMotorReversed = true; //Q4
 

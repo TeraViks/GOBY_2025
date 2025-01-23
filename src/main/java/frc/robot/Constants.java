@@ -104,6 +104,8 @@ public final class Constants {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 3.0 * Math.PI;
     public static final double kMaxAngularDecelerationRadiansPerSecondSquared = 9.0 * Math.PI;
 
+    public static final boolean kLimitSpeedByElevatorHeight = false;
+
     public static final TrapezoidalConstraint kVelocityProfile = new TrapezoidalConstraint(
       kMaxSpeedMetersPerSecond,
       kMaxAccelerationMetersPerSecondSquared,

@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -53,11 +55,11 @@ public final class Constants {
 
     public static final boolean kFrontLeftDriveReversed = true; //Q1
     public static final boolean kRearLeftDriveReversed = true; //Q2
-    public static final boolean kRearRightDriveReversed = false; //Q3
+    public static final boolean kRearRightDriveReversed = true; //Q3
     public static final boolean kFrontRightDriveReversed = true; //Q4
 
     public static final boolean kFrontLeftTurningMotorReversed = true; //Q1
-    public static final boolean kRearLeftTurningMotorReversed = false; //Q2
+    public static final boolean kRearLeftTurningMotorReversed = true; //Q2
     public static final boolean kRearRightTurningMotorReversed = true; //Q3
     public static final boolean kFrontRightTurningMotorReversed = true; //Q4
 
@@ -242,6 +244,10 @@ public final class Constants {
   public static final class ReefConstants {
     public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
   }
+  
+  public static final class StationConstants {
+    public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
+  }
 
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
@@ -288,6 +294,16 @@ public final class Constants {
       return new Translation2d();
     }
 
+    private static Pose2d getAprilTagPose(AprilTagFieldLayout fieldLayout, int aprilTagID) {
+      for (AprilTag aprilTag : fieldLayout.getTags()) {
+        if (aprilTag.ID == aprilTagID) {
+          return aprilTag.pose.toPose2d();
+        }
+      }
+      assert(false);
+      return new Pose2d();
+    }
+
     // The two april tag ID's used have to be across from eachother with different x coordinates
     private static Translation2d calculateReefCenter(int aprilTagID1, int aprilTagID2) {
       Translation2d aprilTag1 = getAprilTagTranslation(kAprilTagFieldLayout, aprilTagID1);
@@ -299,5 +315,15 @@ public final class Constants {
     
     public static final Translation2d kBlueReef = calculateReefCenter(18, 21);
     public static final Translation2d kRedReef = calculateReefCenter(10, 7);
+    
+    public static final ArrayList<Pose2d> kBlueCoralStations = new ArrayList<>() {{
+      add(getAprilTagPose(kAprilTagFieldLayout, 13));
+      add(getAprilTagPose(kAprilTagFieldLayout, 12));
+    }};
+    
+    public static final ArrayList<Pose2d> kRedCoralStations = new ArrayList<>() {{
+      add(getAprilTagPose(kAprilTagFieldLayout, 1));
+      add(getAprilTagPose(kAprilTagFieldLayout, 2));
+    }};
   }
 }

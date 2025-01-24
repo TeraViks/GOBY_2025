@@ -23,7 +23,6 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FaceReef;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.utilities.ElevatorSpeedInterp;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -54,7 +53,7 @@ public class RobotContainer {
     // Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyYAxis))
-      * ElevatorSpeedInterp.heightToMaxSpeed(0.0); //TODO: get actual elevator height: m_elevator.getHeight();
+      * OIConstants.kMaxMetersPerSec;
   }
 
   private double getYSpeedInput() {
@@ -62,7 +61,7 @@ public class RobotContainer {
     // Y axis control, where left is positive. Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyXAxis))
-      * ElevatorSpeedInterp.heightToMaxSpeed(0.0); //TODO: get actual elevator height: m_elevator.getHeight();
+      * OIConstants.kMaxMetersPerSec;
   }
 
   private double getRotationSpeedInput() {

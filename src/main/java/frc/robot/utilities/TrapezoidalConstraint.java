@@ -1,17 +1,17 @@
 package frc.robot.utilities;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class TrapezoidalConstraint {
   private final double m_maxSpeed;
-  private final double m_maxAcceleration;
-  private final double m_maxDeceleration;
+  private final Supplier<Double> m_maxAcceleration;
+  private final Supplier<Double> m_maxDeceleration;
 
-  public TrapezoidalConstraint(double maxSpeed, double maxAcceleration, double maxDeceleration) {
+  public TrapezoidalConstraint(double maxSpeed, Supplier<Double> maxAcceleration, Supplier<Double> maxDeceleration) {
     assert(maxSpeed >= 0.0);
-    assert(maxAcceleration >= 0.0);
-    assert(maxDeceleration >= 0.0); // We negate this during calculation.
     m_maxSpeed = maxSpeed;
     m_maxAcceleration = maxAcceleration;
     m_maxDeceleration = maxDeceleration;
@@ -21,11 +21,11 @@ public class TrapezoidalConstraint {
     double desiredAcceleration = (desiredVelocity - currentVelocity) / deltaT;
     double maxDeceleration, maxAcceleration;
     if (currentVelocity >= 0.0) {
-      maxDeceleration = -m_maxDeceleration;
-      maxAcceleration = m_maxAcceleration;
+      maxDeceleration = -m_maxDeceleration.get();
+      maxAcceleration = m_maxAcceleration.get();
     } else {
-      maxDeceleration = -m_maxAcceleration;
-      maxAcceleration = m_maxDeceleration;
+      maxDeceleration = -m_maxAcceleration.get();
+      maxAcceleration = m_maxDeceleration.get();
     }
     double clampedAcceleration = MathUtil.clamp(desiredAcceleration, maxDeceleration, maxAcceleration);
     double deltaV = clampedAcceleration * deltaT;
@@ -50,7 +50,9 @@ public class TrapezoidalConstraint {
     if (desiredAccelerationMagnitude == 0.0) {
       return currentVelocity;
     }
-    double clampedAccelerationMagnitude = MathUtil.clamp(desiredAccelerationMagnitude, -m_maxDeceleration, m_maxAcceleration);
+    double maxAcceleration = m_maxAcceleration.get();
+    double maxDeceleration = -m_maxDeceleration.get();
+    double clampedAccelerationMagnitude = MathUtil.clamp(desiredAccelerationMagnitude, maxDeceleration, maxAcceleration);
     double accelerationScalar = clampedAccelerationMagnitude / desiredAccelerationMagnitude;
     Translation2d newVelocity = currentVelocity.plus(desiredDeltaVelocity.times(accelerationScalar));
     return newVelocity;

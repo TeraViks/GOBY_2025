@@ -34,6 +34,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.utilities.ElevatorAccelInterp;
+import frc.robot.utilities.TrapezoidalConstraint;
 
 public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule m_frontLeft = //Q1
@@ -91,6 +93,8 @@ public class DriveSubsystem extends SubsystemBase {
   private Pose2d m_initialPose = new Pose2d();
   private CameraSubsystem m_cameraSystem;
 
+  private final TrapezoidalConstraint m_velocityProfile;
+
   private SwerveModulePosition[] getPositions() {
     SwerveModulePosition[] positions = Arrays.stream(m_modules)
       .map(module -> module.getPosition())
@@ -112,7 +116,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem(CameraSubsystem cameraSystem) {
-    m_cameraSystem = cameraSystem;
+    m_cameraSystem = cameraSystem;    
+    
+    m_velocityProfile = new TrapezoidalConstraint(
+      DriveConstants.kMaxSpeedMetersPerSecond,
+      () -> ElevatorAccelInterp.heightToMaxAcceleration(0.0), //TODO: Get actual elevator height
+      () -> ElevatorAccelInterp.heightToMaxDeceleration(0.0)
+    );
+
     m_gyro.enableBoardlevelYawReset(true);
     // We have to wait for the gyro to callibrate before we can reset the gyro
     while (m_gyro.isCalibrating()) {Thread.yield();}
@@ -216,7 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     Translation2d velocityDesired = new Translation2d(xSpeed, ySpeed);
-    m_idealVelocity = DriveConstants.kVelocityProfile.calculateTranslation2d(
+    m_idealVelocity = m_velocityProfile.calculateTranslation2d(
       velocityDesired, m_idealVelocity, Constants.kDt);
 
     m_idealAngularVelocity = DriveConstants.kAngularVelocityProfile.calculate(

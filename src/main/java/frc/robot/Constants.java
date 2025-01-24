@@ -106,16 +106,12 @@ public final class Constants {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 3.0 * Math.PI;
     public static final double kMaxAngularDecelerationRadiansPerSecondSquared = 9.0 * Math.PI;
 
-    public static final TrapezoidalConstraint kVelocityProfile = new TrapezoidalConstraint(
-      kMaxSpeedMetersPerSecond,
-      kMaxAccelerationMetersPerSecondSquared,
-      kMaxDecelerationMetersPerSecondSquared
-    );
+    public static final boolean kLimitSpeedByElevatorHeight = false;
 
     public static final TrapezoidalConstraint kAngularVelocityProfile = new TrapezoidalConstraint(
-      kMaxAngularSpeedRadiansPerSecond,
-      kMaxAngularAccelerationRadiansPerSecondSquared,
-      kMaxAngularDecelerationRadiansPerSecondSquared
+      DriveConstants.kMaxAngularSpeedRadiansPerSecond,
+      () -> kMaxAngularAccelerationRadiansPerSecondSquared,
+      () -> kMaxAngularDecelerationRadiansPerSecondSquared
     );
   }
 

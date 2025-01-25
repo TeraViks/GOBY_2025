@@ -68,10 +68,10 @@ public final class Constants {
     public static final boolean kRearRightEncoderReversed = false; //Q3
     public static final boolean kFrontRightEncoderReversed = false; //Q4
 
-    public static final Rotation2d kFrontLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.661133)); //Q1
-    public static final Rotation2d kRearLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.584229)); //Q2
-    public static final Rotation2d kRearRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.115234)); //Q3
-    public static final Rotation2d kFrontRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.056641)); //Q4
+    public static final Rotation2d kFrontLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(6.05174)); //Q1
+    public static final Rotation2d kRearLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(6.065900)); //Q2
+    public static final Rotation2d kRearRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.475830)); //Q3
+    public static final Rotation2d kFrontRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(5.805890)); //Q4
 
     public static final boolean kSquareInputs = false;
 

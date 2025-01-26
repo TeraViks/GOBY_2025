@@ -177,6 +177,16 @@ public final class Constants {
     public static final long kValueCacheTtlMicroseconds = 15;
   }
 
+  public static final class HandlerConstants {
+    public static final double kIntakeSpeed = 0.0; //TODO: all of these constants are placeholders
+    public static final double kEjectSpeed = 0.0;
+    public static final double kTestSpeed = 0.0;
+
+    public static final int kMotorCurrentLimit = 0;
+    public static final boolean kMotorReversed = false;
+    public static final double kVelocityConversionFactor = 0.0;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;

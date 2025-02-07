@@ -152,6 +152,10 @@ public class HandlerSubsystem extends SubsystemBase {
     }
   }
 
+  public boolean isLoaded() {
+    return m_state == State.LOADED;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putString("Handler State: ", m_state.name());

@@ -17,6 +17,7 @@ import frc.robot.Constants.SwerveModuleConstants;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private boolean m_didAutonomousInit = false;
 
   private final RobotContainer m_robotContainer;
 
@@ -61,11 +62,13 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kAutoPIDFSlotID);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    m_robotContainer.initializePreloaded();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    m_didAutonomousInit = true;
   }
 
   /** This function is called periodically during autonomous. */
@@ -75,6 +78,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kTeleopPIDFSlotID);
+    if (!m_didAutonomousInit) m_robotContainer.initializePreloaded();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

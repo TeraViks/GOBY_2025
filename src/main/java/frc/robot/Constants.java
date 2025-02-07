@@ -178,6 +178,7 @@ public final class Constants {
   }
 
   public static final class HandlerConstants {
+    public static final int kMotorID = 0;
     public static final double kIntakeSpeed = 0.0; //TODO: all of these constants are placeholders
     public static final double kEjectSpeed = 0.0;
     public static final double kTestSpeed = 0.0;

@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -27,15 +28,19 @@ public class HandlerSubsystem extends SubsystemBase {
     CANCELLING
   }
 
-  private State m_state;
+  private State m_state = State.EMPTY;
   private final SparkMax m_motor;
   private final RelativeEncoder m_encoder;
+  private final SendableChooser<State> m_chooser = new SendableChooser<>();
 
   private double m_intakeSpeed = HandlerConstants.kIntakeSpeed;
   private double m_ejectSpeed = HandlerConstants.kEjectSpeed;
 
   public HandlerSubsystem(int driveMotorChannel) {
-    m_state = State.EMPTY; //TODO: chooser
+    m_chooser.setDefaultOption("Empty", State.EMPTY);
+    m_chooser.addOption("Preloaded", State.LOADED);
+    SmartDashboard.putData(m_chooser);
+
     m_motor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
 
     SparkMaxConfig config = new SparkMaxConfig();
@@ -55,6 +60,10 @@ public class HandlerSubsystem extends SubsystemBase {
     m_encoder = m_motor.getEncoder();
 
     //TODO: sensor configs here
+  }
+
+  public void initializePreloaded() {
+    m_state = m_chooser.getSelected();
   }
 
   public void intake() {

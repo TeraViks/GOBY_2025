@@ -48,7 +48,7 @@ public class FaceStationUtil {
     return robotToStation;
   }
 
-  private Pose2d closestStation(Pose2d robotPose) {
+  public Pose2d closestStation(Pose2d robotPose) {
     Translation2d robotPos = robotPose.getTranslation();
     Pose2d nearestStation = m_coralStations.get(0);
 

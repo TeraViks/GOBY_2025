@@ -33,8 +33,8 @@ public class HandlerSubsystem extends SubsystemBase {
   private final RelativeEncoder m_encoder;
   private final SendableChooser<State> m_chooser = new SendableChooser<>();
 
-  private double m_intakeSpeed = HandlerConstants.kIntakeSpeed;
-  private double m_ejectSpeed = HandlerConstants.kEjectSpeed;
+  private final double m_intakeSpeed = HandlerConstants.kIntakeSpeed;
+  private final double m_ejectSpeed = HandlerConstants.kEjectSpeed;
 
   public HandlerSubsystem(int driveMotorChannel) {
     m_chooser.setDefaultOption("Empty", State.EMPTY);
@@ -67,7 +67,7 @@ public class HandlerSubsystem extends SubsystemBase {
   }
 
   public void intake() {
-    if (m_state != State.LOADED) {
+    if (m_state == State.EMPTY) {
       m_state = State.INTAKING;
       m_motor.set(m_intakeSpeed);
     }

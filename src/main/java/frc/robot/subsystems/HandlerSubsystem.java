@@ -67,23 +67,74 @@ public class HandlerSubsystem extends SubsystemBase {
   }
 
   public void intake() {
-    if (m_state == State.EMPTY) {
-      m_state = State.INTAKING;
-      m_motor.set(m_intakeSpeed);
+    switch (m_state) {
+      case EMPTY: {  
+        m_motor.set(m_intakeSpeed);
+        m_state = State.INTAKING;
+      }
+      case INTAKING: {
+        break;
+      }
+      case LOADING: {
+        break;
+      }
+      case LOADED: {
+        break;
+      }
+      case EJECTING: {
+        break;
+      }
+      case CANCELLING: {
+        break;
+      }
     }
   }
 
   public void cancelIntake() {
-    if (m_state != State.LOADING && m_state != State.LOADED) {
-      m_motor.stopMotor();
-      m_state = State.CANCELLING;
+    switch (m_state) {
+      case EMPTY: {
+        break;
+      }
+      case INTAKING: {
+        m_motor.stopMotor();
+        m_state = State.CANCELLING;
+      }
+      case LOADING: {
+        break;
+      }
+      case LOADED: {
+        break;
+      }
+      case EJECTING: {
+        break;
+      }
+      case CANCELLING: {
+        break;
+      }
     }
   }
 
   public void eject() {
-    if (m_state == State.LOADED) {
-      m_state = State.EJECTING;
-      m_motor.set(m_ejectSpeed);
+    switch (m_state) {
+      case EMPTY: {
+        break;
+      }
+      case INTAKING: {
+        break;
+      }
+      case LOADING: {
+        break;
+      }
+      case LOADED: {
+        m_motor.set(m_ejectSpeed);
+        m_state = State.EJECTING;
+      }
+      case EJECTING: {
+        break;
+      }
+      case CANCELLING: {
+        break;
+      }
     }
   }
 

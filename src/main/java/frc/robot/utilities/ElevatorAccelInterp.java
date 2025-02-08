@@ -2,6 +2,8 @@ package frc.robot.utilities;
 
 import java.util.Arrays;
 
+import frc.robot.Constants.DriveConstants;
+
 public final class ElevatorAccelInterp {
   record HeightEntry(double height, double metersPerSecondSquared) {}
 
@@ -25,11 +27,19 @@ public final class ElevatorAccelInterp {
   }
 
   public static double heightToMaxAcceleration(double height) {
-    return heightToMaxMetersPerSecondSquared(height, heightAccelTable);
+    if (DriveConstants.kLimitSpeedByElevatorHeight) {
+      return heightToMaxMetersPerSecondSquared(height, heightAccelTable);
+    } else {
+      return DriveConstants.kMaxAccelerationMetersPerSecondSquared;
+    }
   }
 
   public static double heightToMaxDeceleration(double height) {
-    return heightToMaxMetersPerSecondSquared(height, heightDeccelTable);
+    if (DriveConstants.kLimitSpeedByElevatorHeight) {
+      return heightToMaxMetersPerSecondSquared(height, heightDeccelTable);
+    } else {
+      return DriveConstants.kMaxDecelerationMetersPerSecondSquared;
+    }
   }
 
   public static double heightToMaxMetersPerSecondSquared(double height, HeightEntry[] heightTable) {

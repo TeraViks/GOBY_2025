@@ -11,7 +11,7 @@ public final class ElevatorAccelInterp {
     new HeightEntry(0, 10),
   };
 
-  static final HeightEntry[] heightDeccelTable = {
+  static final HeightEntry[] heightDecelTable = {
     new HeightEntry(0, 30),
   };
 
@@ -36,7 +36,7 @@ public final class ElevatorAccelInterp {
 
   public static double heightToMaxDeceleration(double height) {
     if (DriveConstants.kLimitSpeedByElevatorHeight) {
-      return heightToMaxMetersPerSecondSquared(height, heightDeccelTable);
+      return heightToMaxMetersPerSecondSquared(height, heightDecelTable);
     } else {
       return DriveConstants.kMaxDecelerationMetersPerSecondSquared;
     }

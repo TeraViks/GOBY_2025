@@ -100,11 +100,15 @@ public final class Constants {
     // SwerveModuleConstants.kMaxAngularSpeedRadiansPerSecond.
     public static final double kMaxSpeedMetersPerSecond = 5.0;
     public static final double kMaxAccelerationMetersPerSecondSquared = 10.0;
-    public static final double kMaxDecelerationMetersPerSecondSquared = 30.0;
+    // Max deceleration must be >= ~1.5X max acceleration to avoid overshooting in DriveToPose.
+    public static final double kMaxDecelerationMetersPerSecondSquared =
+      3.0 * kMaxAccelerationMetersPerSecondSquared;
 
     public static final double kMaxAngularSpeedRadiansPerSecond = 3.0 * Math.PI;
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 3.0 * Math.PI;
-    public static final double kMaxAngularDecelerationRadiansPerSecondSquared = 9.0 * Math.PI;
+    // Max deceleration must be >= ~1.5X max acceleration to avoid overshooting in DriveToPose.
+    public static final double kMaxAngularDecelerationRadiansPerSecondSquared =
+      3.0 * kMaxAngularAccelerationRadiansPerSecondSquared;
 
     public static final boolean kLimitSpeedByElevatorHeight = false;
 

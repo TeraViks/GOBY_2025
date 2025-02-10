@@ -287,6 +287,11 @@ public class DriveSubsystem extends SubsystemBase {
     return m_odometry.getEstimatedPosition().getRotation();
   }
 
+  /** Return ideal translational velocity of robot in meters/sec. */
+  public Translation2d getVelocity() {
+    return m_idealVelocity;
+  }
+
   /** Return ideal angular velocity of robot in radians/sec. */
   public double getAngularVelocity() {
     return m_idealAngularVelocity;

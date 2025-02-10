@@ -248,11 +248,8 @@ public final class Constants {
     );
   }
 
-  public static final class ReefConstants {
-    public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
-  }
-  
-  public static final class StationConstants {
+  public static final class DriveCommandConstants {
+    public static final PIDF kTranslatingPIDF = new PIDF(0.0, 0.0, 0.0, 0.0); //TODO: Tune.
     public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
   }
 

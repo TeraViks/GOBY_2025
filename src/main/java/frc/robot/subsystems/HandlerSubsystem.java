@@ -69,14 +69,14 @@ public class HandlerSubsystem extends SubsystemBase {
   public void intake() {
     switch (m_state) {
       case EMPTY:
-      case CANCELLING: {  
+      case CANCELLING: {
         m_motor.set(m_intakeSpeed);
         m_state = State.INTAKING;
         break;
       }
-      case INTAKING: 
-      case LOADING: 
-      case LOADED: 
+      case INTAKING:
+      case LOADING:
+      case LOADED:
       case EJECTING: {
         break;
       }
@@ -91,9 +91,9 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case EMPTY:
-      case LOADING: 
-      case LOADED: 
-      case EJECTING: 
+      case LOADING:
+      case LOADED:
+      case EJECTING:
       case CANCELLING: {
         break;
       }
@@ -102,11 +102,11 @@ public class HandlerSubsystem extends SubsystemBase {
 
   public void eject() {
     switch (m_state) {
-      case EMPTY: 
-      case INTAKING: 
-      case LOADING: 
-      case EJECTING: 
-      case CANCELLING:{
+      case EMPTY:
+      case INTAKING:
+      case LOADING:
+      case EJECTING:
+      case CANCELLING: {
         break;
       }
       case LOADED: {

@@ -32,7 +32,7 @@ public class FaceStationUtil {
     ArrayList<Pose2d> coralStations;
     switch (alliance) {
       default: assert false;
-      case Blue: { 
+      case Blue: {
         coralStations = FieldConstants.kBlueCoralStations;
         break;
       }

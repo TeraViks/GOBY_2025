@@ -111,11 +111,11 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
-    
+
     new JoystickButton(m_driverController, OIConstants.kFaceReef)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceReef(
-        m_robotDrive, 
+        m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput()));
   }

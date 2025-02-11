@@ -116,8 +116,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Creates a new DriveSubsystem. */
   public DriveSubsystem(CameraSubsystem cameraSystem) {
-    m_cameraSystem = cameraSystem;    
-    
+    m_cameraSystem = cameraSystem;
     m_velocityProfile = new TrapezoidalConstraint(
       DriveConstants.kMaxSpeedMetersPerSecond,
       () -> ElevatorAccelInterp.heightToMaxAcceleration(0.0), //TODO: Get actual elevator height

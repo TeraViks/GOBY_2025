@@ -189,7 +189,7 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
     public static final double kMaxRadPerSec = DriveConstants.kMaxAngularSpeedRadiansPerSecond;
     public static final double kMaxMetersPerSec = DriveConstants.kMaxSpeedMetersPerSecond;
-    
+
     public static final int kA = 1;
     public static final int kB = 2;
     public static final int kX = 3;
@@ -210,7 +210,7 @@ public final class Constants {
 
     public static final int kZeroGyro = kStart;
     public static final int kFaceReef = kY;
-    
+
     public static final double kDebounceSeconds = 0.01;
 
     public static final double kJoystickDeadband = 0.05;
@@ -319,15 +319,15 @@ public final class Constants {
         (aprilTag1.getX() + aprilTag2.getX()) / 2.0, (aprilTag1.getY() + aprilTag2.getY()) / 2.0);
       return centerOfReef;
     }
-    
+
     public static final Translation2d kBlueReef = calculateReefCenter(18, 21);
     public static final Translation2d kRedReef = calculateReefCenter(10, 7);
-    
+
     public static final ArrayList<Pose2d> kBlueCoralStations = new ArrayList<>() {{
       add(getAprilTagPose(kAprilTagFieldLayout, 13));
       add(getAprilTagPose(kAprilTagFieldLayout, 12));
     }};
-    
+
     public static final ArrayList<Pose2d> kRedCoralStations = new ArrayList<>() {{
       add(getAprilTagPose(kAprilTagFieldLayout, 1));
       add(getAprilTagPose(kAprilTagFieldLayout, 2));

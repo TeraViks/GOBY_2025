@@ -68,7 +68,7 @@ public class SwerveModule {
       boolean turningEncoderReversed,
       Rotation2d encoderOffset) {
     m_driveMotor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
-    
+
     SparkMaxConfig config = new SparkMaxConfig();
     config.closedLoopRampRate(SwerveModuleConstants.kDriveMotorRampRate)
       .inverted(driveMotorReversed)
@@ -93,7 +93,7 @@ public class SwerveModule {
 
     m_drivePositionCache = new ValueCache<Double>(this::getPlausibleDrivePosition, SwerveModuleConstants.kValueCacheTtlMicroseconds);
     m_driveVelocityCache = new ValueCache<Double>(this::getPlausibleDriveVelocity, SwerveModuleConstants.kValueCacheTtlMicroseconds);
- 
+
     m_absoluteRotationEncoderOffset = encoderOffset;
 
     m_absoluteRotationEncoder = new CANcoder(turningEncoderChannel);
@@ -128,7 +128,7 @@ public class SwerveModule {
     m_turningPIDController = m_turningMotor.getClosedLoopController();
     SwerveModuleConstants.kAutoTurningPIDF.controllerSet(turningConfig.closedLoop, SwerveModuleConstants.kAutoPIDFSlotID);
     SwerveModuleConstants.kTeleopTurningPIDF.controllerSet(turningConfig.closedLoop, SwerveModuleConstants.kTeleopPIDFSlotID);
-    
+
     REVLibError configureTurningMotorError = m_turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, Constants.kPersistMode);
     if (configureTurningMotorError != REVLibError.kOk) {
       throw new UncheckedIOException("Failed to configure turning motor", new IOException());
@@ -204,7 +204,7 @@ public class SwerveModule {
     desiredState.optimize(m_prevAngle);
 
     m_drivePIDController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity, m_PIDFSlotID);
-    
+
     if (!desiredState.angle.equals(m_prevAngle)) {
       // deltaAngle is in [-pi..pi], which is added (intentionally unconstrained) to m_prevAngle.
       // This causes the module to turn e.g. 4 degrees rather than -356 degrees.

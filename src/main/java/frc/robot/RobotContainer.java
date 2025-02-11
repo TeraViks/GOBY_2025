@@ -37,7 +37,7 @@ public class RobotContainer {
   private final CameraSubsystem m_cameraSystem =
     CameraConstants.kEnable ? new CameraSubsystem(CameraConstants.kCameraConfigs) : null;
   public final DriveSubsystem m_robotDrive = new DriveSubsystem(m_cameraSystem);
-  private final HandlerSubsystem m_handler = new HandlerSubsystem(HandlerConstants.kMotorID);
+  private final HandlerSubsystem m_handler = new HandlerSubsystem(HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
 

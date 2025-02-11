@@ -34,55 +34,24 @@ import frc.robot.Constants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.utilities.ElevatorAccelInterp;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final SwerveModule m_frontLeft = //Q1
-      new SwerveModule(
-          DriveConstants.kFrontLeftDriveMotorPort,
-          DriveConstants.kFrontLeftTurningMotorPort,
-          DriveConstants.kFrontLeftTurningEncoderPort,
-          DriveConstants.kFrontLeftDriveReversed,
-          DriveConstants.kFrontLeftTurningMotorReversed,
-          DriveConstants.kFrontLeftEncoderReversed,
-          DriveConstants.kFrontLeftEncoderOffset);
-
-  private final SwerveModule m_rearLeft = //Q2
-      new SwerveModule(
-          DriveConstants.kRearLeftDriveMotorPort,
-          DriveConstants.kRearLeftTurningMotorPort,
-          DriveConstants.kRearLeftTurningEncoderPorts,
-          DriveConstants.kRearLeftDriveReversed,
-          DriveConstants.kRearLeftTurningMotorReversed,
-          DriveConstants.kRearLeftEncoderReversed,
-          DriveConstants.kRearLeftEncoderOffset);
-
-  private final SwerveModule m_rearRight = //Q3
-      new SwerveModule(
-          DriveConstants.kRearRightDriveMotorPort,
-          DriveConstants.kRearRightTurningMotorPort,
-          DriveConstants.kRearRightTurningEncoderPorts,
-          DriveConstants.kRearRightDriveReversed,
-          DriveConstants.kRearRightTurningMotorReversed,
-          DriveConstants.kRearRightEncoderReversed,
-          DriveConstants.kRearRightEncoderOffset);
-
-  private final SwerveModule m_frontRight = //Q4
-      new SwerveModule(
-          DriveConstants.kFrontRightDriveMotorPort,
-          DriveConstants.kFrontRightTurningMotorPort,
-          DriveConstants.kFrontRightTurningEncoderPorts,
-          DriveConstants.kFrontRightDriveReversed,
-          DriveConstants.kFrontRightTurningMotorReversed,
-          DriveConstants.kFrontRightEncoderReversed,
-          DriveConstants.kFrontRightEncoderOffset);
+  // Order must correspond to that of m_modules.
+  private static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+    new Translation2d(DriveConstants.kWheelBase / 2.0, DriveConstants.kTrackWidth / 2.0),
+    new Translation2d(-DriveConstants.kWheelBase / 2.0, DriveConstants.kTrackWidth / 2.0),
+    new Translation2d(-DriveConstants.kWheelBase / 2.0, -DriveConstants.kTrackWidth / 2.0),
+    new Translation2d(DriveConstants.kWheelBase / 2.0, -DriveConstants.kTrackWidth / 2.0)
+  );
 
   private final SwerveModule[] m_modules = new SwerveModule[]{
-    m_frontLeft,
-    m_rearLeft,
-    m_rearRight,
-    m_frontRight
+    new SwerveModule(SwerveModuleConstants.kFrontLeftSwerveConfig),
+    new SwerveModule(SwerveModuleConstants.kRearLeftSwerveConfig),
+    new SwerveModule(SwerveModuleConstants.kRearRightSwerveConfig),
+    new SwerveModule(SwerveModuleConstants.kFrontRightSwerveConfig)
   };
 
   private Translation2d m_idealVelocity = new Translation2d(0.0, 0.0);
@@ -104,13 +73,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   // Odometry class for tracking robot pose
   private SwerveDrivePoseEstimator m_odometry =
-      new SwerveDrivePoseEstimator(
-        DriveConstants.kDriveKinematics,
-        getUncorrectedRotation2d(),
-        getPositions(),
-        m_initialPose,
-        DriveConstants.stateStdDeviations,
-        DriveConstants.visionStdDeviations);
+    new SwerveDrivePoseEstimator(
+      kDriveKinematics,
+      getUncorrectedRotation2d(),
+      getPositions(),
+      m_initialPose,
+      DriveConstants.stateStdDeviations,
+      DriveConstants.visionStdDeviations);
 
   private final Field2d m_field = new Field2d();
 
@@ -139,19 +108,19 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     AutoBuilder.configure(
-        this::getPose, // Robot pose supplier
-        this::initOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-        this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-        new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-            AutoConstants.kTranslationHolonomicPID, // Translation PID constants
-            AutoConstants.kRotationHolonomicPID // Rotation PID constants
-        ), // Drive base radius in meters. Distance from robot center to furthest module.
-        config, // Default path replanning config. See the API for the options here
-        () -> {
-          return DriverStation.getAlliance().get() == Alliance.Red;
-        },
-        this // Reference to this subsystem to set requirements
+      this::getPose, // Robot pose supplier
+      this::initOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+      this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+      (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+      new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+          AutoConstants.kTranslationHolonomicPID, // Translation PID constants
+          AutoConstants.kRotationHolonomicPID // Rotation PID constants
+      ), // Drive base radius in meters. Distance from robot center to furthest module.
+      config, // Default path replanning config. See the API for the options here
+      () -> {
+        return DriverStation.getAlliance().get() == Alliance.Red;
+      },
+      this // Reference to this subsystem to set requirements
     );
   }
 
@@ -207,7 +176,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private ChassisSpeeds getSpeeds() {
-    return DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+    return kDriveKinematics.toChassisSpeeds(getModuleStates());
   }
 
   public void initOdometry(Pose2d initialPose) {
@@ -237,8 +206,7 @@ public class DriveSubsystem extends SubsystemBase {
         m_idealVelocity.getX(), m_idealVelocity.getY(), m_idealAngularVelocity, getEstimatedRotation2d())
       : new ChassisSpeeds(m_idealVelocity.getX(), m_idealVelocity.getY(), m_idealAngularVelocity);
     var swerveModuleStates =
-      DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        ChassisSpeeds.discretize(chassisSpeeds, Constants.kDt));
+      kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, Constants.kDt));
 
     setModuleStates(swerveModuleStates);
   }
@@ -252,7 +220,7 @@ public class DriveSubsystem extends SubsystemBase {
   private void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
     ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, Constants.kDt);
 
-    SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
+    SwerveModuleState[] targetStates = kDriveKinematics.toSwerveModuleStates(targetSpeeds);
     setModuleStates(targetStates);
   }
 

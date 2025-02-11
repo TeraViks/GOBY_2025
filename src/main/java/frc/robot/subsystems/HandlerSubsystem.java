@@ -1,22 +1,14 @@
 package frc.robot.subsystems;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
-import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.HandlerConstants;
+import frc.robot.utilities.SparkUtil;
 
 public class HandlerSubsystem extends SubsystemBase {
   private enum State {
@@ -36,26 +28,13 @@ public class HandlerSubsystem extends SubsystemBase {
   private final double m_intakeSpeed = HandlerConstants.kIntakeSpeed;
   private final double m_ejectSpeed = HandlerConstants.kEjectSpeed;
 
-  public HandlerSubsystem(int driveMotorChannel) {
+  public HandlerSubsystem(int motorID, SparkUtil.Config motorConfig) {
     m_chooser.setDefaultOption("Empty", State.EMPTY);
     m_chooser.addOption("Preloaded", State.LOADED);
     SmartDashboard.putData(m_chooser);
 
-    m_motor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
-
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.inverted(HandlerConstants.kMotorReversed)
-      .smartCurrentLimit(HandlerConstants.kMotorCurrentLimit)
-      .idleMode(IdleMode.kBrake);
-    config.encoder
-      .velocityConversionFactor(HandlerConstants.kVelocityConversionFactor);
-    config.closedLoop
-      .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-
-    REVLibError configureError = m_motor.configure(config, ResetMode.kResetSafeParameters, Constants.kPersistMode);
-    if (configureError != REVLibError.kOk) {
-      throw new UncheckedIOException("Failed to configure handler motor", new IOException());
-    }
+    m_motor = new SparkMax(motorID, MotorType.kBrushless);
+    SparkUtil.configureMotor(m_motor, motorConfig);
 
     m_encoder = m_motor.getEncoder();
 

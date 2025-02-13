@@ -210,9 +210,23 @@ public final class Constants {
 
   public static final class HandlerConstants {
     public static final int kMotorID = 0;
-    public static final double kIntakeSpeed = 0.0; //TODO: all of these constants are placeholders
-    public static final double kEjectSpeed = 0.0;
+    public static final double kIntakeSpeedCoral = 0.0; //TODO: all of these constants are placeholders
+    public static final double kEjectSpeedCoral = 0.0;
+    public static final double kIntakeSpeedAlgae = 0.0; //TODO: Make sure the speeds for the algae and coral are reversed
+    public static final double kEjectSpeedAlgae = 0.0;
     public static final double kTestSpeed = 0.0;
+    
+    //TODO: theese constants are placeholders
+    public static final int kAlgaeSensorInput = 0;
+    public static final int kBackSensorInput = 1;
+    public static final int kFrontSensorInput = 2;
+    public static final int kDistanceSensorInput = 3;
+
+    public static final double kDebounceTime = 0.0;
+    public static final double kAlgaeSensorProxThreshold = 0.03;
+    public static final double kBackSensorProxThreshold = 0.1;
+    public static final double kFrontSensorProxThreshold = 0.1;
+    public static final double kDistanceSensorProxThreshold = 0.1;
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
       20, // TODO: Configure.

@@ -120,7 +120,9 @@ public class RobotContainer {
       new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
       ReefSubPose.A, CraneConstants.kPositionL2));
     m_chooser.setDefaultOption("Empty Auto", new PathPlannerAuto("Empty Auto"));
+    m_chooser.addOption("Right Cross The Line", new PathPlannerAuto("Right Cross The Line"));
     m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
+    m_chooser.addOption("Left Cross The Line", new PathPlannerAuto("Left Cross The Line"));
     m_chooser.addOption("Right auto with place", new PathPlannerAuto("Right Start and Place"));
     m_chooser.addOption("Left auto with place", new PathPlannerAuto("Left Start and Place"));
     SmartDashboard.putData(m_chooser);

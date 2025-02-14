@@ -12,6 +12,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
+import au.grapplerobotics.LaserCan;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -20,18 +21,26 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.CameraSubsystem.CameraConfig;
+import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.SwerveModule;
-import frc.robot.utilities.CraneInterp.PosEntry;
 import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.PIDF;
+import frc.robot.utilities.Segment;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public final class Constants {
+  // Set to true during actual competition. May disable diagnostics, sanity/safety checks, etc.
+  // in order to eliminate failure modes that should only happen during testing.
+  public static final boolean kCompeting = false;
+
+  // Scheduling quantum in seconds.
   public static final double kDt = 0.02;
+
   public static final PersistMode kPersistMode = PersistMode.kNoPersistParameters;
 
   // Tunable constants are disabled unless this is set to true.
@@ -422,43 +431,30 @@ public final class Constants {
   }
 
   public static final class CraneConstants {
-    public static final int kLeftElevatorMotorID = 9; //TODO: Change the ID or give that ID to the motor
-    public static final int kRightElevatorMotorID = 10; //TODO: Change the ID or give that ID to the motor
-    public static final int kPivotMotorID = 11; //TODO: Change the ID or give that ID to the motor
+    public static final int kLeftElevatorMotorID = 9; // TODO: Change the ID or give that ID to the motor
+    public static final int kRightElevatorMotorID = 10; // TODO: Change the ID or give that ID to the motor
+    public static final int kPivotMotorID = 11; // TODO: Change the ID or give that ID to the motor
+    public static final int kLaserCanID = 12; // TODO: Match to LaserCAN configuration.
 
-    public static final double kDebouncingTime = 0.25;
+    public static final long kValueCacheTtlMicroseconds = 15;
 
-    //TODO: Make sure the tables are sorted from lowest to highest height.
-    public static final PosEntry[] kMinAngleTable = {}; //TODO: Populate table
-    public static final PosEntry[] kMaxAngleTable = {}; //TODO: Populate table
+    // Time required to accelerate from stationary to maximum velocity. Acceleration must
+    // be proportional between the pivot and elevator in order to achieve "linear" movement,
+    // hence the shared constant. Both pivot and elevator must be capable of this acceleration
+    // for the crane to move smoothly.
+    public static final double kAccelerationSeconds = 0.25;
+    public static final double kPivotMaxSpeedRadiansPerSecond = Math.PI;
+    public static final double kPivotMaxAccelerationRadiansPerSecondSquared =
+      kPivotMaxSpeedRadiansPerSecond / kAccelerationSeconds; // Do not change.
+    public static final double kElevatorMaxSpeedMetersPerSecond = 1.0;
+    public static final double kElevatorMaxAcccelerationMetersPerSecondSquared =
+      kElevatorMaxSpeedMetersPerSecond / kAccelerationSeconds; // Do not change.
 
-    public static final SparkUtil.PIDFSlot kElevatorVelPIDFSlot = new SparkUtil.PIDFSlot(
+    public static final SparkUtil.PIDFSlot kPivotMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
       ClosedLoopSlot.kSlot0
     );
-    public static final SparkUtil.PIDFSlot kElevatorPosPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
-      ClosedLoopSlot.kSlot1
-    );
-    public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
-      20, // TODO: Configure.
-      0.1, // TODO: Configure.
-      true, // TODO: Find what elevator motor is reversed
-      1.0, // TODO: Compute.
-      1.0, // TODO: Compute.
-      1.0,
-      4.0,
-      new ArrayList<>() {{
-        add(kElevatorPosPIDFSlot);
-        add(kElevatorVelPIDFSlot);
-      }}
-    );
-
-    public static final SparkUtil.PIDFSlot kPivotVelPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
-      ClosedLoopSlot.kSlot0
-    );
-    public static final SparkUtil.PIDFSlot kPivotPosPIDFSlot = new SparkUtil.PIDFSlot(
+    public static final SparkUtil.PIDFSlot kPivotMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
       ClosedLoopSlot.kSlot1
     );
@@ -471,9 +467,105 @@ public final class Constants {
       Math.PI / 2.0,
       2.0 * Math.PI,
       new ArrayList<>() {{
-        add(kPivotPosPIDFSlot);
-        add(kPivotVelPIDFSlot);
+        add(kPivotMotorVelocityPIDFSlot);
+        add(kPivotMotorVoltagePIDFSlot);
       }}
     );
+    public static final double kPivotHomingVoltage = 1.0; // TODO: Tune.
+    public static final double kPivotMinStalledHomingAmperage = 30.0; // TODO: Tune.
+
+    public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
+      ClosedLoopSlot.kSlot0
+    );
+    public static final SparkUtil.PIDFSlot kElevatorMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
+      ClosedLoopSlot.kSlot1
+    );
+    public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
+      20, // TODO: Configure.
+      0.1, // TODO: Configure.
+      true, // TODO: Find what elevator motor is reversed
+      1.0, // TODO: Compute.
+      1.0, // TODO: Compute.
+      1.0,
+      4.0,
+      new ArrayList<>() {{
+        add(kElevatorMotorVelocityPIDFSlot);
+        add(kElevatorMotorVoltagePIDFSlot);
+      }}
+    );
+    public static final double kElevatorHomingVoltage = 1.0; // TODO: Tune.
+    public static final double kElevatorMinStalledHomingAmperage = 30.0; // TODO: Tune.
+
+    public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
+      Units.degreesToRadians(0.5),
+      Units.degreesToRadians(0.25)
+    );
+    public static final Crane.Tolerance kDefaultElevatorTolerance = new Crane.Tolerance(
+      0.005,
+      0.0025
+    );
+
+    public static final PIDF kPivotPIDF = new PIDF(0.0, 0.0, 0.0, 0.0); // TODO: Tune.
+    public static final PIDF kElevatorPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); // TODO: Tune
+
+    public static final double kPivotHardMax = Units.degreesToRadians(90.5);
+    public static final double kPivotHiMin = Units.degreesToRadians(-90.0);
+    public static final double kPivotHiMax = Units.degreesToRadians(44.0);
+    public static final double kPivotLoMin = Units.degreesToRadians(-15.0);
+    public static final double kPivotLoMax = Units.degreesToRadians(90.0);
+    public static final double kPivotHome = kPivotLoMax;
+
+    public static final double kElevatorMax = 1.400;
+    public static final double kElevatorHiPivotHome = 1.250;
+    public static final double kElevatorLoHiThreshold = 0.900;
+    public static final double kElevatorHomeRapid = 0.250;
+    public static final double kElevatorMin = 0.220;
+    public static final double kElevatorHome = kElevatorMin;
+    public static final double kElevatorHardMin = 0.201;
+
+    // Valid configuration space boundaries.
+    public static final Segment kPivotLoBoundary = new Segment(
+      new Translation2d(kPivotHiMin, kElevatorMax),
+      new Translation2d(kPivotLoMin, kElevatorMin)
+    );
+    public static final Segment kPivotHiBoundary = new Segment(
+      new Translation2d(kPivotHiMax, kElevatorMax),
+      new Translation2d(kPivotLoMax, kElevatorMin)
+    );
+    public static final Segment kElevatorLoBoundary = new Segment(
+      new Translation2d(kPivotLoMin, kElevatorMin),
+      new Translation2d(kPivotLoMax, kElevatorMin)
+    );
+    public static final Segment kElevatorHiBoundary = new Segment(
+      new Translation2d(kPivotHiMin, kElevatorMax),
+      new Translation2d(kPivotHiMax, kElevatorMax)
+    );
+    public static final ArrayList<Segment> kBoundaries = new ArrayList<>() {{
+      add(kPivotLoBoundary);
+      add(kPivotHiBoundary);
+      add(kElevatorLoBoundary);
+      add(kElevatorHiBoundary);
+    }};
+
+    // The sensor grid is 16x16, and the ROI is centered on (x,y), w x h in size.
+    public static final LaserCan.RegionOfInterest kRegionOfInterest =
+      new LaserCan.RegionOfInterest(8, 8, 16, 16);
+    // Actual elevator height for a LaserCAN measurement of 0.
+    public static final double kLaserCanBaseMeasurement = 0.150; // TODO: Calibrate.
+
+    public static final Translation2d kPositionHome =
+      new Translation2d(kPivotHome, kElevatorHome);
+    public static final Translation2d kPositionL1 =
+      new Translation2d(Units.degreesToRadians(15.0), 0.454);
+    public static final Translation2d kPositionL2 =
+      new Translation2d(Units.degreesToRadians(-35.0), 0.975);
+    public static final Translation2d kPositionL3 =
+      new Translation2d(Units.degreesToRadians(-35.0), 1.378);
+    public static final Translation2d kPositionLoAlgae =
+      new Translation2d(Units.degreesToRadians(-40.0), 0.924);
+    public static final Translation2d kPositionHiAlgae =
+      new Translation2d(Units.degreesToRadians(-40.0), 1.328);
   }
 }

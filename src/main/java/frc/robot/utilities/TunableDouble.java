@@ -10,7 +10,7 @@ public class TunableDouble {
   private final NetworkTableEntry m_dashboardEntry;
   private final double m_defaultValue;
   private double m_currentValue;
-  
+
   public TunableDouble(String key, double defaultValue) {
     m_defaultValue = defaultValue;
     if (Constants.kEnableTuning) {

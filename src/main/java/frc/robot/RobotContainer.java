@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.HandlerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FaceReef;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.HandlerSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,6 +37,7 @@ public class RobotContainer {
   private final CameraSubsystem m_cameraSystem =
     CameraConstants.kEnable ? new CameraSubsystem(CameraConstants.kCameraConfigs) : null;
   public final DriveSubsystem m_robotDrive = new DriveSubsystem(m_cameraSystem);
+  private final HandlerSubsystem m_handler = new HandlerSubsystem(HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
 
@@ -93,6 +96,10 @@ public class RobotContainer {
       SmartDashboard.putData(m_chooser);
   }
 
+  public void initializePreloaded() {
+    m_handler.initializePreloaded();
+  }
+
   public void setPIDSlotID(ClosedLoopSlot slotID) {
     m_robotDrive.setPIDSlotID(slotID);
   }
@@ -104,11 +111,11 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
-    
+
     new JoystickButton(m_driverController, OIConstants.kFaceReef)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceReef(
-        m_robotDrive, 
+        m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput()));
   }

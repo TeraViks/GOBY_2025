@@ -12,8 +12,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
+import frc.robot.Constants.DriveCommandConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.ReefConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utilities.FaceReefUtil;
 import frc.robot.utilities.PIDF;
@@ -25,12 +25,13 @@ public class FaceReef extends Command {
   Supplier<Double> m_yVelocitySupplier;
   FaceReefUtil m_reef;
 
-  private static final TunablePIDF targetTurningPIDF = new TunablePIDF("Reef.turningPIDF", ReefConstants.kTurningPIDF);
+  private static final TunablePIDF turningPIDF = new TunablePIDF("Reef.turningPIDF",
+    DriveCommandConstants.kTurningPIDF);
 
-  private ProfiledPIDController m_thetaController = new ProfiledPIDController(
-    targetTurningPIDF.get().p(),
-    targetTurningPIDF.get().i(),
-    targetTurningPIDF.get().d(),
+  private ProfiledPIDController m_angleController = new ProfiledPIDController(
+    turningPIDF.get().p(),
+    turningPIDF.get().i(),
+    turningPIDF.get().d(),
     new TrapezoidProfile.Constraints(
       DriveConstants.kMaxAngularSpeedRadiansPerSecond,
       DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared),
@@ -49,7 +50,7 @@ public class FaceReef extends Command {
   @Override
   public void initialize() {
     Pose2d robotPose = m_drive.getPose();
-    m_thetaController.reset(
+    m_angleController.reset(
       m_reef.getRotationDeviation(robotPose).getRadians(),
       m_drive.getAngularVelocity()
     );
@@ -62,18 +63,18 @@ public class FaceReef extends Command {
     Rotation2d rotationDeviation = m_reef.getRotationDeviation(robotPose);
 
     updateConstants();
-    double thetaVelocity = m_thetaController.calculate(rotationDeviation.getRadians());
+    double angleVelocity = m_angleController.calculate(rotationDeviation.getRadians());
     m_drive.drive(
       m_xVelocitySupplier.get(),
-      m_yVelocitySupplier.get(), 
-      thetaVelocity,
+      m_yVelocitySupplier.get(),
+      angleVelocity,
       true);
   }
 
   private void updateConstants() {
-    if (targetTurningPIDF.hasChanged()) {
-      PIDF pidf = targetTurningPIDF.get();
-      m_thetaController.setPID(pidf.p(), pidf.i(), pidf.d());
+    if (turningPIDF.hasChanged()) {
+      PIDF pidf = turningPIDF.get();
+      m_angleController.setPID(pidf.p(), pidf.i(), pidf.d());
     }
   }
 }

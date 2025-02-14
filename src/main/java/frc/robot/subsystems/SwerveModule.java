@@ -4,36 +4,29 @@
 
 package frc.robot.subsystems;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.Constants;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 
 public class SwerveModule {
   public static final TunablePIDF tunableTeleopTurningPIDF =
-    new TunablePIDF("TeleopTurning", SwerveModuleConstants.kTeleopTurningPIDF);
+    new TunablePIDF("TeleopTurning", SwerveModuleConstants.kTeleopTurningPIDFSlot.pidf());
 
   private final SparkMax m_driveMotor;
   private final SparkMax m_turningMotor;
@@ -59,47 +52,32 @@ public class SwerveModule {
   private double m_lastViableDriveVelocity = 0.0;
   private double m_lastViableTurningPosition = 0.0;
 
-  public SwerveModule(
-      int driveMotorChannel,
-      int turningMotorChannel,
-      int turningEncoderChannel,
-      boolean driveMotorReversed,
-      boolean turningMotorReversed,
-      boolean turningEncoderReversed,
-      Rotation2d encoderOffset) {
-    m_driveMotor = new SparkMax(driveMotorChannel, MotorType.kBrushless);
-    
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.closedLoopRampRate(SwerveModuleConstants.kDriveMotorRampRate)
-      .inverted(driveMotorReversed)
-      .smartCurrentLimit(SwerveModuleConstants.kDriveMotorCurrentLimit)
-      .idleMode(IdleMode.kBrake);
-    config.encoder
-      .positionConversionFactor(SwerveModuleConstants.kDrivePositionConversionFactor)
-      .velocityConversionFactor(SwerveModuleConstants.kDriveVelocityConversionFactor);
-    config.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+  public record Config(
+    int driveMotorChannel,
+    int turningMotorChannel,
+    int turningEncoderChannel,
+    SparkUtil.Config driveMotorConfig,
+    SparkUtil.Config turningMotorConfig,
+    boolean turningEncoderReversed,
+    Rotation2d encoderOffset
+  ) {}
 
-    SwerveModuleConstants.kAutoDrivePIDF.controllerSet(config.closedLoop, SwerveModuleConstants.kAutoPIDFSlotID);
-    SwerveModuleConstants.kTeleopDrivePIDF.controllerSet(config.closedLoop, SwerveModuleConstants.kTeleopPIDFSlotID);
+  public SwerveModule(Config config) {
+    m_driveMotor = new SparkMax(config.driveMotorChannel, MotorType.kBrushless);
+    SparkUtil.configureMotor(m_driveMotor, config.driveMotorConfig);
 
-    REVLibError configureError = m_driveMotor.configure(config, ResetMode.kResetSafeParameters, Constants.kPersistMode);
-    if (configureError != REVLibError.kOk) {
-      throw new UncheckedIOException("Failed to configure drive motor", new IOException());
-    }
-
-    m_driveEncoder = m_driveMotor.getEncoder();
     m_drivePIDController = m_driveMotor.getClosedLoopController();
+    m_driveEncoder = m_driveMotor.getEncoder();
 
     m_drivePositionCache = new ValueCache<Double>(this::getPlausibleDrivePosition, SwerveModuleConstants.kValueCacheTtlMicroseconds);
     m_driveVelocityCache = new ValueCache<Double>(this::getPlausibleDriveVelocity, SwerveModuleConstants.kValueCacheTtlMicroseconds);
- 
-    m_absoluteRotationEncoderOffset = encoderOffset;
 
-    m_absoluteRotationEncoder = new CANcoder(turningEncoderChannel);
+    m_absoluteRotationEncoderOffset = config.encoderOffset;
+
+    m_absoluteRotationEncoder = new CANcoder(config.turningEncoderChannel);
     var turningEncoderConfigurator = m_absoluteRotationEncoder.getConfigurator();
     var encoderConfig = new CANcoderConfiguration();
-    encoderConfig.MagnetSensor.SensorDirection = turningEncoderReversed
+    encoderConfig.MagnetSensor.SensorDirection = config.turningEncoderReversed
       ? SensorDirectionValue.Clockwise_Positive
       : SensorDirectionValue.CounterClockwise_Positive;
     encoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = SwerveModuleConstants.kAbsoluteSensorDiscontinuityPoint;
@@ -112,28 +90,10 @@ public class SwerveModule {
         return m_absoluteRotationEncoder.getAbsolutePosition().getValue();
       }, SwerveModuleConstants.kValueCacheTtlMicroseconds);
 
-    m_turningMotor = new SparkMax(turningMotorChannel, MotorType.kBrushless);
-
-    SparkMaxConfig turningConfig = new SparkMaxConfig();
-    turningConfig.closedLoopRampRate(SwerveModuleConstants.kTurningMotorRampRate)
-      .inverted(turningMotorReversed)
-      .smartCurrentLimit(SwerveModuleConstants.kTurningMotorCurrentLimit)
-      .idleMode(IdleMode.kBrake);
-    turningConfig.encoder
-      .positionConversionFactor(SwerveModuleConstants.kTurningPositionConversionFactor)
-      .velocityConversionFactor(SwerveModuleConstants.kTurningVelocityConversionFactor);
-    turningConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+    m_turningMotor = new SparkMax(config.turningMotorChannel, MotorType.kBrushless);
+    SparkUtil.configureMotor(m_turningMotor, config.turningMotorConfig);
 
     m_turningPIDController = m_turningMotor.getClosedLoopController();
-    SwerveModuleConstants.kAutoTurningPIDF.controllerSet(turningConfig.closedLoop, SwerveModuleConstants.kAutoPIDFSlotID);
-    SwerveModuleConstants.kTeleopTurningPIDF.controllerSet(turningConfig.closedLoop, SwerveModuleConstants.kTeleopPIDFSlotID);
-    
-    REVLibError configureTurningMotorError = m_turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, Constants.kPersistMode);
-    if (configureTurningMotorError != REVLibError.kOk) {
-      throw new UncheckedIOException("Failed to configure turning motor", new IOException());
-    }
-
     m_turningEncoder = m_turningMotor.getEncoder();
 
     // Stabilize encoder readings before initializing the cache.
@@ -204,7 +164,7 @@ public class SwerveModule {
     desiredState.optimize(m_prevAngle);
 
     m_drivePIDController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity, m_PIDFSlotID);
-    
+
     if (!desiredState.angle.equals(m_prevAngle)) {
       // deltaAngle is in [-pi..pi], which is added (intentionally unconstrained) to m_prevAngle.
       // This causes the module to turn e.g. 4 degrees rather than -356 degrees.

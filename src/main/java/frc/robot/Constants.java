@@ -22,11 +22,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.CameraSubsystem.CameraConfig;
+import frc.robot.subsystems.SwerveModule;
 import frc.robot.utilities.PIDF;
+import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public final class Constants {
@@ -38,41 +39,6 @@ public final class Constants {
   public static final boolean kEnableTuning = false;
 
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 1; //Q1
-    public static final int kRearLeftDriveMotorPort = 2; //Q2
-    public static final int kRearRightDriveMotorPort = 3; //Q3
-    public static final int kFrontRightDriveMotorPort = 4; //Q4
-
-    public static final int kFrontLeftTurningMotorPort = 5; //Q1
-    public static final int kRearLeftTurningMotorPort = 6; //Q2
-    public static final int kRearRightTurningMotorPort = 7; //Q3
-    public static final int kFrontRightTurningMotorPort = 8; //Q4
-
-    public static final int kFrontLeftTurningEncoderPort = 9; //Q1
-    public static final int kRearLeftTurningEncoderPorts = 10; //Q2
-    public static final int kRearRightTurningEncoderPorts = 11; //Q3
-    public static final int kFrontRightTurningEncoderPorts = 12; //Q4
-
-    public static final boolean kFrontLeftDriveReversed = true; //Q1
-    public static final boolean kRearLeftDriveReversed = true; //Q2
-    public static final boolean kRearRightDriveReversed = true; //Q3
-    public static final boolean kFrontRightDriveReversed = true; //Q4
-
-    public static final boolean kFrontLeftTurningMotorReversed = true; //Q1
-    public static final boolean kRearLeftTurningMotorReversed = true; //Q2
-    public static final boolean kRearRightTurningMotorReversed = true; //Q3
-    public static final boolean kFrontRightTurningMotorReversed = true; //Q4
-
-    public static final boolean kFrontLeftEncoderReversed = false; //Q1
-    public static final boolean kRearLeftEncoderReversed = false; //Q2
-    public static final boolean kRearRightEncoderReversed = false; //Q3
-    public static final boolean kFrontRightEncoderReversed = false; //Q4
-
-    public static final Rotation2d kFrontLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.661133)); //Q1
-    public static final Rotation2d kRearLeftEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.584229)); //Q2
-    public static final Rotation2d kRearRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.115234)); //Q3
-    public static final Rotation2d kFrontRightEncoderOffset = new Rotation2d(Units.rotationsToRadians(0.056641)); //Q4
-
     public static final boolean kSquareInputs = false;
 
     public static final double kTrackWidth = 0.629; // Distance between centers of right and left wheels on robot
@@ -82,13 +48,6 @@ public final class Constants {
       VecBuilder.fill(0.005, 0.005, Math.toRadians(1.0));
     public static final Vector<N3> visionStdDeviations =
       VecBuilder.fill(0.050, 0.050, Math.toRadians(5.0));
-
-    public static final SwerveDriveKinematics kDriveKinematics =
-      new SwerveDriveKinematics(
-        new Translation2d(kWheelBase / 2.0, kTrackWidth / 2.0), //Q1
-        new Translation2d(-kWheelBase / 2.0, kTrackWidth / 2.0), //Q2
-        new Translation2d(-kWheelBase / 2.0, -kTrackWidth / 2.0), //Q3
-        new Translation2d(kWheelBase / 2.0, -kTrackWidth / 2.0)); //Q4
 
     public static final boolean kGyroReversed = false;
 
@@ -106,16 +65,12 @@ public final class Constants {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 3.0 * Math.PI;
     public static final double kMaxAngularDecelerationRadiansPerSecondSquared = 9.0 * Math.PI;
 
-    public static final TrapezoidalConstraint kVelocityProfile = new TrapezoidalConstraint(
-      kMaxSpeedMetersPerSecond,
-      kMaxAccelerationMetersPerSecondSquared,
-      kMaxDecelerationMetersPerSecondSquared
-    );
+    public static final boolean kLimitSpeedByElevatorHeight = false;
 
     public static final TrapezoidalConstraint kAngularVelocityProfile = new TrapezoidalConstraint(
-      kMaxAngularSpeedRadiansPerSecond,
-      kMaxAngularAccelerationRadiansPerSecondSquared,
-      kMaxAngularDecelerationRadiansPerSecondSquared
+      DriveConstants.kMaxAngularSpeedRadiansPerSecond,
+      () -> kMaxAngularAccelerationRadiansPerSecondSquared,
+      () -> kMaxAngularDecelerationRadiansPerSecondSquared
     );
   }
 
@@ -128,6 +83,10 @@ public final class Constants {
     public static final double kAbsoluteSensorDiscontinuityPoint = kUnsigned_0To1;
 
     public static final double kMaxSpeedMetersPerSecond = DriveConstants.kMaxSpeedMetersPerSecond * 2.0;
+    public static final double kMaxAccelerationMetersPerSecondSquared = Math.max(
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared,
+      DriveConstants.kMaxDecelerationMetersPerSecondSquared
+    );
 
     public static final double kWheelDiameterMeters = 0.09525;
 
@@ -161,13 +120,6 @@ public final class Constants {
     public static final double kTurningEncoderStabilizeToleranceRadians =
       Units.degreesToRadians(1.0);
 
-    public static final PIDF kAutoDrivePIDF = new PIDF(0.375, 0.0, 0.0, 0.25);
-    public static final PIDF kAutoTurningPIDF = new PIDF(0.375, 0.0, 0.0);
-
-    public static final PIDF kTeleopDrivePIDF = new PIDF(0.375, 0.0, 0.0, 0.25);
-    // Use SwerveModule.tunableTeleopTurningPIDF rather than directly using this field.
-    public static final PIDF kTeleopTurningPIDF = new PIDF(0.375, 0.0, 0.0);
-
     public static final int kDriveMotorCurrentLimit = 40;
     public static final int kTurningMotorCurrentLimit = 20;
 
@@ -175,6 +127,122 @@ public final class Constants {
     public static final double kTurningMotorRampRate = 0.25;
 
     public static final long kValueCacheTtlMicroseconds = 15;
+
+    // Tune via SwerveModule.tunable*DrivePIDF rather than iteratively modifying these fields.
+    public static final SparkUtil.PIDFSlot kAutoDrivePIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.375, 0.0, 0.0, 0.25),
+      kAutoPIDFSlotID
+    );
+    public static final SparkUtil.PIDFSlot kTeleopDrivePIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.375, 0.0, 0.0, 0.25),
+      kTeleopPIDFSlotID
+    );
+    public static final SparkUtil.Config kFrontLeftDriveMotorConfig = new SparkUtil.Config(
+      kDriveMotorCurrentLimit,
+      kDriveMotorRampRate,
+      true,
+      kDriveVelocityConversionFactor,
+      kDrivePositionConversionFactor,
+      kMaxSpeedMetersPerSecond,
+      kMaxAccelerationMetersPerSecondSquared,
+      new ArrayList<>() {{
+        add(kAutoDrivePIDFSlot);
+        add(kTeleopDrivePIDFSlot);
+      }}
+    );
+    public static final SparkUtil.Config kRearLeftDriveMotorConfig =
+      kFrontLeftDriveMotorConfig.withInvert(true);
+    public static final SparkUtil.Config kRearRightDriveMotorConfig =
+      kFrontLeftDriveMotorConfig.withInvert(true);
+    public static final SparkUtil.Config kFrontRightDriveMotorConfig =
+      kFrontLeftDriveMotorConfig.withInvert(true);
+
+    // Tune via SwerveModule.tunable*TurningPIDF rather than iteratively modifying these fields.
+    public static final SparkUtil.PIDFSlot kAutoTurningPIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.375, 0.0, 0.0),
+      kAutoPIDFSlotID
+    );
+    public static final SparkUtil.PIDFSlot kTeleopTurningPIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.375, 0.0, 0.0),
+      kTeleopPIDFSlotID
+    );
+    public static final SparkUtil.Config kFrontLeftTurningMotorConfig = new SparkUtil.Config(
+      kTurningMotorCurrentLimit,
+      kTurningMotorRampRate,
+      true,
+      kTurningVelocityConversionFactor,
+      kTurningPositionConversionFactor,
+      kMaxSpeedMetersPerSecond,
+      kMaxAccelerationMetersPerSecondSquared,
+      new ArrayList<>() {{
+        add(kAutoTurningPIDFSlot);
+        add(kTeleopTurningPIDFSlot);
+      }}
+    );
+    public static final SparkUtil.Config kRearLeftTurningMotorConfig =
+      kFrontLeftTurningMotorConfig.withInvert(true);
+    public static final SparkUtil.Config kRearRightTurningMotorConfig =
+      kFrontLeftTurningMotorConfig.withInvert(true);
+    public static final SparkUtil.Config kFrontRightTurningMotorConfig =
+      kFrontLeftTurningMotorConfig.withInvert(true);
+
+    public static final SwerveModule.Config kFrontLeftSwerveConfig = new SwerveModule.Config(
+      1, 5, 9,
+      kFrontLeftDriveMotorConfig, kFrontLeftTurningMotorConfig,
+      false, new Rotation2d(Units.rotationsToRadians(6.05174))
+    );
+    public static final SwerveModule.Config kRearLeftSwerveConfig = new SwerveModule.Config(
+      2, 6, 10,
+      kRearLeftDriveMotorConfig, kRearLeftTurningMotorConfig,
+      false, new Rotation2d(Units.rotationsToRadians(6.065900))
+    );
+    public static final SwerveModule.Config kRearRightSwerveConfig = new SwerveModule.Config(
+      3, 7, 11,
+      kRearRightDriveMotorConfig, kRearRightTurningMotorConfig,
+      false, new Rotation2d(Units.rotationsToRadians(0.475830))
+    );
+    public static final SwerveModule.Config kFrontRightSwerveConfig = new SwerveModule.Config(
+      4, 8, 12,
+      kFrontRightDriveMotorConfig, kFrontRightTurningMotorConfig,
+      false, new Rotation2d(Units.rotationsToRadians(5.805890))
+    );
+  }
+
+  public static final class HandlerConstants {
+    public static final int kMotorID = 0;
+    public static final double kIntakeSpeedCoral = 0.0; //TODO: all of these constants are placeholders
+    public static final double kEjectSpeedCoral = 0.0;
+    public static final double kIntakeSpeedAlgae = 0.0; //TODO: Make sure the speeds for the algae and coral are reversed
+    public static final double kEjectSpeedAlgae = 0.0;
+    public static final double kTestSpeed = 0.0;
+    
+    //TODO: theese constants are placeholders
+    public static final int kAlgaeSensorInput = 0;
+    public static final int kBackSensorInput = 1;
+    public static final int kFrontSensorInput = 2;
+    public static final int kDistanceSensorInput = 3;
+
+    public static final double kDebounceTime = 0.0;
+    public static final double kAlgaeSensorProxThreshold = 0.03;
+    public static final double kBackSensorProxThreshold = 0.1;
+    public static final double kFrontSensorProxThreshold = 0.1;
+    public static final double kDistanceSensorProxThreshold = 0.1;
+
+    public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
+      20, // TODO: Configure.
+      0.1, // TODO: Configure.
+      false, // TODO: Configure.
+      1.0, // TODO: Configure.
+      1.0, // TOOO: Configure.
+      1.0, // TODO: Configure.
+      1.0, // TODO: Configure.
+      new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(
+          new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Configure.
+          ClosedLoopSlot.kSlot0
+        ));
+      }}
+    );
   }
 
   public static final class OIConstants {
@@ -182,7 +250,7 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
     public static final double kMaxRadPerSec = DriveConstants.kMaxAngularSpeedRadiansPerSecond;
     public static final double kMaxMetersPerSec = DriveConstants.kMaxSpeedMetersPerSecond;
-    
+
     public static final int kA = 1;
     public static final int kB = 2;
     public static final int kX = 3;
@@ -203,7 +271,7 @@ public final class Constants {
 
     public static final int kZeroGyro = kStart;
     public static final int kFaceReef = kY;
-    
+
     public static final double kDebounceSeconds = 0.01;
 
     public static final double kJoystickDeadband = 0.05;
@@ -241,17 +309,19 @@ public final class Constants {
     );
   }
 
-  public static final class ReefConstants {
-    public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
-  }
-  
-  public static final class StationConstants {
+  public static final class DriveCommandConstants {
+    public static final double kDefaultTranslationPosToleranceMeters = 0.02;
+    public static final double kDefaultTranslationVelToleranceMetersPerSecond = 0.01;
+    public static final double kDefaultAnglePosToleranceRadians = Units.degreesToRadians(2.0);
+    public static final double kDefaultAngleVelToleranceRadiansPerSecond = Units.degreesToRadians(1.0);
+
+    public static final PIDF kTranslatingPIDF = new PIDF(0.0, 0.0, 0.0, 0.0); //TODO: Tune.
     public static final PIDF kTurningPIDF = new PIDF(3.0, 0.0, 0.0, 0.2); //TODO: Update the PIDF values (copied from AC/DC)
   }
 
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
-      final AprilTagFieldLayout rawLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
+      final AprilTagFieldLayout rawLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
       Map<Integer, Rotation3d> rotations = Map.of(
         // In order to adjust an AprilTag's rotation, specify non-zero roll/pitch/yaw, as viewed
         // from perspective of the field XYZ axes. For example, if the blue speaker AprilTag is
@@ -312,15 +382,15 @@ public final class Constants {
         (aprilTag1.getX() + aprilTag2.getX()) / 2.0, (aprilTag1.getY() + aprilTag2.getY()) / 2.0);
       return centerOfReef;
     }
-    
+
     public static final Translation2d kBlueReef = calculateReefCenter(18, 21);
     public static final Translation2d kRedReef = calculateReefCenter(10, 7);
-    
+
     public static final ArrayList<Pose2d> kBlueCoralStations = new ArrayList<>() {{
       add(getAprilTagPose(kAprilTagFieldLayout, 13));
       add(getAprilTagPose(kAprilTagFieldLayout, 12));
     }};
-    
+
     public static final ArrayList<Pose2d> kRedCoralStations = new ArrayList<>() {{
       add(getAprilTagPose(kAprilTagFieldLayout, 1));
       add(getAprilTagPose(kAprilTagFieldLayout, 2));

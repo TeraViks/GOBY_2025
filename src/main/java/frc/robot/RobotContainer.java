@@ -106,6 +106,11 @@ public class RobotContainer {
 
       m_chooser.setDefaultOption("Empty Auto", new PathPlannerAuto("Empty Auto"));
       m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
+      m_chooser.addOption("Left Cross The Line", new PathPlannerAuto("Left Cross The Line"));
+      m_chooser.addOption("Right Cross The Line", new PathPlannerAuto("Right Cross The Line"));
+      
+      
+
       SmartDashboard.putData(m_chooser);
   }
 

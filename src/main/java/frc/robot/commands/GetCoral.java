@@ -19,9 +19,11 @@ public class GetCoral extends SequentialCommandGroup {
     addRequirements(m_drive, m_handler);
 
     Command faceStation = new FaceStation(drive, null, null);
+    Command driveToPose = new DriveToPose(null, drive); //TODO: get poses
 
     addCommands(
       faceStation, 
+      driveToPose,
       //TODO: pivot and elevator (from crane subsystem)
       Commands.runOnce(() -> m_handler.intakeCoral()),
       Commands.waitUntil(() -> m_handler.isCoralLoaded())

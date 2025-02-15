@@ -270,8 +270,25 @@ public final class Constants {
     public static final int kRightJoyYAxis = 5;
 
     public static final int kZeroGyro = kStart;
-    public static final int kFaceReef = kY;
+    public static final int kFaceReefButton = kY;
+    public static final int kFaceCoralStationButton = kX;
+    public static final int kFaceProcessorButton = kA;
+    public static final int kASideButton = kLeftBumper;
+    public static final int kBSideButton = kRightBumper;
+    public static final int kLevel1Button = kA;
+    public static final int kLevel2Button = kBack;
+    public static final int kLevel3Button = kStart;
+    public static final int kIntakeCoralButton = kX;
+    public static final int kIntakeALgaePOV = 0;
+    public static final int kEjectButton = kY;
+    public static final int kHighAlgaePOV = 90;
+    public static final int kLowAlgaePOV = 270;
+    public static final int kAlgaeProcessorPOV = 180;
+    public static final int kExtendClimberAxis = kLeftTriggerAxis;
+    public static final int kRetractClimberAxis = kRightTriggerAxis;
 
+    public static final double kTriggerAcuationValue = 0.5;
+    
     public static final double kDebounceSeconds = 0.01;
 
     public static final double kJoystickDeadband = 0.05;
@@ -321,7 +338,8 @@ public final class Constants {
 
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
-      final AprilTagFieldLayout rawLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      final AprilTagFields rawLayoutFile = AprilTagFields.k2025ReefscapeWelded;
+      final AprilTagFieldLayout rawLayout = AprilTagFieldLayout.loadField(rawLayoutFile);
       Map<Integer, Rotation3d> rotations = Map.of(
         // In order to adjust an AprilTag's rotation, specify non-zero roll/pitch/yaw, as viewed
         // from perspective of the field XYZ axes. For example, if the blue speaker AprilTag is

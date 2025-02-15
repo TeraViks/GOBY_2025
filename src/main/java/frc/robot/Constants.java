@@ -321,7 +321,8 @@ public final class Constants {
 
   public static final class FieldConstants {
     private static final AprilTagFieldLayout loadTransformedAprilTagFieldLayout() {
-      final AprilTagFieldLayout rawLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+      final AprilTagFields rawLayoutFile = AprilTagFields.k2025ReefscapeWelded;
+      final AprilTagFieldLayout rawLayout = AprilTagFieldLayout.loadField(rawLayoutFile);
       Map<Integer, Rotation3d> rotations = Map.of(
         // In order to adjust an AprilTag's rotation, specify non-zero roll/pitch/yaw, as viewed
         // from perspective of the field XYZ axes. For example, if the blue speaker AprilTag is

@@ -17,22 +17,26 @@ public class FieldPoseUtil {
 	Alliance m_alliance;
 	double m_distanceFromWall;
 
-	enum Pose {
-		LEFT_STATION,
-		RIGHT_STATION,
-		PROCESSOR,
+	enum ReefPose {
+		TWELVE,
 		TWO,
 		FOUR,
 		SIX,
 		EIGHT,
-		TEN,
-		TWELVE
+		TEN
+	}
+	
+	enum ReefSubPose {
+		A,
+		B
 	}
 
-	enum SubPose {
-		A,
-		B,
-		ALGAE,
+	enum CoralStationPose {
+		LEFT,
+		RIGHT
+	}
+
+	enum CoralStationSubPose {
 		ONE,
 		TWO,
 		THREE,
@@ -75,7 +79,7 @@ public class FieldPoseUtil {
 		return pose.plus(transform);
 	}
 
-	private Pose2d calculateTargetPoseAtStation(int aprilTagID, SubPose subpose) {
+	private Pose2d calculateTargetPoseAtStation(int aprilTagID, CoralStationSubPose subpose) {
 		Pose2d stationPose = m_field.getTagPose(aprilTagID).get().toPose2d();
 		double parallelOffset;
 		switch (subpose) {
@@ -99,7 +103,7 @@ public class FieldPoseUtil {
 		 
 	}
 
-	private Pose2d calculateTargetPoseAtReef(int aprilTagID, SubPose subpose) {
+	private Pose2d calculateTargetPoseAtReef(int aprilTagID, ReefSubPose subpose) {
 		Pose2d stationPose = m_field.getTagPose(aprilTagID).get().toPose2d();
 		double parallelOffset;
 		switch (subpose) {
@@ -109,80 +113,73 @@ public class FieldPoseUtil {
 			case B:
 				parallelOffset = AutoConstants.kReefParallelOffsetB;
 				break;
-			case ALGAE:
-				parallelOffset = 0;
-				break;
 			default:
-				parallelOffset = 0;
-				break;
+				parallelOffset = 0.0;
 		}
 		return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kWallOffset, parallelOffset);
-		 
 	}
 
-	public Pose2d getTargetPose(Pose pose, SubPose subpose) {
-		Pose2d targetPose;
-		switch (pose) {
-			case LEFT_STATION:
+	public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
+		switch (station) {
+			case LEFT:
 				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtStation(13, subpose);
+					return calculateTargetPoseAtStation(13, slot);
 				} else {
-					targetPose = calculateTargetPoseAtStation(1, subpose);
+					return calculateTargetPoseAtStation(1, slot);
 				}
-				break;
-			case RIGHT_STATION:
+			case RIGHT:
 				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtStation(12, subpose);
+					return calculateTargetPoseAtStation(12, slot);
 				} else {
-					targetPose = calculateTargetPoseAtStation(2, subpose);
+					return calculateTargetPoseAtStation(2, slot);
 				}
-				break;
-			case TWO:
-				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(22, subpose);
-				} else {
-					targetPose = calculateTargetPoseAtReef(9, subpose);
-				}
-				break;
-			case FOUR:
-				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(17, subpose);
-				} else {
-					targetPose = calculateTargetPoseAtReef(8, subpose);
-				}
-				break;
-			case SIX:
-				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(18, subpose);
-				} else {
-					targetPose = calculateTargetPoseAtReef(7, subpose);
-				}
-				break;
-			case EIGHT:
-				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(19, subpose);
-				} else {
-					targetPose = calculateTargetPoseAtReef(6, subpose);
-				}
-				break;
-			case TEN:
-				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(20, subpose);
-				} else {
-					targetPose = calculateTargetPoseAtReef(11, subpose);
-				}
-				break;
+			default:
+				assert(false);
+				return null;
+		}
+	}
+
+	public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
+		switch (reefTime) {
 			case TWELVE:
 				if (m_alliance == Alliance.Blue) {
-					targetPose = calculateTargetPoseAtReef(21, subpose);
+					return calculateTargetPoseAtReef(21, subpose);
 				} else {
-					targetPose = calculateTargetPoseAtReef(10, subpose);
+					return calculateTargetPoseAtReef(10, subpose);
 				}
-				break;
+			case TWO:
+				if (m_alliance == Alliance.Blue) {
+					return calculateTargetPoseAtReef(22, subpose);
+				} else {
+					return calculateTargetPoseAtReef(9, subpose);
+				}
+			case FOUR:
+				if (m_alliance == Alliance.Blue) {
+					return calculateTargetPoseAtReef(17, subpose);
+				} else {
+					return calculateTargetPoseAtReef(8, subpose);
+				}
+			case SIX:
+				if (m_alliance == Alliance.Blue) {
+					return calculateTargetPoseAtReef(18, subpose);
+				} else {
+					return calculateTargetPoseAtReef(7, subpose);
+				}
+			case EIGHT:
+				if (m_alliance == Alliance.Blue) {
+					return calculateTargetPoseAtReef(19, subpose);
+				} else {
+					return calculateTargetPoseAtReef(6, subpose);
+				}
+			case TEN:
+				if (m_alliance == Alliance.Blue) {
+					return calculateTargetPoseAtReef(20, subpose);
+				} else {
+					return calculateTargetPoseAtReef(11, subpose);
+				}
 			default:
-				targetPose = null;
-				break;
+				assert(false);
+				return null;
 		}
-		return targetPose;
 	}
 }

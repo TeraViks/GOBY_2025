@@ -7,7 +7,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FaceStationUtil;
 
-public class GetCoral extends SequentialCommandGroup { 
+public class GetCoral extends SequentialCommandGroup {
   private final DriveSubsystem m_drive;
   private final FaceStationUtil m_station;
   private final HandlerSubsystem m_handler;
@@ -22,7 +22,7 @@ public class GetCoral extends SequentialCommandGroup {
     Command driveToPose = new DriveToPose(null, drive); //TODO: get poses
 
     addCommands(
-      faceStation, 
+      faceStation,
       driveToPose,
       //TODO: pivot and elevator (from crane subsystem)
       Commands.runOnce(() -> m_handler.intakeCoral()),

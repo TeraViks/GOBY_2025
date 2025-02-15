@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.HandlerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.FaceReef;
+import frc.robot.commands.FaceStation;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
@@ -112,14 +114,111 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
-
-    new JoystickButton(m_driverController, OIConstants.kFaceReef)
+    
+    new JoystickButton(m_driverController, OIConstants.kFaceReefButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceReef(
         m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput()));
-  }
+    
+    new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(new FaceStation(
+        m_robotDrive, 
+        () -> getXSpeedInput(),
+        () -> getYSpeedInput()));
+
+    new JoystickButton(m_driverController, OIConstants.kFaceProcessorButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
+
+    new JoystickButton(m_operatorController, OIConstants.kASideButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(Commands.runOnce(() -> {
+        if (m_operatorController.getRawButton(OIConstants.kLevel2Button)) {
+          //m_crane.moveTo(FieldConstants.KLevel2)
+          //Robot also needs to move to right position
+        } else if (m_operatorController.getRawButton(OIConstants.kLevel3Button)) {
+          //m_crane.moveTo(FieldConstants.kLevel3)
+          //Robot also needs to move to right position
+        }
+      }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+    
+      new JoystickButton(m_operatorController, OIConstants.kBSideButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(Commands.runOnce(() -> {
+        if (m_operatorController.getRawButton(OIConstants.kLevel2Button)) {
+          //m_crane.moveTo(FieldConstants.KLevel2)
+          //Robot also needs to move to right position
+        } else if (m_operatorController.getRawButton(OIConstants.kLevel3Button)) {
+          //m_crane.moveTo(FieldConstants.kLevel3)
+          //Robot also needs to move to right position
+        }
+      }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+
+      new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_crane.moveTo(FieldConstants.kLevel1)
+        }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+      
+      new Trigger(() -> m_operatorController.getPOV() == OIConstants.kHighAlgaePOV)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_crane.moveTo(FieldConstants.kHighAlgae)
+        })); //TODO: Requirements also need to include the crane subsystem
+      
+      new Trigger(() -> m_operatorController.getPOV() == OIConstants.kLowAlgaePOV)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_crane.moveTo(FieldConstants.kLowAlgae)
+        })); //TODO: Requirements also need to include the crane subsystem
+
+      new Trigger(() -> m_operatorController.getPOV() == OIConstants.kAlgaeProcessorPOV)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_crane.moveTo(FieldConstants.kAlgaeProcessor)
+          //Robot also needs to move to right position
+        })); //TODO: Requirements also need to include the crane subsystem
+      
+      new Trigger(() -> m_operatorController.getPOV() == OIConstants.kAlgaeProcessorPOV)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_crane.moveTo(FieldConstants.kAlgaeProcessor)
+          //Robot also needs to move to right position
+        })); //TODO: Requirements also need to include the crane subsystem
+      
+      new Trigger(() -> m_operatorController.getPOV() == OIConstants.kIntakeALgaePOV)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          m_handler.intakeAlgae();
+        }, m_handler));
+      
+      new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          m_handler.intakeCoral();
+        }, m_handler));
+      
+      new JoystickButton(m_operatorController, OIConstants.kEjectButton)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          m_handler.eject();
+        }, m_handler));
+      
+      new Trigger(() -> m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >= OIConstants.kTriggerAcuationValue)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_climber.extendClimber()
+        })); //TODO: Requirements needs to include m_climber
+      
+      new Trigger(() -> m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >= OIConstants.kTriggerAcuationValue)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() -> {
+          //m_climber.retractClimber()
+        })); //TODO: Requirements needs to include m_climber
+    }
 
   public Command getAutonomousCommand() {
     Command selectedCommand = m_chooser.getSelected();

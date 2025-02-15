@@ -139,6 +139,16 @@ public class FieldPoseUtil {
 		}
 	}
 
+	public Pose2d getTargetPoseAtProcessor() {
+		Pose2d aprilTagPose;
+		if (m_alliance == Alliance.Blue) {
+			aprilTagPose = m_field.getTagPose(16).get().toPose2d();
+		} else {
+			aprilTagPose = m_field.getTagPose(3).get().toPose2d();
+		}
+		return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kWallOffset, AutoConstants.kProcessorParallelOffset);
+	}
+
 	public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
 		switch (reefTime) {
 			case TWELVE:

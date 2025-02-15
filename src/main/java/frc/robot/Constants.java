@@ -314,6 +314,8 @@ public final class Constants {
     public static final double kReefParallelOffsetA = -0.25;
     public static final double kReefParallelOffsetB = 0.25;
 
+    public static final double kProcessorParallelOffset = 0.0;
+
   }
 
   public static final class CameraConstants {

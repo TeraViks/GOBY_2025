@@ -152,7 +152,7 @@ public class HandlerSubsystem extends SubsystemBase {
     }
   }
 
-  public boolean isCoralLoaded() {
+  public boolean isLoadedCoral() {
     return m_state == State.LOADED_CORAL;
   }
 

@@ -34,6 +34,7 @@ import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 import frc.robot.utilities.FieldPoseUtil.CoralStationSubPose;
+import frc.robot.subsystems.LightSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -49,6 +50,7 @@ public class RobotContainer {
   private final HandlerSubsystem m_handler = new HandlerSubsystem(
     HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
+  private final LightSubsystem m_lightSubsystem = new LightSubsystem();
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();

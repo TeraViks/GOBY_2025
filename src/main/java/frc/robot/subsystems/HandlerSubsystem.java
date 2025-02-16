@@ -156,6 +156,10 @@ public class HandlerSubsystem extends SubsystemBase {
     return m_state == State.LOADED_CORAL;
   }
 
+  public boolean isLoadedAlgae() {
+    return m_state == State.LOADED_ALGAE;
+  }
+
   @Override
   public void periodic() {
     SmartDashboard.putString("Handler State: ", m_state.name());

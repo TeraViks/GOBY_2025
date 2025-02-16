@@ -46,6 +46,10 @@ public final class Constants {
   // Intended to remain false in committed code.
   public static final boolean kEnableTuning = false;
 
+  public static final class LightConstants {
+    public static final int kBlinkinPWMInput = 0;
+  }
+
   public static final class DriveConstants {
     public static final boolean kSquareInputs = false;
     public static final double kSlowSpeedFactor = 0.0625;

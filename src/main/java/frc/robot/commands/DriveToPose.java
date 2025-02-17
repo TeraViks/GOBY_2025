@@ -19,8 +19,8 @@ import frc.robot.utilities.TunablePIDF;
 public class DriveToPose extends Command {
   private final Pose2d m_pose;
   private final DriveSubsystem m_drive;
-  private final double m_SquaredTranslationPosToleranceMeters;
-  private final double m_SquaredTranslationVelToleranceMetersPerDt;
+  private final double m_squaredTranslationPositionToleranceMeters;
+  private final double m_squaredTranslationVelocityToleranceMetersPerDt;
 
   private static final TunablePIDF translatingPIDF = new TunablePIDF("DriveToPose.translatingPIDF",
     DriveCommandConstants.kTranslatingPIDF);
@@ -57,8 +57,8 @@ public class DriveToPose extends Command {
       double anglePosToleranceRadians, double angleVelToleranceRadiansPerSecond) {
     m_pose = pose;
     m_drive = drive;
-    m_SquaredTranslationPosToleranceMeters = square(translationPosToleranceMeters);
-    m_SquaredTranslationVelToleranceMetersPerDt =
+    m_squaredTranslationPositionToleranceMeters = square(translationPosToleranceMeters);
+    m_squaredTranslationVelocityToleranceMetersPerDt =
       square(Constants.kDt * translationVelToleranceMetersPerSecond);
 
     m_angleController.setTolerance(anglePosToleranceRadians,
@@ -69,27 +69,27 @@ public class DriveToPose extends Command {
 
   public DriveToPose(Pose2d pose, DriveSubsystem drive) {
     this(pose, drive,
-      DriveCommandConstants.kDefaultTranslationPosToleranceMeters,
-      DriveCommandConstants.kDefaultTranslationVelToleranceMetersPerSecond,
-      DriveCommandConstants.kDefaultAnglePosToleranceRadians,
-      DriveCommandConstants.kDefaultAngleVelToleranceRadiansPerSecond);
+      DriveCommandConstants.kDefaultTranslationPositionToleranceMeters,
+      DriveCommandConstants.kDefaultTranslationVelocityToleranceMetersPerSecond,
+      DriveCommandConstants.kDefaultAnglePositionToleranceRadians,
+      DriveCommandConstants.kDefaultAngleVelocityToleranceRadiansPerSecond);
   }
 
-  private Translation2d getDesiredTranslation(Pose2d robotPose) {
+  private Translation2d getDesiredTranslation() {
     return m_pose.getTranslation();
   }
 
   private Translation2d getTranslationDeviation(Pose2d robotPose) {
-    return getDesiredTranslation(robotPose).minus(robotPose.getTranslation());
+    return getDesiredTranslation().minus(robotPose.getTranslation());
   }
 
-  private Rotation2d getDesiredRotation(Pose2d robotPose) {
+  private Rotation2d getDesiredRotation() {
     return m_pose.getRotation();
   }
 
   private Rotation2d getRotationDeviation(Pose2d robotPose) {
     Rotation2d currentRotation = robotPose.getRotation();
-    Rotation2d desiredRotation = getDesiredRotation(robotPose);
+    Rotation2d desiredRotation = getDesiredRotation();
     Rotation2d rotationDeviation = currentRotation.minus(desiredRotation);
     return rotationDeviation;
   }
@@ -103,8 +103,7 @@ public class DriveToPose extends Command {
    * initialization, but if the the angle relative to an axis were close to 0, the controller
    * would be incapable of significant movement along the other axis, and if the robot were to
    * deviate from the intended trajectory, the controller would be incapable of correction. */
-  private void scaleXYConstraints(Pose2d robotPose) {
-    Translation2d translationDeviation = getTranslationDeviation(robotPose);
+  private void scaleXYConstraints(Pose2d robotPose, Translation2d translationDeviation) {
     Rotation2d translationAngle = translationDeviation.getAngle();
     double xFactor = translationAngle.getCos();
     m_xController.setConstraints(new TrapezoidProfile.Constraints(
@@ -124,7 +123,7 @@ public class DriveToPose extends Command {
     Translation2d translationDeviation = getTranslationDeviation(robotPose);
     Translation2d velocity = m_drive.getVelocity();
 
-    scaleXYConstraints(robotPose);
+    scaleXYConstraints(robotPose, translationDeviation);
     m_xController.reset(
       translationDeviation.getX(),
       velocity.getX()
@@ -147,7 +146,7 @@ public class DriveToPose extends Command {
 
     updateConstants();
 
-    scaleXYConstraints(robotPose);
+    scaleXYConstraints(robotPose, translationDeviation);
     double xVelocity = m_xController.calculate(translationDeviation.getX());
     double yVelocity = m_yController.calculate(translationDeviation.getY());
     double angleVelocity = m_angleController.calculate(rotationDeviation.getRadians());
@@ -174,12 +173,12 @@ public class DriveToPose extends Command {
     // defines a circle rather than a square.
     double xPosError = m_xController.getPositionError();
     double yPosError = m_yController.getPositionError();
-    if (square(xPosError) + square(yPosError) > m_SquaredTranslationPosToleranceMeters) {
+    if (square(xPosError) + square(yPosError) > m_squaredTranslationPositionToleranceMeters) {
       return false;
     }
     double xVelError = m_xController.getVelocityError();
     double yVelError = m_yController.getVelocityError();
-    if (square(xVelError) + square(yVelError) > m_SquaredTranslationVelToleranceMetersPerDt) {
+    if (square(xVelError) + square(yVelError) > m_squaredTranslationVelocityToleranceMetersPerDt) {
       return false;
     }
     return m_angleController.atSetpoint();

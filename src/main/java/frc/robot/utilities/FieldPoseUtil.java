@@ -17,7 +17,7 @@ public class FieldPoseUtil {
 	Alliance m_alliance;
 	double m_distanceFromWall;
 
-	enum ReefPose {
+	public enum ReefPose {
 		TWELVE,
 		TWO,
 		FOUR,
@@ -26,22 +26,31 @@ public class FieldPoseUtil {
 		TEN
 	}
 	
-	enum ReefSubPose {
+	public enum ReefSubPose {
 		A,
 		B
 	}
 
-	enum CoralStationPose {
+	public enum CoralStationPose {
 		LEFT,
 		RIGHT
 	}
 
-	enum CoralStationSubPose {
+	public enum CoralStationSubPose {
 		ONE,
 		TWO,
 		THREE,
 		FOUR
 	}
+
+	public static CoralStationPose aprilTagIDToStationEnum(int aprilTag) {
+    assert(aprilTag == 1 || aprilTag == 2 || aprilTag == 12 || aprilTag == 13);
+    if (aprilTag == 13 || aprilTag == 1) {
+      return CoralStationPose.LEFT;
+    } else {
+      return CoralStationPose.RIGHT;
+    }
+  }
 
 	public FieldPoseUtil() {
 		m_alliance = getAlliance();

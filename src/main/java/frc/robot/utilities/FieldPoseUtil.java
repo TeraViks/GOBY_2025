@@ -45,7 +45,7 @@ public class FieldPoseUtil {
     }
   }
 
-  enum ReefPose {
+  public enum ReefPose {
     TWELVE,
     TWO,
     FOUR,
@@ -66,7 +66,7 @@ public class FieldPoseUtil {
     }
   }
 
-  enum ReefSubPose {
+  public enum ReefSubPose {
     A(-1),
     B(1);
 
@@ -81,7 +81,7 @@ public class FieldPoseUtil {
     }
   }
 
-  enum CoralStationPose {
+  public enum CoralStationPose {
     LEFT,
     RIGHT;
 
@@ -94,7 +94,7 @@ public class FieldPoseUtil {
     }
   }
 
-  enum CoralStationSubPose {
+  public enum CoralStationSubPose {
     ONE(-4),
     TWO(-3),
     THREE(-2),
@@ -116,10 +116,10 @@ public class FieldPoseUtil {
     }
   }
 
-  Alliance m_alliance;
-  AprilTags m_aprilTags;
-  Translation2d m_reefCenter;
-  ArrayList<Pose2d> m_coralStations;
+  private Alliance m_alliance;
+  private AprilTags m_aprilTags;
+  private Translation2d m_reefCenter;
+  private ArrayList<Pose2d> m_coralStations;
 
   public FieldPoseUtil() {
     m_alliance = getAlliance();

@@ -145,8 +145,8 @@ public class FieldPoseUtil {
     double distanceFromWall = AutoConstants.kBumperToRobotCenter + wallOffset;
     double aprilTagRotationRadians = aprilTagPose.getRotation().getRadians();
 
-    double yTranslation = distanceFromWall * Math.sin(aprilTagRotationRadians);
     double xTranslation = distanceFromWall * Math.cos(aprilTagRotationRadians);
+    double yTranslation = distanceFromWall * Math.sin(aprilTagRotationRadians);
 
     Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d(Math.PI));
 
@@ -156,8 +156,8 @@ public class FieldPoseUtil {
 
   private Pose2d offsetPoseParallel(Pose2d pose, double parallelOffset) {
     double poseRot = pose.getRotation().getRadians();
-    double yTranslation = parallelOffset * Math.sin(poseRot);
     double xTranslation = parallelOffset * Math.cos(poseRot);
+    double yTranslation = parallelOffset * Math.sin(poseRot);
 
     Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d());
 

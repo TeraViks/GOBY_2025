@@ -17,15 +17,14 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.CameraSubsystem.CameraConfig;
 import frc.robot.subsystems.SwerveModule;
+import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TrapezoidalConstraint;
@@ -384,46 +383,41 @@ public final class Constants {
 
     public static final double kMaxX = kAprilTagFieldLayout.getFieldLength();
 
-    private static Translation2d getAprilTagTranslation(AprilTagFieldLayout fieldLayout, int aprilTagID) {
+    private static AprilTag getAprilTag(AprilTagFieldLayout fieldLayout, int aprilTagID) {
       for (AprilTag aprilTag : fieldLayout.getTags()) {
         if (aprilTag.ID == aprilTagID) {
-          return new Translation2d(aprilTag.pose.getX(), aprilTag.pose.getY());
+          return aprilTag;
         }
       }
       assert(false);
-      return new Translation2d();
+      return new AprilTag(0, null);
     }
 
-    private static Pose2d getAprilTagPose(AprilTagFieldLayout fieldLayout, int aprilTagID) {
-      for (AprilTag aprilTag : fieldLayout.getTags()) {
-        if (aprilTag.ID == aprilTagID) {
-          return aprilTag.pose.toPose2d();
-        }
-      }
-      assert(false);
-      return new Pose2d();
-    }
-
-    // The two april tag ID's used have to be across from eachother with different x coordinates
-    private static Translation2d calculateReefCenter(int aprilTagID1, int aprilTagID2) {
-      Translation2d aprilTag1 = getAprilTagTranslation(kAprilTagFieldLayout, aprilTagID1);
-      Translation2d aprilTag2 = getAprilTagTranslation(kAprilTagFieldLayout, aprilTagID2);
-      Translation2d centerOfReef = new Translation2d(
-        (aprilTag1.getX() + aprilTag2.getX()) / 2.0, (aprilTag1.getY() + aprilTag2.getY()) / 2.0);
-      return centerOfReef;
-    }
-
-    public static final Translation2d kBlueReef = calculateReefCenter(18, 21);
-    public static final Translation2d kRedReef = calculateReefCenter(10, 7);
-
-    public static final ArrayList<Pose2d> kBlueCoralStations = new ArrayList<>() {{
-      add(getAprilTagPose(kAprilTagFieldLayout, 13));
-      add(getAprilTagPose(kAprilTagFieldLayout, 12));
-    }};
-
-    public static final ArrayList<Pose2d> kRedCoralStations = new ArrayList<>() {{
-      add(getAprilTagPose(kAprilTagFieldLayout, 1));
-      add(getAprilTagPose(kAprilTagFieldLayout, 2));
-    }};
+    public static final FieldPoseUtil.AprilTags kBlueAprilTags = new FieldPoseUtil.AprilTags(
+      getAprilTag(kAprilTagFieldLayout, 21), // reefTwelve
+      getAprilTag(kAprilTagFieldLayout, 22), // reefTwo
+      getAprilTag(kAprilTagFieldLayout, 17), // reefFour
+      getAprilTag(kAprilTagFieldLayout, 18), // reefSix
+      getAprilTag(kAprilTagFieldLayout, 19), // reefEight
+      getAprilTag(kAprilTagFieldLayout, 20), // reefTen
+      getAprilTag(kAprilTagFieldLayout, 13), // coralStationLeft
+      getAprilTag(kAprilTagFieldLayout, 12), // coralStationRight
+      getAprilTag(kAprilTagFieldLayout, 16), // processor
+      getAprilTag(kAprilTagFieldLayout, 14), // bargeLeft
+      getAprilTag(kAprilTagFieldLayout, 15)  // bargeRight
+    );
+    public static final FieldPoseUtil.AprilTags kRedAprilTags = new FieldPoseUtil.AprilTags(
+      getAprilTag(kAprilTagFieldLayout, 10), // reefTwelve
+      getAprilTag(kAprilTagFieldLayout, 9), // reefTwo
+      getAprilTag(kAprilTagFieldLayout, 8), // reefFour
+      getAprilTag(kAprilTagFieldLayout, 7), // reefSix
+      getAprilTag(kAprilTagFieldLayout, 6), // reefEight
+      getAprilTag(kAprilTagFieldLayout, 11), // reefTen
+      getAprilTag(kAprilTagFieldLayout, 1), // coralStationLeft
+      getAprilTag(kAprilTagFieldLayout, 2), // coralStationRight
+      getAprilTag(kAprilTagFieldLayout, 3), // processor
+      getAprilTag(kAprilTagFieldLayout, 5), // bargeLeft
+      getAprilTag(kAprilTagFieldLayout, 4)  // bargeRight
+    );
   }
 }

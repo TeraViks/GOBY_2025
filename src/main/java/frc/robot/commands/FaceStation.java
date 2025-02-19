@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveCommandConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utilities.FaceStationUtil;
+import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.TunablePIDF;
 
@@ -38,11 +39,13 @@ public class FaceStation extends Command {
     ),
     Constants.kDt);
 
-  public FaceStation(DriveSubsystem drive, Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier) {
+  public FaceStation(DriveSubsystem drive,
+      Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier,
+      FieldPoseUtil fieldPoseUtil) {
     m_drive = drive;
     m_xVelocitySupplier = xVelocitySupplier;
     m_yVelocitySupplier = yVelocitySupplier;
-    m_station = new FaceStationUtil();
+    m_station = new FaceStationUtil(fieldPoseUtil);
 
     addRequirements(m_drive);
   }

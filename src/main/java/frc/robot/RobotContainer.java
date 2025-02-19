@@ -27,6 +27,7 @@ import frc.robot.commands.FaceStation;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
+import frc.robot.utilities.FieldPoseUtil;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,7 +43,7 @@ public class RobotContainer {
   private final HandlerSubsystem m_handler = new HandlerSubsystem(HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
-
+  FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
   double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
 
   private static double joystickTransform(double value) {
@@ -119,14 +120,16 @@ public class RobotContainer {
       .whileTrue(new FaceReef(
         m_robotDrive,
         () -> getXSpeedInput(),
-        () -> getYSpeedInput()));
+        () -> getYSpeedInput(),
+        m_fieldPoseUtil));
     
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceStation(
         m_robotDrive, 
         () -> getXSpeedInput(),
-        () -> getYSpeedInput()));
+        () -> getYSpeedInput(),
+        m_fieldPoseUtil));
 
     new JoystickButton(m_driverController, OIConstants.kFaceProcessorButton)
       .debounce(OIConstants.kDebounceSeconds)

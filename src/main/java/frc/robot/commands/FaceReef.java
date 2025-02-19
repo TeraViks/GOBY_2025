@@ -16,6 +16,7 @@ import frc.robot.Constants.DriveCommandConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.utilities.FaceReefUtil;
+import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.TunablePIDF;
 
@@ -37,11 +38,13 @@ public class FaceReef extends Command {
       DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared),
     Constants.kDt);
 
-  public FaceReef(DriveSubsystem drive, Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier) {
+  public FaceReef(DriveSubsystem drive,
+    Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier,
+    FieldPoseUtil fieldPoseUtil) {
     m_drive = drive;
     m_xVelocitySupplier = xVelocitySupplier;
     m_yVelocitySupplier = yVelocitySupplier;
-    m_reef = new FaceReefUtil();
+    m_reef = new FaceReefUtil(fieldPoseUtil);
 
     addRequirements(m_drive);
   }

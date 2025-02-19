@@ -1,20 +1,49 @@
 package frc.robot.utilities;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 
 public class FieldPoseUtil {
-  AprilTagFieldLayout m_field;
-  Alliance m_alliance;
-  double m_distanceFromWall;
+  public record AprilTags(
+    AprilTag reefTwelve,
+    AprilTag reefTwo,
+    AprilTag reefFour,
+    AprilTag reefSix,
+    AprilTag reefEight,
+    AprilTag reefTen,
+    AprilTag coralStationLeft,
+    AprilTag coralStationRight,
+    AprilTag processor,
+    AprilTag bargeLeft,
+    AprilTag bargeRight
+  ) {
+    private Translation2d reefCenter() {
+      // The two AprilTags used have to be across from each other.
+      Translation2d trans1 = reefTwelve.pose.getTranslation().toTranslation2d();
+      Translation2d trans2 = reefSix.pose.getTranslation().toTranslation2d();
+      return new Translation2d(
+        (trans1.getX() + trans2.getX()) / 2.0,
+        (trans1.getY() + trans2.getY()) / 2.0
+      );
+    }
+
+    private ArrayList<Pose2d> coralStations() {
+      return new ArrayList<>() {{
+        add(coralStationLeft.pose.toPose2d());
+        add(coralStationRight.pose.toPose2d());
+      }};
+    }
+  }
 
   enum ReefPose {
     TWELVE,
@@ -42,12 +71,24 @@ public class FieldPoseUtil {
     FOUR
   }
 
+  Alliance m_alliance;
+  AprilTags m_aprilTags;
+  Translation2d m_reefCenter;
+  ArrayList<Pose2d> m_coralStations;
+
   public FieldPoseUtil() {
     m_alliance = getAlliance();
-
-    m_field = FieldConstants.kAprilTagFieldLayout;
+    switch (m_alliance) {
+      case Blue:
+        m_aprilTags = FieldConstants.kBlueAprilTags;
+        break;
+      case Red:
+        m_aprilTags = FieldConstants.kRedAprilTags;
+        break;
+    }
+    m_reefCenter = m_aprilTags.reefCenter();
+    m_coralStations = m_aprilTags.coralStations();
   }
-
 
   private static Alliance getAlliance() {
     Optional<Alliance> allianceOpt = DriverStation.getAlliance();
@@ -78,8 +119,8 @@ public class FieldPoseUtil {
     return pose.plus(transform);
   }
 
-  private Pose2d calculateTargetPoseAtStation(int aprilTagID, CoralStationSubPose subpose) {
-    Pose2d stationPose = m_field.getTagPose(aprilTagID).get().toPose2d();
+  private Pose2d calculateTargetPoseAtStation(AprilTag aprilTag, CoralStationSubPose subpose) {
+    Pose2d stationPose = aprilTag.pose.toPose2d();
     double parallelOffset;
     switch (subpose) {
       case ONE:
@@ -101,8 +142,8 @@ public class FieldPoseUtil {
     return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kWallOffset, parallelOffset);
   }
 
-  private Pose2d calculateTargetPoseAtReef(int aprilTagID, ReefSubPose subpose) {
-    Pose2d stationPose = m_field.getTagPose(aprilTagID).get().toPose2d();
+  private Pose2d calculateTargetPoseAtReef(AprilTag aprilTag, ReefSubPose subpose) {
+    Pose2d stationPose = aprilTag.pose.toPose2d();
     double parallelOffset;
     switch (subpose) {
       case A:
@@ -120,17 +161,9 @@ public class FieldPoseUtil {
   public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
     switch (station) {
       case LEFT:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtStation(13, slot);
-        } else {
-          return calculateTargetPoseAtStation(1, slot);
-        }
+        return calculateTargetPoseAtStation(m_aprilTags.coralStationLeft, slot);
       case RIGHT:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtStation(12, slot);
-        } else {
-          return calculateTargetPoseAtStation(2, slot);
-        }
+        return calculateTargetPoseAtStation(m_aprilTags.coralStationRight, slot);
       default:
         assert(false);
         return null;
@@ -138,56 +171,36 @@ public class FieldPoseUtil {
   }
 
   public Pose2d getTargetPoseAtProcessor() {
-    Pose2d aprilTagPose;
-    if (m_alliance == Alliance.Blue) {
-      aprilTagPose = m_field.getTagPose(16).get().toPose2d();
-    } else {
-      aprilTagPose = m_field.getTagPose(3).get().toPose2d();
-    }
-    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kWallOffset, AutoConstants.kProcessorParallelOffset);
+    Pose2d aprilTagPose = m_aprilTags.processor.pose.toPose2d();
+    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kWallOffset,
+      AutoConstants.kProcessorParallelOffset);
   }
 
   public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
     switch (reefTime) {
       case TWELVE:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(21, subpose);
-        } else {
-          return calculateTargetPoseAtReef(10, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefTwelve, subpose);
       case TWO:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(22, subpose);
-        } else {
-          return calculateTargetPoseAtReef(9, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefTwo, subpose);
       case FOUR:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(17, subpose);
-        } else {
-          return calculateTargetPoseAtReef(8, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefFour, subpose);
       case SIX:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(18, subpose);
-        } else {
-          return calculateTargetPoseAtReef(7, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefSix, subpose);
       case EIGHT:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(19, subpose);
-        } else {
-          return calculateTargetPoseAtReef(6, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefEight, subpose);
       case TEN:
-        if (m_alliance == Alliance.Blue) {
-          return calculateTargetPoseAtReef(20, subpose);
-        } else {
-          return calculateTargetPoseAtReef(11, subpose);
-        }
+        return calculateTargetPoseAtReef(m_aprilTags.reefTen, subpose);
       default:
         assert(false);
         return null;
     }
+  }
+
+  public Translation2d getReefCenter() {
+    return m_reefCenter;
+  }
+
+  public ArrayList<Pose2d> getCoralStations() {
+    return m_coralStations;
   }
 }

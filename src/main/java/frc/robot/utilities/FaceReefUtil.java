@@ -4,42 +4,15 @@
 
 package frc.robot.utilities;
 
-import java.util.Optional;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants.FieldConstants;
 
 public class FaceReefUtil {
   private final Translation2d m_reef;
 
-  public FaceReefUtil() {
-    m_reef = getReef(getAlliance());
-  }
-
-  private static Alliance getAlliance() {
-    Optional<Alliance> allianceOpt = DriverStation.getAlliance();
-    Alliance alliance = allianceOpt.isPresent() ? allianceOpt.get() : Alliance.Blue;
-    return alliance;
-  }
-
-  private static Translation2d getReef(Alliance alliance) {
-    Translation2d reef;
-    switch (alliance) {
-      default: assert false;
-      case Blue: {
-        reef = FieldConstants.kBlueReef;
-        break;
-      }
-      case Red: {
-        reef = FieldConstants.kRedReef;
-        break;
-      }
-    }
-    return reef;
+  public FaceReefUtil(FieldPoseUtil fieldPoseUtil) {
+    m_reef = fieldPoseUtil.getReefCenter();
   }
 
   private Translation2d getRobotToReef(Pose2d robotPose) {

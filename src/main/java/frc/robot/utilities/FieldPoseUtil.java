@@ -51,24 +51,69 @@ public class FieldPoseUtil {
     FOUR,
     SIX,
     EIGHT,
-    TEN
+    TEN;
+
+    private AprilTag mapToAprilTag(AprilTags aprilTags) {
+      switch (this) {
+        default: assert(false);
+        case TWELVE: return aprilTags.reefTwelve;
+        case TWO: return aprilTags.reefTwo;
+        case FOUR: return aprilTags.reefFour;
+        case SIX: return aprilTags.reefSix;
+        case EIGHT: return aprilTags.reefEight;
+        case TEN: return aprilTags.reefTen;
+      }
+    }
   }
 
   enum ReefSubPose {
-    A,
-    B
+    A(-1),
+    B(1);
+
+    int m_offsetDirection; // Negative is left.
+
+    ReefSubPose(int offsetDirection) {
+      m_offsetDirection = offsetDirection;
+    }
+
+    private int getOffsetDirection() {
+      return m_offsetDirection;
+    }
   }
 
   enum CoralStationPose {
     LEFT,
-    RIGHT
+    RIGHT;
+
+    private AprilTag mapToAprilTag(AprilTags aprilTags) {
+      switch(this) {
+        default: assert(false);
+        case LEFT: return aprilTags.coralStationLeft;
+        case RIGHT: return aprilTags.coralStationRight;
+      }
+    }
   }
 
   enum CoralStationSubPose {
-    ONE,
-    TWO,
-    THREE,
-    FOUR
+    ONE(-4),
+    TWO(-3),
+    THREE(-2),
+    FOUR(-1),
+    FIVE(0), // Center slot, aligned with station AprilTag.
+    SIX(1),
+    SEVEN(2),
+    EIGHT(3),
+    NINE(4);
+
+    int m_slotDelta;
+
+    CoralStationSubPose(int slotDelta) {
+      m_slotDelta = slotDelta;
+    }
+
+    private int getSlotDelta() {
+      return m_slotDelta;
+    }
   }
 
   Alliance m_alliance;
@@ -121,79 +166,31 @@ public class FieldPoseUtil {
 
   private Pose2d calculateTargetPoseAtStation(AprilTag aprilTag, CoralStationSubPose subpose) {
     Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset;
-    switch (subpose) {
-      case ONE:
-        parallelOffset = AutoConstants.kStationParallelOffset1;
-        break;
-      case TWO:
-        parallelOffset = AutoConstants.kStationParallelOffset2;
-        break;
-      case THREE:
-        parallelOffset = AutoConstants.kStationParallelOffset3;
-        break;
-      case FOUR:
-        parallelOffset = AutoConstants.kStationParallelOffset4;
-        break;
-      default:
-        parallelOffset = 0;
-        break;
-    }
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kWallOffset, parallelOffset);
+    double parallelOffset = AutoConstants.kStingerCenterOffset
+      + (double)subpose.getSlotDelta() * AutoConstants.kStationSlotSpacing;
+    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kStationWallOffset, parallelOffset);
   }
 
   private Pose2d calculateTargetPoseAtReef(AprilTag aprilTag, ReefSubPose subpose) {
     Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset;
-    switch (subpose) {
-      case A:
-        parallelOffset = AutoConstants.kReefParallelOffsetA;
-        break;
-      case B:
-        parallelOffset = AutoConstants.kReefParallelOffsetB;
-        break;
-      default:
-        parallelOffset = 0.0;
-    }
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kWallOffset, parallelOffset);
+    double parallelOffset = AutoConstants.kStingerCenterOffset
+      + (double)subpose.getOffsetDirection() * AutoConstants.kReefBranchOffset;
+    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kReefWallOffset, parallelOffset);
   }
 
   public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
-    switch (station) {
-      case LEFT:
-        return calculateTargetPoseAtStation(m_aprilTags.coralStationLeft, slot);
-      case RIGHT:
-        return calculateTargetPoseAtStation(m_aprilTags.coralStationRight, slot);
-      default:
-        assert(false);
-        return null;
-    }
+    AprilTag aprilTag = station.mapToAprilTag(m_aprilTags);
+    return calculateTargetPoseAtStation(aprilTag, slot);
   }
 
   public Pose2d getTargetPoseAtProcessor() {
     Pose2d aprilTagPose = m_aprilTags.processor.pose.toPose2d();
-    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kWallOffset,
-      AutoConstants.kProcessorParallelOffset);
+    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kProcessorWallOffset,
+    AutoConstants.kStingerCenterOffset);
   }
 
   public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
-    switch (reefTime) {
-      case TWELVE:
-        return calculateTargetPoseAtReef(m_aprilTags.reefTwelve, subpose);
-      case TWO:
-        return calculateTargetPoseAtReef(m_aprilTags.reefTwo, subpose);
-      case FOUR:
-        return calculateTargetPoseAtReef(m_aprilTags.reefFour, subpose);
-      case SIX:
-        return calculateTargetPoseAtReef(m_aprilTags.reefSix, subpose);
-      case EIGHT:
-        return calculateTargetPoseAtReef(m_aprilTags.reefEight, subpose);
-      case TEN:
-        return calculateTargetPoseAtReef(m_aprilTags.reefTen, subpose);
-      default:
-        assert(false);
-        return null;
-    }
+    return calculateTargetPoseAtReef(reefTime.mapToAprilTag(m_aprilTags), subpose);
   }
 
   public Translation2d getReefCenter() {

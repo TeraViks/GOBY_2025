@@ -304,17 +304,16 @@ public final class Constants {
 
     public static final double kDriveBaseRadius = 0.4;
     public static final double kBumperToRobotCenter = 0.381; //TODO: add bumper width
-    public static final double kWallOffset = 0.1524;
-    public static final double kStationParallelOffset1 = -0.75;
-    public static final double kStationParallelOffset2 = -0.25;
-    public static final double kStationParallelOffset3 = 0.25;
-    public static final double kStationParallelOffset4 = 0.75;
 
-    public static final double kReefParallelOffsetA = -0.25;
-    public static final double kReefParallelOffsetB = 0.25;
+    public static final double kStingerCenterOffset = 0.0; // TODO: Tune.
 
-    public static final double kProcessorParallelOffset = 0.0;
+    public static final double kStationWallOffset = 0.1524; // TODO: Tune.
+    public static final double kStationSlotSpacing = 0.202;
 
+    public static final double kReefWallOffset = 0.1524; // TODO: Tune.
+    public static final double kReefBranchOffset = 0.164;
+
+    public static final double kProcessorWallOffset = 0.1524; // TODO: Tune.
   }
 
   public static final class CameraConstants {

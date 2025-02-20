@@ -218,7 +218,7 @@ public final class Constants {
   }
 
   public static final class HandlerConstants {
-    public static final int kMotorID = 0;
+    public static final int kMotorID = 17;
     public static final double kIntakeSpeedCoral = 0.0; //TODO: all of these constants are placeholders
     public static final double kEjectSpeedCoral = 0.0;
     public static final double kIntakeSpeedAlgae = 0.0; //TODO: Make sure the speeds for the algae and coral are reversed
@@ -431,10 +431,10 @@ public final class Constants {
   }
 
   public static final class CraneConstants {
-    public static final int kLeftElevatorMotorID = 9; // TODO: Change the ID or give that ID to the motor
-    public static final int kRightElevatorMotorID = 10; // TODO: Change the ID or give that ID to the motor
-    public static final int kPivotMotorID = 11; // TODO: Change the ID or give that ID to the motor
-    public static final int kLaserCanID = 12; // TODO: Match to LaserCAN configuration.
+    public static final int kLeftElevatorMotorID = 13; // TODO: Change the ID or give that ID to the motor
+    public static final int kRightElevatorMotorID = 14; // TODO: Change the ID or give that ID to the motor
+    public static final int kPivotMotorID = 15; // TODO: Change the ID or give that ID to the motor
+    public static final int kLaserCanID = 16; // TODO: Match to LaserCAN configuration.
 
     public static final long kValueCacheTtlMicroseconds = 15;
 

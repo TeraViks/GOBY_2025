@@ -12,7 +12,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
-import au.grapplerobotics.LaserCan;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -434,7 +433,7 @@ public final class Constants {
     public static final int kLeftElevatorMotorID = 13; // TODO: Change the ID or give that ID to the motor
     public static final int kRightElevatorMotorID = 14; // TODO: Change the ID or give that ID to the motor
     public static final int kPivotMotorID = 15; // TODO: Change the ID or give that ID to the motor
-    public static final int kLaserCanID = 16; // TODO: Match to LaserCAN configuration.
+    public static final int kDistanceSensorInput = 4; // TODO: Configure.
 
     public static final long kValueCacheTtlMicroseconds = 15;
 
@@ -549,11 +548,8 @@ public final class Constants {
       add(kElevatorHiBoundary);
     }};
 
-    // The sensor grid is 16x16, and the ROI is centered on (x,y), w x h in size.
-    public static final LaserCan.RegionOfInterest kRegionOfInterest =
-      new LaserCan.RegionOfInterest(8, 8, 16, 16);
-    // Actual elevator height for a LaserCAN measurement of 0.
-    public static final double kLaserCanBaseMeasurement = 0.150; // TODO: Calibrate.
+    // Actual elevator height for a distance sensor measurement of 0.
+    public static final double kDistanceSensorBaseMeasurement = 0.150; // TODO: Calibrate.
 
     public static final Translation2d kPositionHome =
       new Translation2d(kPivotHome, kElevatorHome);

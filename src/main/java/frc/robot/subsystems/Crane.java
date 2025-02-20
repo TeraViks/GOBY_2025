@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Optional;
 
 import com.revrobotics.RelativeEncoder;
@@ -10,8 +8,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import au.grapplerobotics.ConfigurationFailedException;
-import au.grapplerobotics.LaserCan;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -40,7 +36,7 @@ public class Crane extends SubsystemBase {
   private final SparkClosedLoopController m_pivotPID;
   private final SparkClosedLoopController m_leftElevatorPID;
 
-  private final LaserCan m_laserCan;
+  private final Pololu4079 m_distanceSensor;
 
   private final ValueCache<Double> m_pivotPositionCache;
   private final ValueCache<Double> m_pivotVelocityCache;
@@ -106,14 +102,7 @@ public class Crane extends SubsystemBase {
     m_pivotPID = m_pivotMotor.getClosedLoopController();
     m_leftElevatorPID = m_leftElevatorMotor.getClosedLoopController();
 
-    m_laserCan = new LaserCan(CraneConstants.kLaserCanID);
-    try {
-      m_laserCan.setRangingMode(LaserCan.RangingMode.SHORT);
-      m_laserCan.setRegionOfInterest(CraneConstants.kRegionOfInterest);
-      m_laserCan.setTimingBudget(LaserCan.TimingBudget.TIMING_BUDGET_100MS);
-    } catch (ConfigurationFailedException e) {
-      throw new UncheckedIOException("Failed to configure LaserCAN: " + e, new IOException());
-    }
+    m_distanceSensor = new Pololu4079(CraneConstants.kDistanceSensorInput);
 
     m_pivotPositionCache =
       new ValueCache<Double>(() -> {
@@ -227,35 +216,6 @@ public class Crane extends SubsystemBase {
     } else {
       return Optional.empty();
     }
-  }
-
-  private void laserCanStatusError(int status) {
-    String statusString;
-    switch (status) {
-      case LaserCan.LASERCAN_STATUS_NOISE_ISSUE: {
-        statusString = "Noise issue";
-        break;
-      }
-      case LaserCan.LASERCAN_STATUS_WEAK_SIGNAL: {
-        statusString = "Weak signal";
-        break;
-      }
-      case LaserCan.LASERCAN_STATUS_OUT_OF_BOUNDS: {
-        statusString = "Out of bounds";
-        break;
-      }
-      case LaserCan.LASERCAN_STATUS_WRAPAROUND: {
-        statusString = "Wraparound";
-        break;
-      }
-      default: {
-        assert(false);
-        statusString = "Unreachable code reached";
-        break;
-      }
-    }
-    throw new UncheckedIOException("Failed to get LaserCAN measurement: " + statusString,
-      new IOException());
   }
 
   /* Dynamically scale the a,h controller constraints such that the combined a,h component
@@ -398,26 +358,12 @@ public class Crane extends SubsystemBase {
         break;
       }
       case ESTIMATE_H: {
-        LaserCan.Measurement m = m_laserCan.getMeasurement();
-        if (m == null) {
-          // No measurement is available yet.
-          break;
-        }
-        switch (m.status) {
-          case LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT: {
-            double h = CraneConstants.kLaserCanBaseMeasurement + (m.distance_mm / 1000.0);
-            initElevatorPosition(h);
-            if (h <= CraneConstants.kElevatorLoHiThreshold) {
-              toStateLoPivotHome();
-            } else {
-              toStateHiElevatorRapidA();
-            }
-            break;
-          }
-          default: {
-            laserCanStatusError(m.status);
-            break;
-          }
+        double h = CraneConstants.kDistanceSensorBaseMeasurement + m_distanceSensor.getDistance();
+        initElevatorPosition(h);
+        if (h <= CraneConstants.kElevatorLoHiThreshold) {
+          toStateLoPivotHome();
+        } else {
+          toStateHiElevatorRapidA();
         }
         break;
       }

@@ -4,6 +4,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,6 +33,7 @@ public class HandlerSubsystem extends SubsystemBase {
   private final Pololu4079 m_frontProxSensor;
   private final Pololu4079 m_distanceSensor;
   private final SendableChooser<State> m_chooser = new SendableChooser<>();
+  private double m_startTime = 0.0;
 
   public HandlerSubsystem(int motorID, SparkUtil.Config motorConfig) {
     m_chooser.setDefaultOption("Empty", State.EMPTY);
@@ -127,6 +129,10 @@ public class HandlerSubsystem extends SubsystemBase {
     }
   }
 
+  private static double getTimeSeconds() {
+    return (double)RobotController.getFPGATime() / 1_000_000.0;
+  }
+
   public void eject() {
     switch (m_state) {
       case EMPTY:
@@ -141,6 +147,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case LOADED_ALGAE: {
         m_motor.set(HandlerConstants.kEjectSpeedAlgae);
+        m_startTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
@@ -163,6 +170,15 @@ public class HandlerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SmartDashboard.putString("Handler State: ", m_state.name());
+    SmartDashboard.putNumber("Back Sensor", m_backProxSensor.getDistance());
+    SmartDashboard.putNumber("Front Sensor", m_frontProxSensor.getDistance());
+    SmartDashboard.putNumber("Distance Sensor", getDistanceSensorMeasurement());
+    SmartDashboard.putNumber("Algae Sensor", m_algaeProxSensor.getDistance());
+    SmartDashboard.putNumber("Speed", m_encoder.getVelocity()); //TODO: Need to check is speed is right for ff
+    SmartDashboard.putBoolean("Front Prox", m_backProxSensor.isProximate());
+    SmartDashboard.putBoolean("Back Prox", m_frontProxSensor.isProximate());
+    SmartDashboard.putBoolean("Algae Prox", m_algaeProxSensor.isProximate());
+    SmartDashboard.putBoolean("Distance Prox", m_distanceSensor.isProximate());
     switch (m_state) {
       case EMPTY: {
         break;
@@ -201,7 +217,8 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case EJECTING_ALGAE: {
-        if (!m_algaeProxSensor.isProximate()) {
+        double currentTime = getTimeSeconds();
+        if (currentTime - m_startTime >= HandlerConstants.kTimeDelay) {
           m_motor.stopMotor();
           m_state = State.EMPTY;
         }

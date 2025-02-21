@@ -218,35 +218,37 @@ public final class Constants {
 
   public static final class HandlerConstants {
     public static final int kMotorID = 17;
-    public static final double kIntakeSpeedCoral = 0.0; //TODO: all of these constants are placeholders
-    public static final double kEjectSpeedCoral = 0.0;
-    public static final double kIntakeSpeedAlgae = 0.0; //TODO: Make sure the speeds for the algae and coral are reversed
-    public static final double kEjectSpeedAlgae = 0.0;
+    public static final double kIntakeSpeedCoral = 0.25; //TODO: all of these constants are placeholders
+    public static final double kEjectSpeedCoral = -0.25;
+    public static final double kIntakeSpeedAlgae = -0.4; //TODO: Make sure the speeds for the algae and coral are reversed
+    public static final double kEjectSpeedAlgae = 0.1;
     public static final double kTestSpeed = 0.0;
+
+    public static final double kTimeDelay = 0.25;
     
     //TODO: theese constants are placeholders
     public static final int kAlgaeSensorInput = 0;
-    public static final int kBackSensorInput = 1;
+    public static final int kBackSensorInput = 3;
     public static final int kFrontSensorInput = 2;
-    public static final int kDistanceSensorInput = 3;
+    public static final int kDistanceSensorInput = 1;
 
     public static final double kDebounceTime = 0.0;
-    public static final double kAlgaeSensorProxThreshold = 0.03;
-    public static final double kBackSensorProxThreshold = 0.1;
-    public static final double kFrontSensorProxThreshold = 0.1;
-    public static final double kDistanceSensorProxThreshold = 0.1;
+    public static final double kAlgaeSensorProxThreshold = 0.02;
+    public static final double kBackSensorProxThreshold = 0.02;
+    public static final double kFrontSensorProxThreshold = 0.03;
+    public static final double kDistanceSensorProxThreshold = 0.08;
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
-      20, // TODO: Configure.
-      0.1, // TODO: Configure.
-      false, // TODO: Configure.
+      20, // TODO: Configure
+      0.1, 
+      true, // TODO: Configure.
+      1.083e-4, 
+      0.0065, // 4 in. wheel and 2.5^3 gear reduction
       1.0, // TODO: Configure.
-      1.0, // TOOO: Configure.
-      1.0, // TODO: Configure.
-      1.0, // TODO: Configure.
+      2.0, // TODO: Configure.
       new ArrayList<>() {{
         add(new SparkUtil.PIDFSlot(
-          new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Configure.
+          new PIDF(16.0, 0.0, 0.0, 0.0), // TODO: Configure.
           ClosedLoopSlot.kSlot0
         ));
       }}

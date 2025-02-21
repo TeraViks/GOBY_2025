@@ -1,6 +1,7 @@
 package frc.robot.utilities;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
@@ -210,6 +211,28 @@ public class FieldPoseUtil {
     return m_coralStations;
   }
 
+  public ReefPose closestReefTime(Pose2d robotPose) {
+    Map<AprilTag, ReefPose> reefTimeList = Map.of(
+      m_aprilTags.reefTwo, ReefPose.TWO,
+      m_aprilTags.reefFour, ReefPose.FOUR,
+      m_aprilTags.reefSix, ReefPose.SIX,
+      m_aprilTags.reefEight, ReefPose.EIGHT,
+      m_aprilTags.reefTen, ReefPose.TEN,
+      m_aprilTags.reefTwelve, ReefPose.TWELVE
+    );
+
+    Translation2d robotPos = robotPose.getTranslation();
+    AprilTag nearestReefTime = null;
+
+    for (AprilTag reefTime : reefTimeList.keySet()) {
+      if (nearestReefTime == null || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos) < nearestReefTime.pose.toPose2d().getTranslation().getDistance(robotPos)) {
+        nearestReefTime = reefTime;
+      }
+    }
+    
+    return reefTimeList.get(nearestReefTime);
+  }  
+    
   public CoralStationPose closestStation(Pose2d robotPose) {
     ArrayList<AprilTag> coralStations = new ArrayList<>(List.of(m_aprilTags.coralStationLeft, m_aprilTags.coralStationRight));
     Translation2d robotPos = robotPose.getTranslation();
@@ -222,5 +245,5 @@ public class FieldPoseUtil {
     }
     
     return CoralStationPose.ofAprilTag(nearestStation, m_aprilTags);
-  }
+  } 
 }

@@ -19,9 +19,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraConstants;
+import frc.robot.Constants.CraneConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.HandlerConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.CoralPlacement;
 import frc.robot.commands.FaceReef;
 import frc.robot.commands.FaceStation;
 import frc.robot.commands.GetCoral;
@@ -30,6 +32,7 @@ import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
+import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 import frc.robot.utilities.FieldPoseUtil.CoralStationSubPose;
 
 /*
@@ -153,29 +156,21 @@ public class RobotContainer {
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
 
-    new JoystickButton(m_operatorController, OIConstants.kASideButton)
-      .debounce(OIConstants.kDebounceSeconds)
-      .whileTrue(Commands.runOnce(() -> {
-        if (m_operatorController.getRawButton(OIConstants.kLevel2Button)) {
-          //m_crane.moveTo(FieldConstants.KLevel2)
-          //Robot also needs to move to right position
-        } else if (m_operatorController.getRawButton(OIConstants.kLevel3Button)) {
-          //m_crane.moveTo(FieldConstants.kLevel3)
-          //Robot also needs to move to right position
-        }
-      }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kASideButton) && m_operatorController.getRawButton(OIConstants.kLevel2Button))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
     
-      new JoystickButton(m_operatorController, OIConstants.kBSideButton)
-      .debounce(OIConstants.kDebounceSeconds)
-      .whileTrue(Commands.runOnce(() -> {
-        if (m_operatorController.getRawButton(OIConstants.kLevel2Button)) {
-          //m_crane.moveTo(FieldConstants.KLevel2)
-          //Robot also needs to move to right position
-        } else if (m_operatorController.getRawButton(OIConstants.kLevel3Button)) {
-          //m_crane.moveTo(FieldConstants.kLevel3)
-          //Robot also needs to move to right position
-        }
-      }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kASideButton) && m_operatorController.getRawButton(OIConstants.kLevel3Button))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL3));
+      
+      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kBSideButton) && m_operatorController.getRawButton(OIConstants.kLevel2Button))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL2));
+
+      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kBSideButton) && m_operatorController.getRawButton(OIConstants.kLevel3Button))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL3));
 
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)

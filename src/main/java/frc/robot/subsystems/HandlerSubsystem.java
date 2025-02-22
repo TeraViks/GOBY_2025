@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,6 +29,7 @@ public class HandlerSubsystem extends SubsystemBase {
 
   private State m_state = State.EMPTY;
   private final SparkMax m_motor;
+  private final SparkClosedLoopController m_motorController;
   private final RelativeEncoder m_encoder;
   private final Pololu4079 m_algaeProxSensor;
   private final Pololu4079 m_backProxSensor;
@@ -41,6 +44,7 @@ public class HandlerSubsystem extends SubsystemBase {
     SmartDashboard.putData(m_chooser);
 
     m_motor = new SparkMax(motorID, MotorType.kBrushless);
+    m_motorController = m_motor.getClosedLoopController();
     SparkUtil.configureMotor(m_motor, motorConfig);
     m_encoder = m_motor.getEncoder();
 
@@ -66,7 +70,7 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_CORAL: {
-        m_motor.set(HandlerConstants.kIntakeSpeedCoral);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
         m_state = State.INTAKING_CORAL;
         break;
       }
@@ -87,7 +91,7 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_ALGAE: {
-        m_motor.set(HandlerConstants.kIntakeSpeedAlgae);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl);
         m_state = State.INTAKING_ALGAE;
         break;
       }
@@ -146,13 +150,13 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case LOADED_ALGAE: {
-        m_motor.set(HandlerConstants.kEjectSpeedAlgae);
+        m_motorController.setReference(HandlerConstants.kEjectSpeedAlgae, ControlType.kMAXMotionVelocityControl);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
       case LOADED_CORAL: {
-        m_motor.set(HandlerConstants.kEjectSpeedCoral);
+        m_motorController.setReference(HandlerConstants.kEjectSpeedCoral, ControlType.kMAXMotionVelocityControl);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_CORAL;
         break;
@@ -185,14 +189,14 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case INTAKING_CORAL: {
-        m_motor.set(HandlerConstants.kIntakeSpeedCoral);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
         if (m_frontProxSensor.isProximate()) {
           m_state = State.LOADING_CORAL;
         }
         break;
       }
       case INTAKING_ALGAE: {
-        m_motor.set(HandlerConstants.kIntakeSpeedAlgae);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl);
         if (m_algaeProxSensor.isProximate()) {
           m_state = State.LOADED_ALGAE;
         }
@@ -228,7 +232,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case CANCELLING_CORAL: {
         if (m_frontProxSensor.isProximate()) {
-          m_motor.set(HandlerConstants.kIntakeSpeedCoral);
+          m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
           m_state = State.LOADING_CORAL;
         } else {
           m_state = State.EMPTY;

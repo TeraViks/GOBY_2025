@@ -16,7 +16,7 @@ public class CoralPlacement extends SequentialCommandGroup {
   private final Crane m_crane;
   private FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
 
-  public CoralPlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, ReefSubPose subPose, Translation2d level) {
+  public CoralPlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, ReefSubPose subPose, Translation2d cranePosition) {
     m_drive = drive;
     m_handler = handler;
     m_crane = crane;
@@ -27,7 +27,7 @@ public class CoralPlacement extends SequentialCommandGroup {
     addCommands(
       driveToPose,
       //TODO: strafe and align
-      Commands.runOnce(() -> m_crane.moveTo(level)),
+      Commands.runOnce(() -> m_crane.moveTo(cranePosition)),
       Commands.waitUntil(() -> m_crane.atSetpoint().isPresent()),
       Commands.runOnce(() -> m_handler.eject()),
       Commands.waitUntil(() -> !m_handler.isLoadedCoral())

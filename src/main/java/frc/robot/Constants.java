@@ -228,16 +228,15 @@ public final class Constants {
     public static final int kHoldingCurrentLimit = 15;
     public static final int kNormalCurrentLimit = 40;
     
-    //TODO: theese constants are placeholders
     public static final int kAlgaeSensorInput = 0;
     public static final int kBackSensorInput = 3;
     public static final int kFrontSensorInput = 2;
     public static final int kDistanceSensorInput = 1;
 
-    public static final double kDebounceTime = 0.0;
-    public static final double kAlgaeSensorProxThreshold = 0.02;
-    public static final double kBackSensorProxThreshold = 0.02;
-    public static final double kFrontSensorProxThreshold = 0.03;
+    public static final double kDebounceTime = kDt;
+    public static final double kAlgaeSensorProxThreshold = 0.06;
+    public static final double kBackSensorProxThreshold = 0.01;
+    public static final double kFrontSensorProxThreshold = 0.01;
     public static final double kDistanceSensorProxThreshold = 0.08;
 
     public static final ClosedLoopSlot kPIDFSlotVelocity = ClosedLoopSlot.kSlot0;
@@ -251,8 +250,8 @@ public final class Constants {
       true,
       1.083e-4, 
       0.0065, // 4 in. wheel and 2.5^3 gear reduction
-      1.0, // TODO: Configure.
-      2.0, // TODO: Configure.
+      1.0, 
+      6.0, 
       new ArrayList<>() {{
         add(new SparkUtil.PIDFSlot(
           kMotorPIDFVel,

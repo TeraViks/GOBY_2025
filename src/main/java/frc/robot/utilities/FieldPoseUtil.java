@@ -211,8 +211,8 @@ public class FieldPoseUtil {
     return m_coralStations;
   }
 
-  public ReefPose closestReefTime(Pose2d robotPose) {
-    Map<AprilTag, ReefPose> reefTimeList = Map.of(
+  public ReefPose closestReefHour(Pose2d robotPose) {
+    Map<AprilTag, ReefPose> reefHourList = Map.of(
       m_aprilTags.reefTwo, ReefPose.TWO,
       m_aprilTags.reefFour, ReefPose.FOUR,
       m_aprilTags.reefSix, ReefPose.SIX,
@@ -222,11 +222,11 @@ public class FieldPoseUtil {
     );
 
     Translation2d robotPos = robotPose.getTranslation();
-    AprilTag nearestReefTime = null;
+    AprilTag nearestReefHour = null;
 
-    for (AprilTag reefTime : reefTimeList.keySet()) {
-      if (nearestReefTime == null || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos) < nearestReefTime.pose.toPose2d().getTranslation().getDistance(robotPos)) {
-        nearestReefTime = reefTime;
+    for (AprilTag reefTime : reefHourList.keySet()) {
+      if (nearestReefHour == null || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos) < nearestReefHour.pose.toPose2d().getTranslation().getDistance(robotPos)) {
+        nearestReefHour = reefTime;
       }
     }
     

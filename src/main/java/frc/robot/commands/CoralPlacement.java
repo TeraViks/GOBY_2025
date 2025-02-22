@@ -22,7 +22,7 @@ public class CoralPlacement extends SequentialCommandGroup {
     m_crane = crane;
     addRequirements(m_drive, m_handler, m_crane);
 
-    Command driveToPose = new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefTime(m_drive.getPose()), subPose), drive);
+    Command driveToPose = new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), subPose), drive);
 
     addCommands(
       driveToPose,

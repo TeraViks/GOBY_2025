@@ -206,8 +206,11 @@ public class RobotContainer {
       
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kIntakeALgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() -> {
+        .whileTrue(Commands.runOnce(() -> {
           m_handler.intakeAlgae();
+        }, m_handler))
+        .onFalse(Commands.runOnce(() -> {
+          m_handler.cancelIntake();
         }, m_handler));
       
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)

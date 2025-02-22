@@ -31,6 +31,14 @@ public class SparkUtil {
         this.maxVelocity, this.maxAcceleration,
         this.pidfSlots);
     }
+
+    public Config withPIDFSlots(ArrayList<PIDFSlot> pidfSlots) {
+      return new Config(
+        this.currentLimit, this.rampRate, this.invert,
+        this.velocityConversionFactor, this.positionConversionFactor,
+        this.maxVelocity, this.maxAcceleration,
+        pidfSlots);
+    }
   }
 
   private static void configureMotorImpl(SparkMax motor, Config config, SparkMax leader) {

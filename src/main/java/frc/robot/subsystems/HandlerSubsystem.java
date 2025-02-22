@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -11,7 +13,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.HandlerConstants;
+import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
+import frc.robot.utilities.TunablePIDF;
 
 public class HandlerSubsystem extends SubsystemBase {
   private enum State {
@@ -26,6 +31,9 @@ public class HandlerSubsystem extends SubsystemBase {
     CANCELLING_CORAL,
     CANCELLING_ALGAE
   }
+
+  private static final TunablePIDF motorPIDF = new TunablePIDF("Handler.motorPIDF",
+    HandlerConstants.kMotorPIDF);
 
   private State m_state = State.EMPTY;
   private final SparkMax m_motor;
@@ -172,8 +180,20 @@ public class HandlerSubsystem extends SubsystemBase {
     return m_state == State.LOADED_ALGAE;
   }
 
+  private void updateConstants() {
+    if (motorPIDF.hasChanged()) {
+      PIDF pidf = motorPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, HandlerConstants.kPIDFSlot));
+      }};
+      SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_motor, motorConfig);
+    }
+  }
+
   @Override
   public void periodic() {
+    updateConstants();
     SmartDashboard.putString("Handler State: ", m_state.name());
     SmartDashboard.putNumber("Back Sensor", m_backProxSensor.getDistance());
     SmartDashboard.putNumber("Front Sensor", m_frontProxSensor.getDistance());

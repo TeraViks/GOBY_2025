@@ -241,8 +241,8 @@ public final class Constants {
 
     public static final ClosedLoopSlot kPIDFSlotVelocity = ClosedLoopSlot.kSlot0;
     public static final ClosedLoopSlot kPIDFSlotPosition = ClosedLoopSlot.kSlot1;
-    public static final PIDF kMotorPIDFVel = new PIDF(2.5, 0.0, 50.0, 1.55);
-    public static final PIDF kMotorPIDFPos = new PIDF(2.5, 0.0, 50.0, 1.55);
+    public static final PIDF kMotorPIDFVelocity = new PIDF(2.5, 0.0, 50.0, 1.55);
+    public static final PIDF kMotorPIDFPosition = new PIDF(2.5, 0.0, 50.0, 1.55);
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
       kNormalCurrentLimit,
@@ -254,11 +254,11 @@ public final class Constants {
       6.0, 
       new ArrayList<>() {{
         add(new SparkUtil.PIDFSlot(
-          kMotorPIDFVel,
+          kMotorPIDFVelocity,
           kPIDFSlotVelocity
         ));
         add(new SparkUtil.PIDFSlot(
-        kMotorPIDFPos,
+        kMotorPIDFPosition,
         kPIDFSlotPosition
         ));
       }}

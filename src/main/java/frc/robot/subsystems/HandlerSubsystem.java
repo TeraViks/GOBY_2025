@@ -33,7 +33,7 @@ public class HandlerSubsystem extends SubsystemBase {
   }
 
   private static final TunablePIDF motorPIDF = new TunablePIDF("Handler.motorPIDF",
-    HandlerConstants.kMotorPIDFVel);
+    HandlerConstants.kMotorPIDFVelocity);
 
   private State m_state = State.EMPTY;
   private final SparkMax m_motor;

@@ -218,10 +218,10 @@ public final class Constants {
 
   public static final class HandlerConstants {
     public static final int kMotorID = 17;
-    public static final double kIntakeSpeedCoral = 0.25; //TODO: all of these constants are placeholders
-    public static final double kEjectSpeedCoral = -0.25;
-    public static final double kIntakeSpeedAlgae = -0.4; //TODO: Make sure the speeds for the algae and coral are reversed
-    public static final double kEjectSpeedAlgae = 0.1;
+    public static final double kIntakeSpeedCoral = 0.25; 
+    public static final double kEjectSpeedCoral = -0.4;
+    public static final double kIntakeSpeedAlgae = -0.4;
+    public static final double kEjectSpeedAlgae = 0.2;
     public static final double kTestSpeed = 0.0;
 
     public static final double kEjectDelaySeconds = 0.25;

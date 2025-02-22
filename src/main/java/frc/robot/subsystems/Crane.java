@@ -11,9 +11,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.CraneConstants;
+import frc.robot.utilities.PIDF;
 import frc.robot.utilities.Segment;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TunablePIDF;
@@ -350,8 +352,21 @@ public class Crane extends SubsystemBase {
     m_state = State.ELEVATOR_HOME;
   }
 
+  private void updateConstants() {
+    if (pivotPIDF.hasChanged()) {
+      PIDF pidf = pivotPIDF.get();
+      m_aController.setPID(pidf.p(), pidf.i(), pidf.d());
+    }
+    if (elevatorPIDF.hasChanged()) {
+      PIDF pidf = elevatorPIDF.get();
+      m_hController.setPID(pidf.p(), pidf.i(), pidf.d());
+    }
+  }
+
   @Override
   public void periodic() {
+    updateConstants();
+    SmartDashboard.putString("Crane State", m_state.toString());
     switch (m_state) {
       case CRANING: {
         crane();

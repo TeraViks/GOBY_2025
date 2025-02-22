@@ -57,13 +57,21 @@ public class HandlerSubsystem extends SubsystemBase {
     m_encoder = m_motor.getEncoder();
 
     m_algaeProxSensor = new Pololu4079(
-      HandlerConstants.kAlgaeSensorInput, HandlerConstants.kAlgaeSensorProxThreshold, HandlerConstants.kDebounceTime);
+      HandlerConstants.kAlgaeSensorInput, 
+      HandlerConstants.kAlgaeSensorProxThreshold, 
+      HandlerConstants.kDebounceTime);
     m_backProxSensor = new Pololu4079(
-      HandlerConstants.kBackSensorInput, HandlerConstants.kBackSensorProxThreshold, HandlerConstants.kDebounceTime);
+      HandlerConstants.kBackSensorInput, 
+      HandlerConstants.kBackSensorProxThreshold, 
+      HandlerConstants.kDebounceTime);
     m_frontProxSensor = new Pololu4079(
-      HandlerConstants.kFrontSensorInput, HandlerConstants.kFrontSensorProxThreshold, HandlerConstants.kDebounceTime);
+      HandlerConstants.kFrontSensorInput, 
+      HandlerConstants.kFrontSensorProxThreshold, 
+      HandlerConstants.kDebounceTime);
     m_distanceSensor = new Pololu4079(
-      HandlerConstants.kDistanceSensorInput, HandlerConstants.kDistanceSensorProxThreshold, HandlerConstants.kDebounceTime);
+      HandlerConstants.kDistanceSensorInput, 
+      HandlerConstants.kDistanceSensorProxThreshold, 
+      HandlerConstants.kDebounceTime);
   }
 
   public void initializePreloaded() {
@@ -78,7 +86,10 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_CORAL: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kIntakeSpeedCoral, 
+          ControlType.kMAXMotionVelocityControl, 
+          HandlerConstants.kPIDFSlotVelocity);
         m_state = State.INTAKING_CORAL;
         break;
       }
@@ -99,7 +110,10 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_ALGAE: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kIntakeSpeedAlgae, 
+          ControlType.kMAXMotionVelocityControl, 
+          HandlerConstants.kPIDFSlotVelocity);
         m_state = State.INTAKING_ALGAE;
         break;
       }
@@ -158,15 +172,22 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case LOADED_ALGAE: {
-        SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kNormalCurrentLimit);
+        SparkUtil.Config motorConfig = 
+          HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kNormalCurrentLimit);
         SparkUtil.configureMotor(m_motor, motorConfig);
-        m_motorController.setReference(HandlerConstants.kEjectSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kEjectSpeedAlgae,
+          ControlType.kMAXMotionVelocityControl,
+          HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
       case LOADED_CORAL: {
-        m_motorController.setReference(HandlerConstants.kEjectSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kEjectSpeedCoral,
+          ControlType.kMAXMotionVelocityControl,
+          HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_CORAL;
         break;
@@ -202,18 +223,28 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case INTAKING_CORAL: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kIntakeSpeedCoral,
+          ControlType.kMAXMotionVelocityControl,
+          HandlerConstants.kPIDFSlotVelocity);
         if (m_frontProxSensor.isProximate()) {
           m_state = State.LOADING_CORAL;
         }
         break;
       }
       case INTAKING_ALGAE: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+        m_motorController.setReference(
+          HandlerConstants.kIntakeSpeedAlgae, 
+          ControlType.kMAXMotionVelocityControl,
+          HandlerConstants.kPIDFSlotVelocity);
         if (m_algaeProxSensor.isProximate()) {
           
-          m_motorController.setReference(m_encoder.getPosition(), ControlType.kMAXMotionPositionControl, HandlerConstants.kPIDFSlotPosition);
-          SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kHoldingCurrentLimit);
+          m_motorController.setReference(
+            m_encoder.getPosition(),
+            ControlType.kMAXMotionPositionControl,
+            HandlerConstants.kPIDFSlotPosition);
+          SparkUtil.Config motorConfig = 
+            HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kHoldingCurrentLimit);
           SparkUtil.configureMotor(m_motor, motorConfig);
           m_state = State.LOADED_ALGAE;
         }
@@ -249,7 +280,10 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case CANCELLING_CORAL: {
         if (m_frontProxSensor.isProximate()) {
-          m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
+          m_motorController.setReference(
+            HandlerConstants.kIntakeSpeedCoral,
+            ControlType.kMAXMotionVelocityControl,
+            HandlerConstants.kPIDFSlotVelocity);
           m_state = State.LOADING_CORAL;
         } else {
           m_state = State.EMPTY;

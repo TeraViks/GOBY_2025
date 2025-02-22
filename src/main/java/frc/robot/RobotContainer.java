@@ -46,7 +46,8 @@ public class RobotContainer {
   private final CameraSubsystem m_cameraSystem =
     CameraConstants.kEnable ? new CameraSubsystem(CameraConstants.kCameraConfigs) : null;
   public final DriveSubsystem m_robotDrive = new DriveSubsystem(m_cameraSystem);
-  private final HandlerSubsystem m_handler = new HandlerSubsystem(HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
+  private final HandlerSubsystem m_handler = new HandlerSubsystem(
+    HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
@@ -156,21 +157,33 @@ public class RobotContainer {
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
 
-      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kASideButton) && m_operatorController.getRawButton(OIConstants.kLevel2Button))
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kASideButton) && 
+          m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+        .onTrue(new CoralPlacement(
+          m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
     
-      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kASideButton) && m_operatorController.getRawButton(OIConstants.kLevel3Button))
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kASideButton) && 
+          m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL3));
+        .onTrue(new CoralPlacement(
+          m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL3));
       
-      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kBSideButton) && m_operatorController.getRawButton(OIConstants.kLevel2Button))
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kBSideButton) && 
+          m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL2));
+        .onTrue(new CoralPlacement(
+          m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL2));
 
-      new Trigger(() -> m_operatorController.getRawButton(OIConstants.kBSideButton) && m_operatorController.getRawButton(OIConstants.kLevel3Button))
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kBSideButton) && 
+          m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL3));
+        .onTrue(new CoralPlacement(
+          m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL3));
 
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)
@@ -223,13 +236,17 @@ public class RobotContainer {
           m_handler.eject();
         }, m_handler));
       
-      new Trigger(() -> m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >= OIConstants.kTriggerAcuationValue)
+      new Trigger(() -> 
+          m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >= 
+          OIConstants.kTriggerAcuationValue)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           //m_climber.extendClimber()
         })); //TODO: Requirements needs to include m_climber
       
-      new Trigger(() -> m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >= OIConstants.kTriggerAcuationValue)
+      new Trigger(() -> 
+          m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >= 
+          OIConstants.kTriggerAcuationValue)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           //m_climber.retractClimber()

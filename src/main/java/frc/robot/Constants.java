@@ -224,7 +224,7 @@ public final class Constants {
     public static final double kEjectSpeedAlgae = 0.1;
     public static final double kTestSpeed = 0.0;
 
-    public static final double kTimeDelay = 0.25;
+    public static final double kEjectDelaySeconds = 0.25;
     
     //TODO: theese constants are placeholders
     public static final int kAlgaeSensorInput = 0;

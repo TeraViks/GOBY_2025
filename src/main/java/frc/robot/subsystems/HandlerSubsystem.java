@@ -33,7 +33,7 @@ public class HandlerSubsystem extends SubsystemBase {
   private final Pololu4079 m_frontProxSensor;
   private final Pololu4079 m_distanceSensor;
   private final SendableChooser<State> m_chooser = new SendableChooser<>();
-  private double m_startTime = 0.0;
+  private double m_ejectDelayStartTime = 0.0;
 
   public HandlerSubsystem(int motorID, SparkUtil.Config motorConfig) {
     m_chooser.setDefaultOption("Empty", State.EMPTY);
@@ -153,6 +153,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case LOADED_CORAL: {
         m_motor.set(HandlerConstants.kEjectSpeedCoral);
+        m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_CORAL;
         break;
       }
@@ -218,7 +219,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case EJECTING_ALGAE: {
         double currentTime = getTimeSeconds();
-        if (currentTime - m_startTime >= HandlerConstants.kTimeDelay) {
+        if (currentTime - m_ejectDelayStartTime >= HandlerConstants.kEjectDelaySeconds) {
           m_motor.stopMotor();
           m_state = State.EMPTY;
         }

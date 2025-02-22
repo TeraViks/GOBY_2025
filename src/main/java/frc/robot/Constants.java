@@ -224,7 +224,7 @@ public final class Constants {
     public static final double kEjectSpeedAlgae = 0.2;
     public static final double kTestSpeed = 0.0;
 
-    public static final double kEjectDelaySeconds = 0.25;
+    public static final double kEjectDelaySeconds = 0.5;
     public static final int kHoldingCurrentLimit = 15;
     public static final int kNormalCurrentLimit = 40;
     

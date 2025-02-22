@@ -583,4 +583,8 @@ public final class Constants {
     public static final double kIntakeAngle = 55;
     public static final double kIntakeHeight = 0.95; //TODO: calculate elevator height taking into account angle and stinger length
   }
+
+  public static final class LightConstants {
+    public static final int kBlinkinPWMInput = 0;  //TODO: Check if this is the correct port
+  }
 }

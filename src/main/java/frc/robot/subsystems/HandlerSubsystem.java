@@ -3,10 +3,10 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -36,7 +36,7 @@ public class HandlerSubsystem extends SubsystemBase {
     HandlerConstants.kMotorPIDFVelocity);
 
   private State m_state = State.EMPTY;
-  private final SparkMax m_motor;
+  private final SparkFlex m_motor;
   private final SparkClosedLoopController m_motorController;
   private final RelativeEncoder m_encoder;
   private final Pololu4079 m_algaeProxSensor;
@@ -51,7 +51,7 @@ public class HandlerSubsystem extends SubsystemBase {
     m_chooser.addOption("Preloaded", State.LOADED_CORAL);
     SmartDashboard.putData(m_chooser);
 
-    m_motor = new SparkMax(motorID, MotorType.kBrushless);
+    m_motor = new SparkFlex(motorID, MotorType.kBrushless);
     m_motorController = m_motor.getClosedLoopController();
     SparkUtil.configureMotor(m_motor, motorConfig);
     m_encoder = m_motor.getEncoder();

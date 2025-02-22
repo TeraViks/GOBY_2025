@@ -39,6 +39,14 @@ public class SparkUtil {
         this.maxVelocity, this.maxAcceleration,
         pidfSlots);
     }
+
+    public Config withCurrentLimit(int currentLimit) {
+      return new Config(
+        currentLimit, this.rampRate, this.invert,
+        this.velocityConversionFactor, this.positionConversionFactor,
+        this.maxVelocity, this.maxAcceleration,
+        this.pidfSlots);
+    }
   }
 
   private static void configureMotorImpl(SparkMax motor, Config config, SparkMax leader) {

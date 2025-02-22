@@ -158,6 +158,8 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case LOADED_ALGAE: {
+        SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kNormalCurrentLimit);
+        SparkUtil.configureMotor(m_motor, motorConfig);
         m_motorController.setReference(HandlerConstants.kEjectSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
@@ -220,6 +222,8 @@ public class HandlerSubsystem extends SubsystemBase {
         if (m_algaeProxSensor.isProximate()) {
           
           m_motorController.setReference(m_encoder.getPosition(), ControlType.kMAXMotionPositionControl, HandlerConstants.kPIDFSlotPosition);
+          SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withCurrentLimit(HandlerConstants.kHoldingCurrentLimit);
+          SparkUtil.configureMotor(m_motor, motorConfig);
           m_state = State.LOADED_ALGAE;
         }
       }

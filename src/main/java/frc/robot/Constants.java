@@ -225,6 +225,8 @@ public final class Constants {
     public static final double kTestSpeed = 0.0;
 
     public static final double kEjectDelaySeconds = 0.25;
+    public static final int kHoldingCurrentLimit = 15;
+    public static final int kNormalCurrentLimit = 40;
     
     //TODO: theese constants are placeholders
     public static final int kAlgaeSensorInput = 0;
@@ -244,9 +246,9 @@ public final class Constants {
     public static final PIDF kMotorPIDFPos = new PIDF(2.5, 0.0, 50.0, 1.55);
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
-      20, // TODO: Configure
-      0.1, 
-      true, // TODO: Configure.
+      kNormalCurrentLimit,
+      0.0, 
+      true,
       1.083e-4, 
       0.0065, // 4 in. wheel and 2.5^3 gear reduction
       1.0, // TODO: Configure.

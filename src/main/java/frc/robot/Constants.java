@@ -238,8 +238,10 @@ public final class Constants {
     public static final double kFrontSensorProxThreshold = 0.03;
     public static final double kDistanceSensorProxThreshold = 0.08;
 
-    public static final ClosedLoopSlot kPIDFSlot = ClosedLoopSlot.kSlot0;
-    public static final PIDF kMotorPIDF = new PIDF(1.0, 0.0, 0.0, 0.0);
+    public static final ClosedLoopSlot kPIDFSlotVelocity = ClosedLoopSlot.kSlot0;
+    public static final ClosedLoopSlot kPIDFSlotPosition = ClosedLoopSlot.kSlot1;
+    public static final PIDF kMotorPIDFVel = new PIDF(2.5, 0.0, 50.0, 1.55);
+    public static final PIDF kMotorPIDFPos = new PIDF(2.5, 0.0, 50.0, 1.55);
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
       20, // TODO: Configure
@@ -251,8 +253,12 @@ public final class Constants {
       2.0, // TODO: Configure.
       new ArrayList<>() {{
         add(new SparkUtil.PIDFSlot(
-          kMotorPIDF,
-          kPIDFSlot
+          kMotorPIDFVel,
+          kPIDFSlotVelocity
+        ));
+        add(new SparkUtil.PIDFSlot(
+        kMotorPIDFPos,
+        kPIDFSlotPosition
         ));
       }}
     );

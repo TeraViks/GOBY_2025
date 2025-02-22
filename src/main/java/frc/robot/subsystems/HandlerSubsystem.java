@@ -33,7 +33,7 @@ public class HandlerSubsystem extends SubsystemBase {
   }
 
   private static final TunablePIDF motorPIDF = new TunablePIDF("Handler.motorPIDF",
-    HandlerConstants.kMotorPIDF);
+    HandlerConstants.kMotorPIDFVel);
 
   private State m_state = State.EMPTY;
   private final SparkMax m_motor;
@@ -78,7 +78,7 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_CORAL: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         m_state = State.INTAKING_CORAL;
         break;
       }
@@ -99,7 +99,7 @@ public class HandlerSubsystem extends SubsystemBase {
     switch (m_state) {
       case EMPTY:
       case CANCELLING_ALGAE: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         m_state = State.INTAKING_ALGAE;
         break;
       }
@@ -158,13 +158,13 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case LOADED_ALGAE: {
-        m_motorController.setReference(HandlerConstants.kEjectSpeedAlgae, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kEjectSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
       case LOADED_CORAL: {
-        m_motorController.setReference(HandlerConstants.kEjectSpeedCoral, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kEjectSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_CORAL;
         break;
@@ -184,7 +184,7 @@ public class HandlerSubsystem extends SubsystemBase {
     if (motorPIDF.hasChanged()) {
       PIDF pidf = motorPIDF.get();
       ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
-        add(new SparkUtil.PIDFSlot(pidf, HandlerConstants.kPIDFSlot));
+        add(new SparkUtil.PIDFSlot(pidf, HandlerConstants.kPIDFSlotVelocity));
       }};
       SparkUtil.Config motorConfig = HandlerConstants.kmotorConfig.withPIDFSlots(pidfSlots);
       SparkUtil.configureMotor(m_motor, motorConfig);
@@ -209,15 +209,17 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case INTAKING_CORAL: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         if (m_frontProxSensor.isProximate()) {
           m_state = State.LOADING_CORAL;
         }
         break;
       }
       case INTAKING_ALGAE: {
-        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl);
+        m_motorController.setReference(HandlerConstants.kIntakeSpeedAlgae, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
         if (m_algaeProxSensor.isProximate()) {
+          
+          m_motorController.setReference(m_encoder.getPosition(), ControlType.kMAXMotionPositionControl, HandlerConstants.kPIDFSlotPosition);
           m_state = State.LOADED_ALGAE;
         }
       }
@@ -252,7 +254,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case CANCELLING_CORAL: {
         if (m_frontProxSensor.isProximate()) {
-          m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl);
+          m_motorController.setReference(HandlerConstants.kIntakeSpeedCoral, ControlType.kMAXMotionVelocityControl, HandlerConstants.kPIDFSlotVelocity);
           m_state = State.LOADING_CORAL;
         } else {
           m_state = State.EMPTY;

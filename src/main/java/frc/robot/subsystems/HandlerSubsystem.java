@@ -147,7 +147,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case LOADED_ALGAE: {
         m_motor.set(HandlerConstants.kEjectSpeedAlgae);
-        m_startTime = getTimeSeconds();
+        m_ejectDelayStartTime = getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
@@ -211,7 +211,8 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case EJECTING_CORAL: {
-        if (!m_frontProxSensor.isProximate() && !m_distanceSensor.isProximate()) {
+        double currentTime = getTimeSeconds();
+        if (currentTime - m_ejectDelayStartTime >= HandlerConstants.kEjectDelaySeconds) {
           m_motor.stopMotor();
           m_state = State.EMPTY;
         }

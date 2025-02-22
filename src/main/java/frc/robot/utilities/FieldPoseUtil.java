@@ -230,7 +230,7 @@ public class FieldPoseUtil {
       }
     }
     
-    return reefTimeList.get(nearestReefTime);
+    return reefHourList.get(nearestReefHour);
   }  
     
   public CoralStationPose closestStation(Pose2d robotPose) {

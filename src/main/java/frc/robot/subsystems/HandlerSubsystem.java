@@ -197,15 +197,6 @@ public class HandlerSubsystem extends SubsystemBase {
   public void periodic() {
     updateConstants();
     SmartDashboard.putString("Handler State: ", m_state.name());
-    SmartDashboard.putNumber("Back Sensor", m_backProxSensor.getDistance());
-    SmartDashboard.putNumber("Front Sensor", m_frontProxSensor.getDistance());
-    SmartDashboard.putNumber("Distance Sensor", getDistanceSensorMeasurement());
-    SmartDashboard.putNumber("Algae Sensor", m_algaeProxSensor.getDistance());
-    SmartDashboard.putNumber("Speed", m_encoder.getVelocity()); //TODO: Need to check is speed is right for ff
-    SmartDashboard.putBoolean("Front Prox", m_backProxSensor.isProximate());
-    SmartDashboard.putBoolean("Back Prox", m_frontProxSensor.isProximate());
-    SmartDashboard.putBoolean("Algae Prox", m_algaeProxSensor.isProximate());
-    SmartDashboard.putBoolean("Distance Prox", m_distanceSensor.isProximate());
     switch (m_state) {
       case EMPTY: {
         break;

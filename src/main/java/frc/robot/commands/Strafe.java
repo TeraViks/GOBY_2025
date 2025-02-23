@@ -7,7 +7,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 
 public class Strafe extends SequentialCommandGroup {
-
   private final DriveSubsystem m_drive;
 
   public Strafe(HandlerSubsystem handler, DriveSubsystem drive) {

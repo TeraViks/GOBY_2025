@@ -27,7 +27,8 @@ public class FaceStationUtil {
     Pose2d nearestStation = m_coralStations.get(0);
 
     for (Pose2d station : m_coralStations) {
-      if (station.getTranslation().getDistance(robotPos) < nearestStation.getTranslation().getDistance(robotPos)) {
+      if (station.getTranslation().getDistance(robotPos)
+          < nearestStation.getTranslation().getDistance(robotPos)) {
         nearestStation = station;
       }
     }

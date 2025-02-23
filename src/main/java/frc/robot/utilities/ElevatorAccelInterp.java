@@ -17,7 +17,10 @@ public final class ElevatorAccelInterp {
 
   public static int heightIndex(double height, HeightEntry[] heightTable) {
     assert(height >= 0);
-    int index = Arrays.binarySearch(heightTable, new HeightEntry(height, 0), (a,b) -> Double.compare(a.height, b.height));
+    int index = Arrays.binarySearch(
+      heightTable,
+      new HeightEntry(height, 0),
+      (a,b) -> Double.compare(a.height, b.height));
     if (index < 0) {
       // Imperfect match
       index = -index - 1;

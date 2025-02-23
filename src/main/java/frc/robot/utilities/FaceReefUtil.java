@@ -24,7 +24,9 @@ public class FaceReefUtil {
   private Rotation2d getDesiredRotation(Pose2d robotPose) {
     Rotation2d reefToRobotAngle = getRobotToReef(robotPose).getAngle();
     Rotation2d desiredAngle = new Rotation2d(
-      Math.floor((reefToRobotAngle.getRadians() + (Math.PI/6.0)) / (Math.PI/3.0)) * (Math.PI/3.0) + Math.PI);
+      Math.floor(
+        (reefToRobotAngle.getRadians() + (Math.PI/6.0))
+        / (Math.PI/3.0)) * (Math.PI/3.0) + Math.PI);
     return desiredAngle;
   }
 

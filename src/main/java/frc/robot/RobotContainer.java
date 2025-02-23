@@ -54,7 +54,7 @@ public class RobotContainer {
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
   double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
-  
+
   private CoralStationSubPose m_selectedCoralStationSlot = CoralStationSubPose.FIVE;
 
   private static double joystickTransform(double value) {
@@ -105,8 +105,10 @@ public class RobotContainer {
       )
     );
 
-    NamedCommands.registerCommand("RightHourTwoAuto", new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
-    NamedCommands.registerCommand("LeftHourTenAuto", new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+    NamedCommands.registerCommand("RightHourTwoAuto",
+      new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+    NamedCommands.registerCommand("LeftHourTenAuto",
+      new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
     m_chooser.setDefaultOption("Empty Auto", new PathPlannerAuto("Empty Auto"));
     m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
     m_chooser.addOption("Right auto with place", new PathPlannerAuto("Right Start and Place"));
@@ -129,7 +131,7 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
-    
+
     new JoystickButton(m_driverController, OIConstants.kFaceReefButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceReef(
@@ -137,11 +139,11 @@ public class RobotContainer {
         () -> getXSpeedInput(),
         () -> getYSpeedInput(),
         m_fieldPoseUtil));
-    
+
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceStation(
-        m_robotDrive, 
+        m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput(),
         m_fieldPoseUtil));
@@ -162,29 +164,29 @@ public class RobotContainer {
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
 
-      new Trigger(() -> 
-          m_operatorController.getRawButton(OIConstants.kASideButton) && 
+      new Trigger(() ->
+          m_operatorController.getRawButton(OIConstants.kASideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
           m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
-    
-      new Trigger(() -> 
-          m_operatorController.getRawButton(OIConstants.kASideButton) && 
+
+      new Trigger(() ->
+          m_operatorController.getRawButton(OIConstants.kASideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
           m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL3));
-      
-      new Trigger(() -> 
-          m_operatorController.getRawButton(OIConstants.kBSideButton) && 
+
+      new Trigger(() ->
+          m_operatorController.getRawButton(OIConstants.kBSideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
           m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL2));
 
-      new Trigger(() -> 
-          m_operatorController.getRawButton(OIConstants.kBSideButton) && 
+      new Trigger(() ->
+          m_operatorController.getRawButton(OIConstants.kBSideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
@@ -195,13 +197,13 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> {
           //m_crane.moveTo(FieldConstants.kLevel1)
         }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
-      
+
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kHighAlgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           //m_crane.moveTo(FieldConstants.kHighAlgae)
         })); //TODO: Requirements also need to include the crane subsystem
-      
+
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kLowAlgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
@@ -214,14 +216,14 @@ public class RobotContainer {
           //m_crane.moveTo(FieldConstants.kAlgaeProcessor)
           //Robot also needs to move to right position
         })); //TODO: Requirements also need to include the crane subsystem
-      
+
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kAlgaeProcessorPOV)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           //m_crane.moveTo(FieldConstants.kAlgaeProcessor)
           //Robot also needs to move to right position
         })); //TODO: Requirements also need to include the crane subsystem
-      
+
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kIntakeALgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
         .whileTrue(Commands.runOnce(() -> {
@@ -230,27 +232,27 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> {
           m_handler.cancelIntake();
         }, m_handler));
-      
+
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_selectedCoralStationSlot));
-      
+
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           m_handler.eject();
         }, m_handler));
-      
-      new Trigger(() -> 
-          m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >= 
+
+      new Trigger(() ->
+          m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >=
           OIConstants.kTriggerAcuationValue)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           //m_climber.extendClimber()
         })); //TODO: Requirements needs to include m_climber
-      
-      new Trigger(() -> 
-          m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >= 
+
+      new Trigger(() ->
+          m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >=
           OIConstants.kTriggerAcuationValue)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {

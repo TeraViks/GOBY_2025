@@ -16,13 +16,16 @@ public class CoralPlacement extends SequentialCommandGroup {
   private final Crane m_crane;
   private FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
 
-  public CoralPlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, ReefSubPose subPose, Translation2d cranePosition) {
+  public CoralPlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
+      ReefSubPose subPose, Translation2d cranePosition) {
     m_drive = drive;
     m_handler = handler;
     m_crane = crane;
     addRequirements(m_drive, m_handler, m_crane);
 
-    Command driveToPose = new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), subPose), drive);
+    Command driveToPose = new DriveToPose(
+      m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), subPose),
+      drive);
 
     addCommands(
       driveToPose,

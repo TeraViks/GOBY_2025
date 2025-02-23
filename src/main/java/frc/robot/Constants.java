@@ -218,7 +218,7 @@ public final class Constants {
 
   public static final class HandlerConstants {
     public static final int kMotorID = 17;
-    public static final double kIntakeSpeedCoral = 0.25; 
+    public static final double kIntakeSpeedCoral = 0.25;
     public static final double kEjectSpeedCoral = -0.4;
     public static final double kIntakeSpeedAlgae = -0.4;
     public static final double kEjectSpeedAlgae = 0.2;
@@ -227,7 +227,7 @@ public final class Constants {
     public static final double kEjectDelaySeconds = 0.5;
     public static final int kHoldingCurrentLimit = 15;
     public static final int kNormalCurrentLimit = 40;
-    
+
     public static final int kAlgaeSensorInput = 0;
     public static final int kBackSensorInput = 3;
     public static final int kFrontSensorInput = 2;
@@ -246,12 +246,12 @@ public final class Constants {
 
     public static final SparkUtil.Config kmotorConfig = new SparkUtil.Config(
       kNormalCurrentLimit,
-      0.0, 
+      0.0,
       true,
-      1.083e-4, 
+      1.083e-4,
       0.0065, // 4 in. wheel and 2.5^3 gear reduction
-      1.0, 
-      6.0, 
+      1.0,
+      6.0,
       new ArrayList<>() {{
         add(new SparkUtil.PIDFSlot(
           kMotorPIDFVelocity,
@@ -311,7 +311,7 @@ public final class Constants {
     public static final int kCoralIntake8 = 180;
 
     public static final double kTriggerAcuationValue = 0.5;
-    
+
     public static final double kDebounceSeconds = 0.01;
 
     public static final double kJoystickDeadband = 0.05;
@@ -363,9 +363,9 @@ public final class Constants {
   public static final class DriveCommandConstants {
     public static final double kDefaultTranslationPositionToleranceMeters = 0.02;
     public static final double kDefaultTranslationVelocityToleranceMetersPerSecond = 0.01;
-    public static final double kDefaultAnglePositionToleranceRadians = 
+    public static final double kDefaultAnglePositionToleranceRadians =
       Units.degreesToRadians(2.0);
-    public static final double kDefaultAngleVelocityToleranceRadiansPerSecond = 
+    public static final double kDefaultAngleVelocityToleranceRadiansPerSecond =
       Units.degreesToRadians(1.0);
 
     public static final PIDF kTranslatingPIDF = new PIDF(0.0, 0.0, 0.0, 0.0); //TODO: Tune.

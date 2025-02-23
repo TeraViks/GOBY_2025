@@ -96,7 +96,8 @@ public class Crane extends SubsystemBase {
     SparkUtil.configureMotor(m_leftElevatorMotor, CraneConstants.kElevatorMotorConfig);
 
     m_rightElevatorMotor = new SparkFlex(CraneConstants.kRightElevatorMotorID, MotorType.kBrushless);
-    SparkUtil.configureFollowerMotor(m_rightElevatorMotor, CraneConstants.kElevatorMotorConfig, m_leftElevatorMotor);
+    SparkUtil.configureFollowerMotor(m_rightElevatorMotor, CraneConstants.kElevatorMotorConfig,
+      m_leftElevatorMotor);
 
     m_pivotEncoder = m_pivotMotor.getEncoder();
     m_elevatorEncoder = m_leftElevatorMotor.getEncoder();

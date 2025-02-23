@@ -98,7 +98,7 @@ public class FieldPoseUtil {
     private static CoralStationPose ofAprilTag(AprilTag aprilTag, AprilTags aprilTags) {
       if (aprilTag == aprilTags.coralStationLeft) {
         return LEFT;
-      } 
+      }
       assert(aprilTag == aprilTags.coralStationRight);
       return RIGHT;
     }
@@ -151,7 +151,8 @@ public class FieldPoseUtil {
     return alliance;
   }
 
-  private Pose2d offsetAprilTagPoseByRobot(Pose2d aprilTagPose, double wallOffset, double parallelOffset) {
+  private Pose2d offsetAprilTagPoseByRobot(Pose2d aprilTagPose, double wallOffset,
+      double parallelOffset) {
     double distanceFromWall = AutoConstants.kBumperToRobotCenter + wallOffset;
     double aprilTagRotationRadians = aprilTagPose.getRotation().getRadians();
 
@@ -225,25 +226,29 @@ public class FieldPoseUtil {
     AprilTag nearestReefHour = null;
 
     for (AprilTag reefTime : reefHourList.keySet()) {
-      if (nearestReefHour == null || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos) < nearestReefHour.pose.toPose2d().getTranslation().getDistance(robotPos)) {
+      if (nearestReefHour == null
+         || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos)
+          < nearestReefHour.pose.toPose2d().getTranslation().getDistance(robotPos)) {
         nearestReefHour = reefTime;
       }
     }
-    
+
     return reefHourList.get(nearestReefHour);
-  }  
-    
+  }
+
   public CoralStationPose closestStation(Pose2d robotPose) {
-    ArrayList<AprilTag> coralStations = new ArrayList<>(List.of(m_aprilTags.coralStationLeft, m_aprilTags.coralStationRight));
+    ArrayList<AprilTag> coralStations = new ArrayList<>(List.of(
+      m_aprilTags.coralStationLeft, m_aprilTags.coralStationRight));
     Translation2d robotPos = robotPose.getTranslation();
     AprilTag nearestStation = coralStations.get(0);
 
     for (AprilTag station : coralStations) {
-      if (station.pose.toPose2d().getTranslation().getDistance(robotPos) < nearestStation.pose.toPose2d().getTranslation().getDistance(robotPos)) {
+      if (station.pose.toPose2d().getTranslation().getDistance(robotPos)
+          < nearestStation.pose.toPose2d().getTranslation().getDistance(robotPos)) {
         nearestStation = station;
       }
     }
-    
+
     return CoralStationPose.ofAprilTag(nearestStation, m_aprilTags);
-  } 
+  }
 }

@@ -106,9 +106,11 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand("RightHourTwoAuto",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+        ReefSubPose.A, CraneConstants.kPositionL2));
     NamedCommands.registerCommand("LeftHourTenAuto",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      ReefSubPose.A, CraneConstants.kPositionL2));
     m_chooser.setDefaultOption("Empty Auto", new PathPlannerAuto("Empty Auto"));
     m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
     m_chooser.addOption("Right auto with place", new PathPlannerAuto("Right Start and Place"));
@@ -169,28 +171,32 @@ public class RobotContainer {
           m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+          ReefSubPose.A, CraneConstants.kPositionL2));
 
       new Trigger(() ->
           m_operatorController.getRawButton(OIConstants.kASideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL3));
+          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+          ReefSubPose.A, CraneConstants.kPositionL3));
 
       new Trigger(() ->
           m_operatorController.getRawButton(OIConstants.kBSideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel2Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL2));
+          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+          ReefSubPose.B, CraneConstants.kPositionL2));
 
       new Trigger(() ->
           m_operatorController.getRawButton(OIConstants.kBSideButton) &&
           m_operatorController.getRawButton(OIConstants.kLevel3Button))
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, ReefSubPose.B, CraneConstants.kPositionL3));
+          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+          ReefSubPose.B, CraneConstants.kPositionL3));
 
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)
@@ -235,7 +241,8 @@ public class RobotContainer {
 
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_selectedCoralStationSlot));
+        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+          m_selectedCoralStationSlot));
 
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)
         .debounce(OIConstants.kDebounceSeconds)

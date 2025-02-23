@@ -15,17 +15,14 @@ public class GetCoral extends SequentialCommandGroup {
   private final DriveSubsystem m_drive;
   private final HandlerSubsystem m_handler;
   private final Crane m_crane;
-  private final FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
-  private final Translation2d m_intakePos =
-    new Translation2d(CraneConstants.kIntakeAngle, CraneConstants.kIntakeHeight);
-  private final Translation2d m_homePos =
-    new Translation2d(CraneConstants.kPivotHome, CraneConstants.kElevatorHome);
+  private final FieldPoseUtil m_fieldPoseUtil;
 
   public GetCoral(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
-      CoralStationSubPose subPose) {
+      FieldPoseUtil fieldPoseUtil, CoralStationSubPose subPose) {
     m_drive = drive;
     m_handler = handler;
     m_crane = crane;
+    m_fieldPoseUtil = fieldPoseUtil;
     addRequirements(m_drive, m_handler, m_crane);
 
     Command driveToPose = new DriveToPose(
@@ -34,10 +31,10 @@ public class GetCoral extends SequentialCommandGroup {
 
     addCommands(
       driveToPose,
-      Commands.runOnce(() -> m_crane.moveTo(m_intakePos)),
+      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake)),
       Commands.runOnce(() -> m_handler.intakeCoral()),
       Commands.waitUntil(() -> m_handler.isLoadedCoral()),
-      Commands.runOnce(() -> m_crane.moveTo(m_homePos)),
+      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionHome)),
       Commands.waitUntil(() -> m_crane.atSetpoint().isPresent())
     );
   }

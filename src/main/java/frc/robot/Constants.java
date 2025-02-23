@@ -491,6 +491,7 @@ public final class Constants {
     public static final double kPivotHomingVoltage = 1.0; // TODO: Tune.
     public static final double kPivotMinStalledHomingAmperage = 30.0; // TODO: Tune.
 
+    public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
       ClosedLoopSlot.kSlot0
@@ -502,7 +503,7 @@ public final class Constants {
     public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
       20, // TODO: Configure.
       0.1, // TODO: Configure.
-      true, // TODO: Find what elevator motor is reversed
+      kInvertLeftElevatorMotor,
       1.0, // TODO: Compute.
       1.0, // TODO: Compute.
       1.0,

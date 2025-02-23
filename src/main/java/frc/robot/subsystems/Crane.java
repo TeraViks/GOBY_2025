@@ -73,7 +73,7 @@ public class Crane extends SubsystemBase {
     new TrapezoidProfile.Constraints(0.0, 0.0) // Dynamically scaled.
   );
 
-  private Translation2d m_setpoint;
+  private Translation2d m_setpoint = new Translation2d(0.0, 0.0);
   private double m_pivotControlFactor; // 1.0 for position-based control.
   private double m_elevatorControlFactor; // 1.0 for position-based control.
 
@@ -110,7 +110,9 @@ public class Crane extends SubsystemBase {
       m_leftElevatorMotor);
 
     m_pivotEncoder = m_pivotMotor.getEncoder();
+    m_pivotEncoder.setPosition(0.0);
     m_elevatorEncoder = m_leftElevatorMotor.getEncoder();
+    m_elevatorEncoder.setPosition(0.0);
 
     m_pivotPID = m_pivotMotor.getClosedLoopController();
     m_leftElevatorPID = m_leftElevatorMotor.getClosedLoopController();

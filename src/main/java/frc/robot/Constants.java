@@ -35,7 +35,7 @@ import frc.robot.utilities.TrapezoidalConstraint;
 public final class Constants {
   // Set to true during actual competition. May disable diagnostics, sanity/safety checks, etc.
   // in order to eliminate failure modes that should only happen during testing.
-  public static final boolean kCompeting = false;
+  public static final boolean kCompeting = true;
 
   // Scheduling quantum in seconds.
   public static final double kDt = 0.02;

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import com.revrobotics.RelativeEncoder;
@@ -18,6 +19,7 @@ import frc.robot.Constants.CraneConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.Segment;
 import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 import frc.robot.utilities.Vector;
@@ -49,6 +51,14 @@ public class Crane extends SubsystemBase {
     CraneConstants.kPivotPIDF);
   private static final TunablePIDF elevatorPIDF = new TunablePIDF("Crane.elevatorPIDF",
     CraneConstants.kElevatorPIDF);
+  private static final TunablePIDF pivotVoltagePIDF = new TunablePIDF("Crane.pivotVoltagePIDF",
+    CraneConstants.kPivotMotorVoltagePIDFSlot.pidf());
+  private static final TunablePIDF elevatorVoltagePIDF = new TunablePIDF("Crane.elevatorVoltagePIDF",
+    CraneConstants.kElevatorMotorVoltagePIDFSlot.pidf());
+  private static final TunablePIDF pivotVelocityPIDF = new TunablePIDF("Crane.pivotVelocityPIDF",
+    CraneConstants.kPivotMotorVelocityPIDFSlot.pidf());
+  private static final TunablePIDF elevatorVelocityPIDF = new TunablePIDF("Crane.elevatorVelocityPIDF",
+    CraneConstants.kElevatorMotorVelocityPIDFSlot.pidf());
 
   private ProfiledPIDController m_aController = new ProfiledPIDController(
     pivotPIDF.get().p(),
@@ -366,6 +376,52 @@ public class Crane extends SubsystemBase {
     if (elevatorPIDF.hasChanged()) {
       PIDF pidf = elevatorPIDF.get();
       m_hController.setPID(pidf.p(), pidf.i(), pidf.d());
+    }
+    if (elevatorVoltagePIDF.hasChanged()) {
+      PIDF pidf = elevatorVoltagePIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(elevatorVelocityPIDF.get(), CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
+      SparkUtil.configureFollowerMotor(
+        m_rightElevatorMotor,
+        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
+        m_leftElevatorMotor
+      );
+    }
+    if (elevatorVelocityPIDF.hasChanged()) {
+      PIDF pidf = elevatorVelocityPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(elevatorVoltagePIDF.get(), CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
+      SparkUtil.configureFollowerMotor(
+        m_rightElevatorMotor,
+        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
+        m_leftElevatorMotor
+      );
+    }
+    if (pivotVoltagePIDF.hasChanged()) {
+      PIDF pidf = pivotVoltagePIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(pivotVelocityPIDF.get(), CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
+    }
+    if (pivotVelocityPIDF.hasChanged()) {
+      PIDF pidf = pivotVelocityPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(pivotVoltagePIDF.get(), CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
     }
   }
 

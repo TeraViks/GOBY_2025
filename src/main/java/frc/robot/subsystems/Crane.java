@@ -219,10 +219,12 @@ public class Crane extends SubsystemBase {
           return;
         }
       }
-    } else {
-      // Zero velocity; move to (i.e. stay at) current position.
-      moveTo(getPosition());
+      System.out.printf("move(%.2f, %.2f) missed all boundaries\n",
+        pivotVelocityFactor, elevatorVelocityFactor);
     }
+
+    // Zero velocity, or outside boundaries; move to (i.e. stay at) current position.
+    moveTo(getPosition());
   }
 
   public void movePivot(double pivotVelocityRadiansPerSecond) {

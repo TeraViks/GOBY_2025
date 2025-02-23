@@ -65,6 +65,14 @@ public class RobotContainer {
     return transformedValue;
   }
 
+  private double getElevatorAxis() {
+    return m_operatorController.getRawAxis(OIConstants.kRightJoyYAxis);
+  }
+
+  private double getPivotAxis() {
+    return m_operatorController.getRawAxis(OIConstants.kLeftJoyYAxis);
+  }
+
   private double getXSpeedInput() {
     // The Y axis on the controller is inverted! Pushing forward (up) generates a negative value.
     // Negate the input value here.
@@ -165,6 +173,12 @@ public class RobotContainer {
     new JoystickButton(m_driverController, OIConstants.kFaceProcessorButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
+
+      new JoystickButton(m_operatorController, OIConstants.kManualCraneMode)
+        .debounce(OIConstants.kDebounceSeconds)
+        .whileTrue(Commands.runOnce(() -> {
+          m_crane.move(getPivotAxis(), getElevatorAxis());
+        }, m_crane));
 
       new Trigger(() ->
           m_operatorController.getRawButton(OIConstants.kASideButton) &&

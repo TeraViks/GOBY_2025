@@ -165,6 +165,8 @@ public class Crane extends SubsystemBase {
       Tolerance pivotTolerance, Tolerance elevatorTolerance,
       double pivotVelocityFactor, double elevatorVelocityFactor) {
     m_setpoint = setpoint;
+    m_aController.setGoal(m_setpoint.getX());
+    m_hController.setGoal(m_setpoint.getY());
     m_aController.setTolerance(pivotTolerance.position,
       Constants.kDt * pivotTolerance.velocity);
     m_hController.setTolerance(elevatorTolerance.position,
@@ -291,8 +293,8 @@ public class Crane extends SubsystemBase {
     Translation2d deviation = getDeviation(position);
 
     scaleAHConstraints(position, deviation);
-    double aVelocity = m_aController.calculate(deviation.getX());
-    double hVelocity = m_hController.calculate(deviation.getY());
+    double aVelocity = m_aController.calculate(position.getX());
+    double hVelocity = m_hController.calculate(position.getY());
     m_pivotPID.setReference(aVelocity, ControlType.kMAXMotionVelocityControl,
       CraneConstants.kPivotMotorVelocityPIDFSlot.slot());
     m_leftElevatorPID.setReference(hVelocity, ControlType.kMAXMotionVelocityControl,

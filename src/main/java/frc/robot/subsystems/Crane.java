@@ -186,18 +186,23 @@ public class Crane extends SubsystemBase {
   }
 
   public void move(double pivotVelocityFactor, double elevatorVelocityFactor) {
-    Translation2d velocity = new Translation2d(
-      pivotVelocityFactor * CraneConstants.kPivotMaxSpeedRadiansPerSecond,
-      elevatorVelocityFactor * CraneConstants.kElevatorMaxSpeedMetersPerSecond
-    );
-    Vector v = new Vector(getPosition(), velocity.getAngle());
-    for (Segment boundary : CraneConstants.kBoundaries) {
-      Optional<Translation2d> setpointOpt = boundary.intersection(v);
-      if (setpointOpt.isPresent()) {
-        Translation2d setpoint = setpointOpt.get();
-        moveTo(setpoint, pivotVelocityFactor, elevatorVelocityFactor);
-        return;
+    if (pivotVelocityFactor != 0.0 || elevatorVelocityFactor != 0.0) {
+      Translation2d velocity = new Translation2d(
+        pivotVelocityFactor * CraneConstants.kPivotMaxSpeedRadiansPerSecond,
+        elevatorVelocityFactor * CraneConstants.kElevatorMaxSpeedMetersPerSecond
+      );
+      Vector v = new Vector(getPosition(), velocity.getAngle());
+      for (Segment boundary : CraneConstants.kBoundaries) {
+        Optional<Translation2d> setpointOpt = boundary.intersection(v);
+        if (setpointOpt.isPresent()) {
+          Translation2d setpoint = setpointOpt.get();
+          moveTo(setpoint, pivotVelocityFactor, elevatorVelocityFactor);
+          return;
+        }
       }
+    } else {
+      // Zero velocity; move to (i.e. stay at) current position.
+      moveTo(getPosition());
     }
   }
 

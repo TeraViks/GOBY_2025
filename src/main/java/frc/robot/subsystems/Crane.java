@@ -12,6 +12,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -431,6 +432,10 @@ public class Crane extends SubsystemBase {
   public void periodic() {
     updateConstants();
     SmartDashboard.putString("Crane State", m_state.toString());
+    SmartDashboard.putNumber("Crane Pivot angle", Units.radiansToDegrees(m_pivotEncoder.getPosition()));
+    SmartDashboard.putNumber("Crane Sensor Distance", m_distanceSensor.getDistance());
+    SmartDashboard.putNumber("Elevator Height", m_elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Elevator PID Reference", m_leftElevatorMotor.getAppliedOutput());
     switch (m_state) {
       case CRANING: {
         crane();

@@ -139,7 +139,11 @@ public class Crane extends SubsystemBase {
         return m_elevatorEncoder.getVelocity();
       }, CraneConstants.kValueCacheTtlMicroseconds);
 
-    m_state = Constants.kCompeting ? State.LO_PIVOT_HOME : State.ESTIMATE_H;
+    if (Constants.kCompeting) {
+      toStateLoPivotHome();
+    } else {
+      m_state = State.ESTIMATE_H;
+    }
   }
 
   // Only increase serial number once while controlling with velocity to avoid the serial

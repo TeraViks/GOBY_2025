@@ -439,11 +439,13 @@ public class Crane extends SubsystemBase {
   @Override
   public void periodic() {
     updateConstants();
-    SmartDashboard.putString("Crane State", m_state.toString());
-    SmartDashboard.putNumber("Crane Pivot angle", Units.radiansToDegrees(m_pivotEncoder.getPosition()));
-    SmartDashboard.putNumber("Crane Sensor Distance", m_distanceSensor.getDistance());
-    SmartDashboard.putNumber("Elevator Height", m_elevatorEncoder.getPosition());
-    SmartDashboard.putNumber("Elevator PID Reference", m_leftElevatorMotor.getAppliedOutput());
+    SmartDashboard.putString("Crane state", m_state.toString());
+    SmartDashboard.putNumber("Crane pivot setpoint", Units.radiansToDegrees(m_setpoint.getX()));
+    SmartDashboard.putNumber("Crane elevator setpoint", m_setpoint.getY());
+    SmartDashboard.putNumber("Crane pivot angle", Units.radiansToDegrees(m_pivotEncoder.getPosition()));
+    SmartDashboard.putNumber("Crane elevator height", m_elevatorEncoder.getPosition());
+    SmartDashboard.putNumber("Crane sensor distance", m_distanceSensor.getDistance());
+    SmartDashboard.putNumber("Crane elevator PID reference", m_leftElevatorMotor.getAppliedOutput());
     switch (m_state) {
       case CRANING: {
         crane();

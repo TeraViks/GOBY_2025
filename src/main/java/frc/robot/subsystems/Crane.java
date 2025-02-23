@@ -335,7 +335,7 @@ public class Crane extends SubsystemBase {
       moveElevatorTo(CraneConstants.kElevatorHomeRapid);
       m_state = State.LO_ELEVATOR_RAPID;
     } else {
-      m_state = State.ELEVATOR_HOME;
+      toStateElevatorHome();
     }
   }
 

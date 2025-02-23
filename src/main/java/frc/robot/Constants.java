@@ -448,10 +448,10 @@ public final class Constants {
   }
 
   public static final class CraneConstants {
-    public static final int kLeftElevatorMotorID = 13; // TODO: Change the ID or give that ID to the motor
-    public static final int kRightElevatorMotorID = 14; // TODO: Change the ID or give that ID to the motor
-    public static final int kPivotMotorID = 15; // TODO: Change the ID or give that ID to the motor
-    public static final int kDistanceSensorInput = 4; // TODO: Configure.
+    public static final int kLeftElevatorMotorID = 13;
+    public static final int kRightElevatorMotorID = 14;
+    public static final int kPivotMotorID = 15;
+    public static final int kDistanceSensorInput = 4;
 
     public static final long kValueCacheTtlMicroseconds = 15;
 
@@ -476,11 +476,11 @@ public final class Constants {
       ClosedLoopSlot.kSlot1
     );
     public static final SparkUtil.Config kPivotMotorConfig = new SparkUtil.Config(
-      20, // TODO: Configure.
-      0.1, // TODO: Configure.
-      false, // TODO: Find if the pivot motor is reversed
-      1.0, // TODO: Compute.
-      1.0, // TODO: Compute.
+      40,
+      0.1,
+      false,
+      ((2.0*Math.PI)/75.0)/60.0,
+      (2.0*Math.PI)/75.0,
       Math.PI / 2.0,
       2.0 * Math.PI,
       new ArrayList<>() {{
@@ -488,8 +488,8 @@ public final class Constants {
         add(kPivotMotorVoltagePIDFSlot);
       }}
     );
-    public static final double kPivotHomingVoltage = 1.0; // TODO: Tune.
-    public static final double kPivotMinStalledHomingAmperage = 30.0; // TODO: Tune.
+    public static final double kPivotHomingVoltage = 0.5;
+    public static final double kPivotMinStalledHomingAmperage = 20.0;
 
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
@@ -501,11 +501,11 @@ public final class Constants {
       ClosedLoopSlot.kSlot1
     );
     public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
-      20, // TODO: Configure.
-      0.1, // TODO: Configure.
+      40,
+      0.1,
       kInvertLeftElevatorMotor,
-      1.0, // TODO: Compute.
-      1.0, // TODO: Compute.
+      0.0116/60.0, // rot/min -> m/s
+      0.0116, // rot -> meters: 12:1 gearbox reduction, 22T sprocket, 1/4" chain link.
       1.0,
       4.0,
       new ArrayList<>() {{
@@ -513,8 +513,8 @@ public final class Constants {
         add(kElevatorMotorVoltagePIDFSlot);
       }}
     );
-    public static final double kElevatorHomingVoltage = 1.0; // TODO: Tune.
-    public static final double kElevatorMinStalledHomingAmperage = 30.0; // TODO: Tune.
+    public static final double kElevatorHomingVoltage = -0.5;
+    public static final double kElevatorMinStalledHomingAmperage = 20.0;
 
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
       Units.degreesToRadians(0.5),
@@ -538,23 +538,26 @@ public final class Constants {
     public static final double kElevatorMax = 1.400;
     public static final double kElevatorHiPivotHome = 1.250;
     public static final double kElevatorLoHiThreshold = 0.900;
-    public static final double kElevatorHomeRapid = 0.250;
-    public static final double kElevatorMin = 0.220;
-    public static final double kElevatorHome = kElevatorMin;
-    public static final double kElevatorHardMin = 0.201;
+    public static final double kElevatorHardMin = 0.283;
+    public static final double kElevatorHomeRapid = kElevatorHardMin + 0.05;
+    public static final double kElevatorSoftMin = kElevatorHardMin + 0.02;
+    public static final double kElevatorHome = kElevatorSoftMin;
+    // Actual elevator height for a distance sensor measurement of 0.
+    public static final double kDistanceSensorBaseMeasurement = kElevatorHardMin - 0.03;
+
 
     // Valid configuration space boundaries.
     public static final Segment kPivotLoBoundary = new Segment(
       new Translation2d(kPivotHiMin, kElevatorMax),
-      new Translation2d(kPivotLoMin, kElevatorMin)
+      new Translation2d(kPivotLoMin, kElevatorSoftMin)
     );
     public static final Segment kPivotHiBoundary = new Segment(
       new Translation2d(kPivotHiMax, kElevatorMax),
-      new Translation2d(kPivotLoMax, kElevatorMin)
+      new Translation2d(kPivotLoMax, kElevatorSoftMin)
     );
     public static final Segment kElevatorLoBoundary = new Segment(
-      new Translation2d(kPivotLoMin, kElevatorMin),
-      new Translation2d(kPivotLoMax, kElevatorMin)
+      new Translation2d(kPivotLoMin, kElevatorSoftMin),
+      new Translation2d(kPivotLoMax, kElevatorSoftMin)
     );
     public static final Segment kElevatorHiBoundary = new Segment(
       new Translation2d(kPivotHiMin, kElevatorMax),
@@ -566,9 +569,6 @@ public final class Constants {
       add(kElevatorLoBoundary);
       add(kElevatorHiBoundary);
     }};
-
-    // Actual elevator height for a distance sensor measurement of 0.
-    public static final double kDistanceSensorBaseMeasurement = 0.150; // TODO: Calibrate.
 
     public static final Translation2d kPositionHome =
       new Translation2d(kPivotHome, kElevatorHome);

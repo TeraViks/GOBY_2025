@@ -176,7 +176,7 @@ public class RobotContainer {
 
       new JoystickButton(m_operatorController, OIConstants.kManualCraneMode)
         .debounce(OIConstants.kDebounceSeconds)
-        .whileTrue(Commands.runOnce(() -> {
+        .whileTrue(Commands.run(() -> {
           m_crane.move(getPivotAxis(), getElevatorAxis());
         }, m_crane));
 

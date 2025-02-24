@@ -532,7 +532,7 @@ public final class Constants {
     public static final double kPivotHiMin = Units.degreesToRadians(-90.0);
     public static final double kPivotHiMax = Units.degreesToRadians(44.0);
     public static final double kPivotLoMin = Units.degreesToRadians(-15.0);
-    public static final double kPivotLoMax = Units.degreesToRadians(90.0);
+    public static final double kPivotLoMax = Units.degreesToRadians(88.0);
     public static final double kPivotHome = kPivotLoMax;
 
     public static final double kElevatorMax = 1.400;

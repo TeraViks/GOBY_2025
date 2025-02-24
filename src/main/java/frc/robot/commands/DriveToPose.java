@@ -56,6 +56,9 @@ public class DriveToPose extends Command {
       double translationPosToleranceMeters, double translationVelToleranceMetersPerSecond,
       double anglePosToleranceRadians, double angleVelToleranceRadiansPerSecond) {
     m_pose = pose;
+    m_xController.setGoal(pose.getX());
+    m_yController.setGoal(pose.getY());
+    m_angleController.setGoal(pose.getRotation().getRadians());
     m_drive = drive;
     m_squaredTranslationPositionToleranceMeters = square(translationPosToleranceMeters);
     m_squaredTranslationVelocityToleranceMetersPerDt =
@@ -81,17 +84,6 @@ public class DriveToPose extends Command {
 
   private Translation2d getTranslationDeviation(Pose2d robotPose) {
     return getDesiredTranslation().minus(robotPose.getTranslation());
-  }
-
-  private Rotation2d getDesiredRotation() {
-    return m_pose.getRotation();
-  }
-
-  private Rotation2d getRotationDeviation(Pose2d robotPose) {
-    Rotation2d currentRotation = robotPose.getRotation();
-    Rotation2d desiredRotation = getDesiredRotation();
-    Rotation2d rotationDeviation = currentRotation.minus(desiredRotation);
-    return rotationDeviation;
   }
 
   /* Dynamically scale the x,y controller constraints such that the combined x,y component
@@ -125,15 +117,15 @@ public class DriveToPose extends Command {
 
     scaleXYConstraints(robotPose, translationDeviation);
     m_xController.reset(
-      translationDeviation.getX(),
+      robotPose.getX(),
       velocity.getX()
     );
     m_yController.reset(
-      translationDeviation.getY(),
+      robotPose.getY(),
       velocity.getY()
     );
     m_angleController.reset(
-      getRotationDeviation(robotPose).getRadians(),
+      robotPose.getRotation().getRadians(),
       m_drive.getAngularVelocity()
     );
   }
@@ -142,14 +134,13 @@ public class DriveToPose extends Command {
   public void execute() {
     Pose2d robotPose = m_drive.getPose();
     Translation2d translationDeviation = getTranslationDeviation(robotPose);
-    Rotation2d rotationDeviation = getRotationDeviation(robotPose);
 
     updateConstants();
 
     scaleXYConstraints(robotPose, translationDeviation);
-    double xVelocity = m_xController.calculate(translationDeviation.getX());
-    double yVelocity = m_yController.calculate(translationDeviation.getY());
-    double angleVelocity = m_angleController.calculate(rotationDeviation.getRadians());
+    double xVelocity = m_xController.calculate(robotPose.getX());
+    double yVelocity = m_yController.calculate(robotPose.getY());
+    double angleVelocity = m_angleController.calculate(robotPose.getRotation().getRadians());
     m_drive.drive(
       xVelocity,
       yVelocity,

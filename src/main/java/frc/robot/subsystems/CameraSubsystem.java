@@ -35,7 +35,7 @@ public class CameraSubsystem extends SubsystemBase {
   private static final class PoseEstimator {
     public final PhotonCamera m_camera;
     public final PhotonPoseEstimator m_photonPoseEstimator;
-    private Optional<EstimatedRobotPose> m_estimate;
+    private Optional<EstimatedRobotPose> m_estimate = Optional.empty();
 
     public PoseEstimator(CameraConfig cameraConfig) {
       assert(cameraConfig.m_enable);

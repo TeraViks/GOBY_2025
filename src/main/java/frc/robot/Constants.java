@@ -504,8 +504,8 @@ public final class Constants {
       40,
       0.1,
       kInvertLeftElevatorMotor,
-      0.0116/60.0, // rot/min -> m/s
-      0.0116, // rot -> meters: 12:1 gearbox reduction, 22T sprocket, 1/4" chain link.
+      0.0233/60.0, // rot/min -> m/s
+      0.0233, // rot -> meters: 12:1 gearbox, 22T sprocket, 1/4" chain link, 2-stage elevator.
       1.0,
       4.0,
       new ArrayList<>() {{

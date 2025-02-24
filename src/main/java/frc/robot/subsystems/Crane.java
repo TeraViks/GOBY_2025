@@ -189,9 +189,19 @@ public class Crane extends SubsystemBase {
       CraneConstants.kDefaultPivotTolerance, CraneConstants.kDefaultElevatorTolerance);
   }
 
+  private void updatePivotSetpoint(double pivotAngle) {
+    Translation2d setpoint = new Translation2d(pivotAngle, m_setpoint.getY());
+    m_setpoint = setpoint;
+  }
+
   public int movePivotTo(double pivotAngle) {
     Translation2d setpoint = new Translation2d(pivotAngle, m_setpoint.getY());
     return moveTo(setpoint);
+  }
+
+  private void updateElevatorSetpoint(double elevatorHeight) {
+    Translation2d setpoint = new Translation2d(m_setpoint.getX(), elevatorHeight);
+    m_setpoint = setpoint;
   }
 
   public int moveElevatorTo(double elevatorHeight) {
@@ -304,14 +314,14 @@ public class Crane extends SubsystemBase {
   private void initPivotPosition(double a) {
     m_pivotEncoder.setPosition(a);
     m_pivotPositionCache.flush();
-    movePivotTo(a);
+    updatePivotSetpoint(a);
     resetCrane();
   }
 
   private void initElevatorPosition(double h) {
     m_elevatorEncoder.setPosition(h);
     m_elevatorPositionCache.flush();
-    moveElevatorTo(h);
+    updateElevatorSetpoint(h);
     resetCrane();
   }
 

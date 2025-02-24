@@ -265,9 +265,9 @@ public class Crane extends SubsystemBase {
   private void scaleAHConstraints(Translation2d position, Translation2d deviation) {
     // Estimate pivot,elevator movement time, ignoring current velocity, as the basis of constraint
     // factors. Acceleration can be legitimately ignored since it proportionally affects the axes.
-    double pivotTime = deviation.getX()
+    double pivotTime = Math.abs(deviation.getX())
       / (CraneConstants.kPivotMaxSpeedRadiansPerSecond * m_pivotControlFactor);
-    double elevatorTime = deviation.getY()
+    double elevatorTime = Math.abs(deviation.getY())
       / CraneConstants.kElevatorMaxSpeedMetersPerSecond * m_elevatorControlFactor;
     double maxTime = Math.max(pivotTime, elevatorTime);
     double aFactor = pivotTime / maxTime;

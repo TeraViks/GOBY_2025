@@ -490,6 +490,7 @@ public final class Constants {
     );
     public static final double kPivotHomingVoltage = 0.5;
     public static final double kPivotMinStalledHomingAmperage = 20.0;
+    public static final double kPivotHomingDebounceSeconds = kDt;
 
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
@@ -544,7 +545,6 @@ public final class Constants {
     public static final double kElevatorHome = kElevatorSoftMin;
     // Actual elevator height for a distance sensor measurement of 0.
     public static final double kDistanceSensorBaseMeasurement = kElevatorHardMin - 0.03;
-
 
     // Valid configuration space boundaries.
     public static final Segment kPivotLoBoundary = new Segment(

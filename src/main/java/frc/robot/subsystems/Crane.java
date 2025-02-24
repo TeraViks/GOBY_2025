@@ -21,6 +21,7 @@ import frc.robot.utilities.PIDF;
 import frc.robot.utilities.Segment;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.SparkUtil.PIDFSlot;
+import frc.robot.utilities.Time;
 import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 import frc.robot.utilities.Vector;
@@ -60,6 +61,8 @@ public class Crane extends SubsystemBase {
     CraneConstants.kPivotMotorVelocityPIDFSlot.pidf());
   private static final TunablePIDF elevatorVelocityPIDF = new TunablePIDF("Crane.elevatorVelocityPIDF",
     CraneConstants.kElevatorMotorVelocityPIDFSlot.pidf());
+
+  private double m_pivotStallStartTime = Double.POSITIVE_INFINITY;
 
   private ProfiledPIDController m_aController = new ProfiledPIDController(
     pivotPIDF.get().p(),
@@ -479,24 +482,31 @@ public class Crane extends SubsystemBase {
       case HI_PIVOT_HOME: {
         // Check if motor amperage is spiked due to a stall condition creating a short circuit.
         if (m_pivotMotor.getOutputCurrent() >= CraneConstants.kPivotMinStalledHomingAmperage) {
-          m_pivotMotor.stopMotor();
-          initPivotPosition(CraneConstants.kPivotHardMax);
-          movePivotTo(CraneConstants.kPivotHome);
-          switch (m_state) {
-            case LO_PIVOT_HOME: {
-              if (Constants.kCompeting) {
-                toStateElevatorHome();
-              } else {
-                toStateLoElevatorRapid();
+          double currentTime = Time.getTimeSeconds();
+          if (m_pivotStallStartTime == Double.POSITIVE_INFINITY) {
+            m_pivotStallStartTime = currentTime;
+          } else if (currentTime >= m_pivotStallStartTime + CraneConstants.kPivotHomingDebounceSeconds) {
+            m_pivotMotor.stopMotor();
+            initPivotPosition(CraneConstants.kPivotHardMax);
+            movePivotTo(CraneConstants.kPivotHome);
+            switch (m_state) {
+              case LO_PIVOT_HOME: {
+                if (Constants.kCompeting) {
+                  toStateElevatorHome();
+                } else {
+                  toStateLoElevatorRapid();
+                }
+                break;
               }
-              break;
+              case HI_PIVOT_HOME: {
+                toStateHiPivot0();
+                break;
+              }
+              default: assert(false);
             }
-            case HI_PIVOT_HOME: {
-              toStateHiPivot0();
-              break;
-            }
-            default: assert(false);
           }
+        } else {
+          m_pivotStallStartTime = Double.POSITIVE_INFINITY;
         }
         break;
       }

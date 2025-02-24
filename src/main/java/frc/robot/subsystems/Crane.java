@@ -338,7 +338,9 @@ public class Crane extends SubsystemBase {
   }
 
   private Translation2d getDeviation(Translation2d position) {
-    return getDesiredTranslation().minus(position);
+    return new Translation2d(
+      Math.abs(getDesiredTranslation().minus(position).getX()), 
+      Math.abs(getDesiredTranslation().minus(position).getY()));
   }
 
   private void toStateCraning() {

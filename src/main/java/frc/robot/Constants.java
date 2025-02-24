@@ -342,21 +342,21 @@ public final class Constants {
   }
 
   public static final class CameraConstants {
-    public static final boolean kEnable = false;
+    public static final boolean kEnable = true;
     public static final List<CameraConfig> kCameraConfigs = List.of(
       new CameraConfig(
         "reefCamera",
         new Transform3d(
           0.279292, 0.137998, 0.317346,
           new Rotation3d(0.0, 0.0, Units.degreesToRadians(21.5))),
-        false
+        true
       ),
       new CameraConfig(
         "coralStationCamera",
         new Transform3d(
           0.283631, 0.130006, 0.935310,
           new Rotation3d(0.0, Units.degreesToRadians(-22.5), Units.degreesToRadians(9.5))),
-        false
+        true
       )
     );
   }

@@ -493,7 +493,7 @@ public final class Constants {
 
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(1.5, 0.0, 0.0, 0.0), // TODO: Tune.
+      new PIDF(0.75, 0.0, 8.0, 0.0), // TODO: Tune.
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kElevatorMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
@@ -526,7 +526,7 @@ public final class Constants {
     );
 
     public static final PIDF kPivotPIDF = new PIDF(1.0, 0.0, 0.0, 0.0); // TODO: Tune.
-    public static final PIDF kElevatorPIDF = new PIDF(0.8, 0.0, 0.0, 0.2); // TODO: Tune
+    public static final PIDF kElevatorPIDF = new PIDF(9.0, 0.0, 0.0, 0.2); // TODO: Tune
 
     public static final double kPivotHardMax = Units.degreesToRadians(90.5);
     public static final double kPivotHiMin = Units.degreesToRadians(-90.0);

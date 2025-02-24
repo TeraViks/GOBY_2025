@@ -279,11 +279,11 @@ public class Crane extends SubsystemBase {
 
     scaleAHConstraints(position, deviation);
     m_aController.reset(
-      deviation.getX(),
+      position.getX(),
       velocity.getX()
     );
     m_hController.reset(
-      deviation.getY(),
+      position.getY(),
       velocity.getY()
     );
   }

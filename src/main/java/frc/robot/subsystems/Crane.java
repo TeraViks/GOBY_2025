@@ -305,6 +305,8 @@ public class Crane extends SubsystemBase {
     scaleAHConstraints(position, deviation);
     double aVelocity = m_aController.calculate(position.getX());
     double hVelocity = m_hController.calculate(position.getY());
+    SmartDashboard.putNumber("Elevator Goal", m_hController.getGoal().position);
+    SmartDashboard.putNumber("Pivot Goal", Units.radiansToDegrees(m_aController.getGoal().position));
     m_pivotPID.setReference(aVelocity, ControlType.kMAXMotionVelocityControl,
       CraneConstants.kPivotMotorVelocityPIDFSlot.slot());
     m_leftElevatorPID.setReference(hVelocity, ControlType.kMAXMotionVelocityControl,

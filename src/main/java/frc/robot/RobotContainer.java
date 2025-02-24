@@ -33,8 +33,8 @@ import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
-import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 import frc.robot.utilities.FieldPoseUtil.CoralStationSubPose;
+import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -180,43 +180,68 @@ public class RobotContainer {
           m_crane.move(getPivotAxis(), getElevatorAxis());
         }, m_crane));
 
-      new Trigger(() ->
-          m_operatorController.getRawButton(OIConstants.kASideButton) &&
-          m_operatorController.getRawButton(OIConstants.kLevel2Button))
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-          ReefSubPose.A, CraneConstants.kPositionL2));
-
-      new Trigger(() ->
-          m_operatorController.getRawButton(OIConstants.kASideButton) &&
-          m_operatorController.getRawButton(OIConstants.kLevel3Button))
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-          ReefSubPose.A, CraneConstants.kPositionL3));
-
-      new Trigger(() ->
-          m_operatorController.getRawButton(OIConstants.kBSideButton) &&
-          m_operatorController.getRawButton(OIConstants.kLevel2Button))
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-          ReefSubPose.B, CraneConstants.kPositionL2));
-
-      new Trigger(() ->
-          m_operatorController.getRawButton(OIConstants.kBSideButton) &&
-          m_operatorController.getRawButton(OIConstants.kLevel3Button))
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new CoralPlacement(
-          m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-          ReefSubPose.B, CraneConstants.kPositionL3));
-
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() -> {
-          //m_crane.moveTo(FieldConstants.kLevel1)
-        }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionL1), m_crane));
+
+      new JoystickButton(m_operatorController, OIConstants.kLevel2Button)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionL2), m_crane));
+
+      new JoystickButton(m_operatorController, OIConstants.kLevel3Button)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionL3), m_crane));
+
+      new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionIntake), m_crane));
+
+      // new JoystickButton(m_operatorController, OIConstants.k)
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(Commands.runOnce(() ->
+      //     m_crane.moveTo(CraneConstants.kPositionL3), m_crane));
+
+      // new Trigger(() ->
+      //     m_operatorController.getRawButton(OIConstants.kASideButton) &&
+      //     m_operatorController.getRawButton(OIConstants.kLevel2Button))
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(new CoralPlacement(
+      //     m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      //     ReefSubPose.A, CraneConstants.kPositionL2));
+
+      // new Trigger(() ->
+      //     m_operatorController.getRawButton(OIConstants.kASideButton) &&
+      //     m_operatorController.getRawButton(OIConstants.kLevel3Button))
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(new CoralPlacement(
+      //     m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      //     ReefSubPose.A, CraneConstants.kPositionL3));
+
+      // new Trigger(() ->
+      //     m_operatorController.getRawButton(OIConstants.kBSideButton) &&
+      //     m_operatorController.getRawButton(OIConstants.kLevel2Button))
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(new CoralPlacement(
+      //     m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      //     ReefSubPose.B, CraneConstants.kPositionL2));
+
+      // new Trigger(() ->
+      //     m_operatorController.getRawButton(OIConstants.kBSideButton) &&
+      //     m_operatorController.getRawButton(OIConstants.kLevel3Button))
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(new CoralPlacement(
+      //     m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      //     ReefSubPose.B, CraneConstants.kPositionL3));
+
+      // new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(Commands.runOnce(() -> {
+      //     //m_crane.moveTo(FieldConstants.kLevel1)
+      //   }, m_robotDrive)); //TODO: Requirements also need to include the crane subsystem
 
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kHighAlgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
@@ -253,10 +278,10 @@ public class RobotContainer {
           m_handler.cancelIntake();
         }, m_handler));
 
-      new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-          m_selectedCoralStationSlot));
+      // new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      //     m_selectedCoralStationSlot));
 
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)
         .debounce(OIConstants.kDebounceSeconds)

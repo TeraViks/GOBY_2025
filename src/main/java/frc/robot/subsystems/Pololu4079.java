@@ -2,9 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.utilities.Time;
 import frc.robot.utilities.ValueCache;
 
 /** Distance/proximity sensor based on the Pololu 4079 (https://www.pololu.com/product/4079). */
@@ -63,17 +63,13 @@ public class Pololu4079 extends SubsystemBase {
     return m_distanceCache.get();
   }
 
-  private double getTimeSec() {
-    return (double)RobotController.getFPGATime() / 1_000_000.0;
-  }
-
   private boolean isProximateImpl() {
     return getDistance() <= m_max_distance;
   }
 
   public boolean isProximate() {
     if (m_debounceSec != 0.0) {
-      return m_proximateT0Sec + m_debounceSec <= getTimeSec();
+      return m_proximateT0Sec + m_debounceSec <= Time.getTimeSeconds();
     } else {
       return isProximateImpl();
     }
@@ -85,7 +81,7 @@ public class Pololu4079 extends SubsystemBase {
     if (m_debounceSec != 0.0) {
       if (isProximateImpl()) {
         if (m_proximateT0Sec == Double.POSITIVE_INFINITY) {
-          m_proximateT0Sec = getTimeSec();
+          m_proximateT0Sec = Time.getTimeSeconds();
         }
       } else {
         m_proximateT0Sec = Double.POSITIVE_INFINITY;

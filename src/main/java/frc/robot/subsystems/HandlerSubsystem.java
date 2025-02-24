@@ -8,7 +8,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +15,7 @@ import frc.robot.Constants.HandlerConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.SparkUtil.PIDFSlot;
+import frc.robot.utilities.Time;
 import frc.robot.utilities.TunablePIDF;
 
 public class HandlerSubsystem extends SubsystemBase {
@@ -159,10 +159,6 @@ public class HandlerSubsystem extends SubsystemBase {
     }
   }
 
-  private static double getTimeSeconds() {
-    return (double)RobotController.getFPGATime() / 1_000_000.0;
-  }
-
   public void eject() {
     switch (m_state) {
       case EMPTY:
@@ -183,7 +179,7 @@ public class HandlerSubsystem extends SubsystemBase {
           HandlerConstants.kEjectSpeedAlgae,
           ControlType.kMAXMotionVelocityControl,
           HandlerConstants.kPIDFSlotVelocity);
-        m_ejectDelayStartTime = getTimeSeconds();
+        m_ejectDelayStartTime = Time.getTimeSeconds();
         m_state = State.EJECTING_ALGAE;
         break;
       }
@@ -192,7 +188,7 @@ public class HandlerSubsystem extends SubsystemBase {
           HandlerConstants.kEjectSpeedCoral,
           ControlType.kMAXMotionVelocityControl,
           HandlerConstants.kPIDFSlotVelocity);
-        m_ejectDelayStartTime = getTimeSeconds();
+        m_ejectDelayStartTime = Time.getTimeSeconds();
         m_state = State.EJECTING_CORAL;
         break;
       }
@@ -276,7 +272,7 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case EJECTING_CORAL: {
-        double currentTime = getTimeSeconds();
+        double currentTime = Time.getTimeSeconds();
         if (currentTime - m_ejectDelayStartTime >= HandlerConstants.kEjectDelaySeconds) {
           m_motor.stopMotor();
           m_state = State.EMPTY;
@@ -284,7 +280,7 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
       case EJECTING_ALGAE: {
-        double currentTime = getTimeSeconds();
+        double currentTime = Time.getTimeSeconds();
         if (currentTime - m_ejectDelayStartTime >= HandlerConstants.kEjectDelaySeconds) {
           m_motor.stopMotor();
           m_state = State.EMPTY;

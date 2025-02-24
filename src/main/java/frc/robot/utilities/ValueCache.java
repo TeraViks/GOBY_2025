@@ -2,8 +2,6 @@ package frc.robot.utilities;
 
 import java.util.function.Supplier;
 
-import edu.wpi.first.wpilibj.RobotController;
-
 public class ValueCache<T> {
   private Supplier<T> m_supplier;
   private final long m_ttlMicroseconds;
@@ -13,11 +11,7 @@ public class ValueCache<T> {
   public ValueCache(Supplier<T> supplier, long ttlMicroseconds) {
     m_supplier = supplier;
     m_ttlMicroseconds = ttlMicroseconds;
-    update(getTimestampMicroseconds());
-  }
-
-  private long getTimestampMicroseconds() {
-    return RobotController.getFPGATime();
+    update(Time.getTimeMicroseconds());
   }
 
   private void update(long currentTimestampMicroseconds) {
@@ -26,7 +20,7 @@ public class ValueCache<T> {
   }
 
   public T get() {
-    long currentTimestampMicroseconds = getTimestampMicroseconds();
+    long currentTimestampMicroseconds = Time.getTimeMicroseconds();
     if (m_timestampMicroseconds + m_ttlMicroseconds < currentTimestampMicroseconds) {
       update(currentTimestampMicroseconds);
     }
@@ -35,7 +29,7 @@ public class ValueCache<T> {
 
   public void flush() {
     // Set the timestamp far enough in the past to invalidate the cache.
-    long currentTimestampMicroseconds = getTimestampMicroseconds();
+    long currentTimestampMicroseconds = Time.getTimeMicroseconds();
     m_timestampMicroseconds = currentTimestampMicroseconds - m_ttlMicroseconds - 1;
   }
 }

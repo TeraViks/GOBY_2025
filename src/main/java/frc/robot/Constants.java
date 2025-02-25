@@ -575,9 +575,9 @@ public final class Constants {
     public static final Translation2d kPositionL1 =
       new Translation2d(Units.degreesToRadians(15.0), 0.454);
     public static final Translation2d kPositionL2 =
-      new Translation2d(Units.degreesToRadians(-35.0), 0.975);
+      new Translation2d(Units.degreesToRadians(-40.207), 1.255);
     public static final Translation2d kPositionL3 =
-      new Translation2d(Units.degreesToRadians(-35.0), 1.378);
+      new Translation2d(Units.degreesToRadians(-21.003), 1.496);
     public static final Translation2d kPositionLoAlgae =
       new Translation2d(Units.degreesToRadians(-40.0), 0.924);
     public static final Translation2d kPositionHiAlgae =

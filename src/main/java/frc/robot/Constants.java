@@ -197,22 +197,22 @@ public final class Constants {
     public static final SwerveModule.Config kFrontLeftSwerveConfig = new SwerveModule.Config(
       1, 5, 9,
       kFrontLeftDriveMotorConfig, kFrontLeftTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.266357))
+      false, new Rotation2d(Units.rotationsToRadians(0.766357))
     );
     public static final SwerveModule.Config kRearLeftSwerveConfig = new SwerveModule.Config(
       2, 6, 10,
       kRearLeftDriveMotorConfig, kRearLeftTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.281982))
+      false, new Rotation2d(Units.rotationsToRadians(0.781982))
     );
     public static final SwerveModule.Config kRearRightSwerveConfig = new SwerveModule.Config(
       3, 7, 11,
       kRearRightDriveMotorConfig, kRearRightTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.476562))
+      false, new Rotation2d(Units.rotationsToRadians(0.976562))
     );
     public static final SwerveModule.Config kFrontRightSwerveConfig = new SwerveModule.Config(
       4, 8, 12,
       kFrontRightDriveMotorConfig, kFrontRightTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.367920))
+      false, new Rotation2d(Units.rotationsToRadians(0.867920))
     );
   }
 

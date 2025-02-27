@@ -319,7 +319,7 @@ public final class Constants {
 
     public static final double kDebounceSeconds = 0.01;
 
-    public static final double kJoystickDeadband = 0.05;
+    public static final double kJoystickDeadband = 0.00;
   }
 
   public static final class AutoConstants {

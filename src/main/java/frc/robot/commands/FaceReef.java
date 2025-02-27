@@ -53,6 +53,7 @@ public class FaceReef extends Command {
   @Override
   public void initialize() {
     Pose2d robotPose = m_drive.getPose();
+    m_angleController.enableContinuousInput(-Math.PI, Math.PI);
     m_angleController.reset(
       m_reef.getRotationDeviation(robotPose).getRadians(),
       m_drive.getAngularVelocity()

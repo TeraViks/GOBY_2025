@@ -4,6 +4,7 @@
 
 package frc.robot.utilities;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -13,6 +14,12 @@ public class FaceReefUtil {
 
   public FaceReefUtil(FieldPoseUtil fieldPoseUtil) {
     m_reef = fieldPoseUtil.getReefCenter();
+  }
+
+  // Get rotation angle, constrained to [-pi..pi]. This is necessary in conjunction with
+  // ProfiledPIDController.enableContinuousInput().
+  private static Rotation2d rotationAngle(Rotation2d rotation) {
+    return new Rotation2d(MathUtil.angleModulus(rotation.getRadians()));
   }
 
   private Translation2d getRobotToReef(Pose2d robotPose) {
@@ -33,7 +40,7 @@ public class FaceReefUtil {
   public Rotation2d getRotationDeviation(Pose2d robotPose) {
     Rotation2d currentRotation = robotPose.getRotation();
     Rotation2d desiredRotation = getDesiredRotation(robotPose);
-    Rotation2d rotationDeviation = currentRotation.minus(desiredRotation);
+    Rotation2d rotationDeviation = rotationAngle(currentRotation.minus(desiredRotation));
     return rotationDeviation;
   }
 }

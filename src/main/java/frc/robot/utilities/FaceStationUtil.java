@@ -6,6 +6,7 @@ package frc.robot.utilities;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -15,6 +16,12 @@ public class FaceStationUtil {
 
   public FaceStationUtil(FieldPoseUtil fieldPoseUtil) {
     m_coralStations = fieldPoseUtil.getCoralStations();
+  }
+
+  // Get rotation angle, constrained to [-pi..pi]. This is necessary in conjunction with
+  // ProfiledPIDController.enableContinuousInput().
+  private static Rotation2d rotationAngle(Rotation2d rotation) {
+    return new Rotation2d(MathUtil.angleModulus(rotation.getRadians()));
   }
 
   private static Translation2d getRobotToCoralStation(Pose2d robotPose, Pose2d station) {
@@ -37,8 +44,8 @@ public class FaceStationUtil {
 
   public Rotation2d getRotationDeviation(Pose2d robotPose) {
     Rotation2d currentRotation = robotPose.getRotation();
-    Rotation2d desiredRotation = closestStation(robotPose).getRotation();
-    Rotation2d rotationDeviation = currentRotation.minus(desiredRotation);
+    Rotation2d desiredRotation = closestStation(robotPose).getRotation().plus(new Rotation2d(Math.PI));
+    Rotation2d rotationDeviation = rotationAngle(currentRotation.minus(desiredRotation));
     return rotationDeviation;
   }
 

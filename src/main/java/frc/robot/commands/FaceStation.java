@@ -54,6 +54,7 @@ public class FaceStation extends Command {
   @Override
   public void initialize() {
     Pose2d robotPose = m_drive.getPose();
+    m_angleController.enableContinuousInput(-Math.PI, Math.PI);
     m_angleController.reset(
       m_station.getRotationDeviation(robotPose).getRadians(),
       m_drive.getAngularVelocity()

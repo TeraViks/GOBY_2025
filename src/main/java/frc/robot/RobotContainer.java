@@ -224,6 +224,14 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() ->
           m_handler.intakeCoral(), m_handler));
 
+      // Manual crane home
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kManualOperatorMode) &&
+          m_operatorController.getRawButton(OIConstants.kHomeCraneButton))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionHome), m_crane));
+
       // Automatic level two A placement
       new Trigger(() ->
           m_operatorController.getRawButton(OIConstants.kASideButton) &&

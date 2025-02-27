@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,18 +53,26 @@ public class DriveToPose extends Command {
     return x * x;
   }
 
+  // Get pose angle, constrained to [-pi..pi]. This is necessary in conjunction with
+  // ProfiledPIDController.enableContinuousInput().
+  private static double poseAngle(Pose2d pose) {
+    return MathUtil.angleModulus(pose.getRotation().getRadians());
+  }
+
   public DriveToPose(Pose2d pose, DriveSubsystem drive,
       double translationPosToleranceMeters, double translationVelToleranceMetersPerSecond,
       double anglePosToleranceRadians, double angleVelToleranceRadiansPerSecond) {
     m_pose = pose;
+    m_drive = drive;
+
     m_xController.setGoal(pose.getX());
     m_yController.setGoal(pose.getY());
-    m_angleController.setGoal(pose.getRotation().getRadians());
-    m_drive = drive;
     m_squaredTranslationPositionToleranceMeters = square(translationPosToleranceMeters);
     m_squaredTranslationVelocityToleranceMetersPerDt =
       square(Constants.kDt * translationVelToleranceMetersPerSecond);
 
+    m_angleController.setGoal(poseAngle(pose));
+    m_angleController.enableContinuousInput(-Math.PI, Math.PI);
     m_angleController.setTolerance(anglePosToleranceRadians,
       Constants.kDt * angleVelToleranceRadiansPerSecond);
 
@@ -125,7 +134,7 @@ public class DriveToPose extends Command {
       velocity.getY()
     );
     m_angleController.reset(
-      robotPose.getRotation().getRadians(),
+      poseAngle(robotPose),
       m_drive.getAngularVelocity()
     );
   }
@@ -140,7 +149,7 @@ public class DriveToPose extends Command {
     scaleXYConstraints(robotPose, translationDeviation);
     double xVelocity = m_xController.calculate(robotPose.getX());
     double yVelocity = m_yController.calculate(robotPose.getY());
-    double angleVelocity = m_angleController.calculate(robotPose.getRotation().getRadians());
+    double angleVelocity = m_angleController.calculate(poseAngle(robotPose));
     m_drive.drive(
       xVelocity,
       yVelocity,

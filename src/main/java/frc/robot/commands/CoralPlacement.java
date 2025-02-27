@@ -18,9 +18,7 @@ public class CoralPlacement extends SequentialCommandGroup {
 
     addCommands(
       Commands.runOnce(() -> m_crane.moveTo(cranePosition)),
-      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent()),
-      Commands.runOnce(() -> m_handler.eject()),
-      Commands.waitUntil(() -> !m_handler.isLoadedCoral())
+      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent())
     );
   }
 }

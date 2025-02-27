@@ -221,8 +221,10 @@ public class RobotContainer {
           m_operatorController.getRawButton(OIConstants.kManualOperatorMode) &&
           m_operatorController.getRawButton(OIConstants.kIntakeCoralButton))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() ->
-          m_handler.intakeCoral(), m_handler));
+        .whileTrue(Commands.runOnce(() ->
+          m_handler.intakeCoral(), m_handler))
+        .onFalse(Commands.runOnce(() ->
+          m_handler.cancelIntake(), m_handler));
 
       // Manual crane home
       new Trigger(() -> 

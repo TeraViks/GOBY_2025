@@ -299,6 +299,7 @@ public final class Constants {
     public static final int kLevel1Button = kA;
     public static final int kLevel2Button = kBack;
     public static final int kLevel3Button = kStart;
+    public static final int kIntakePosition = kB;
     public static final int kIntakeCoralButton = kX;
     public static final int kIntakeALgaePOV = 0;
     public static final int kEjectButton = kY;

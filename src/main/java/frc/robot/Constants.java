@@ -219,7 +219,7 @@ public final class Constants {
 
   public static final class HandlerConstants {
     public static final int kMotorID = 17;
-    public static final double kIntakeSpeedCoral = 0.25;
+    public static final double kIntakeSpeedCoral = 0.5;
     public static final double kEjectSpeedCoral = -0.4;
     public static final double kIntakeSpeedAlgae = -0.4;
     public static final double kEjectSpeedAlgae = 0.2;

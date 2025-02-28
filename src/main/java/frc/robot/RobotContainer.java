@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.function.ObjIntConsumer;
-
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -58,7 +56,7 @@ public class RobotContainer {
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
   double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
   boolean m_robotRelative = false;
-  double m_speedFactor = DriveConstants.kSlowSpeedFactor;
+  double m_speedFactor = 1.0;
 
   private CoralStationSubPose m_selectedCoralStationSlot = CoralStationSubPose.FIVE;
 
@@ -157,12 +155,12 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
       .debounce(OIConstants.kDebounceSeconds)
-      .whileTrue(Commands.runOnce(() -> setRobotRelative(true)))
+      .onTrue(Commands.runOnce(() -> setRobotRelative(true)))
       .onFalse(Commands.runOnce(() -> setRobotRelative(false)));
 
     new JoystickButton(m_driverController, OIConstants.kSlowModeButton)
       .debounce(OIConstants.kDebounceSeconds)
-      .whileTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor)))
+      .onTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor)))
       .onFalse(Commands.runOnce(() -> setSpeedFactor(1.0)));
 
     new JoystickButton(m_driverController, OIConstants.kFaceReefButton)

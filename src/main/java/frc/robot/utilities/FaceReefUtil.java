@@ -33,7 +33,7 @@ public class FaceReefUtil {
     Rotation2d desiredAngle = new Rotation2d(
       Math.floor(
         (reefToRobotAngle.getRadians() + (Math.PI/6.0))
-        / (Math.PI/3.0)) * (Math.PI/3.0) + Math.PI);
+        / (Math.PI/3.0)) * (Math.PI/3.0));
     return desiredAngle;
   }
 

@@ -13,10 +13,13 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.estimation.TargetModel;
+import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.FieldConstants;
 
 public class CameraSubsystem extends SubsystemBase {
@@ -49,11 +52,23 @@ public class CameraSubsystem extends SubsystemBase {
 
     public void periodic() {
       for (PhotonPipelineResult pipelineResult : m_camera.getAllUnreadResults()) {
-        Optional<EstimatedRobotPose> estimate = m_photonPoseEstimator.update(pipelineResult);
+        Optional<MultiTargetPNPResult> multiTargetResultOpt = pipelineResult.getMultiTagResult();
+        if (multiTargetResultOpt.isPresent()) {
+          if (multiTargetResultOpt.get().estimatedPose.ambiguity > CameraConstants.kMaxAmbiguity) {
+            return;
+          }
+        } else {
+          for (PhotonTrackedTarget target : pipelineResult.targets) {
+            if (target.poseAmbiguity > CameraConstants.kMaxAmbiguity) {
+              return;
+            }
+          }
+        }
         // Filter out spurious empty results, such that the most recent non-empty result is
         // used as the estimate. PhotonVision may return multiple pipeline results (some
         // empty) per periodic update, and a result that's a few milliseconds old is better
         // than no result at all.
+        Optional<EstimatedRobotPose> estimate = m_photonPoseEstimator.update(pipelineResult);
         if (estimate.isPresent()) {
           m_estimate = estimate;
         }

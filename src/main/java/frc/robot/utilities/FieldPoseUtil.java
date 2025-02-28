@@ -1,8 +1,9 @@
 package frc.robot.utilities;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
-import java.util.List;
 import java.util.Optional;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -95,14 +96,6 @@ public class FieldPoseUtil {
         case RIGHT: return aprilTags.coralStationRight;
       }
     }
-
-    private static CoralStationPose ofAprilTag(AprilTag aprilTag, AprilTags aprilTags) {
-      if (aprilTag == aprilTags.coralStationLeft) {
-        return LEFT;
-      }
-      assert(aprilTag == aprilTags.coralStationRight);
-      return RIGHT;
-    }
   }
 
   public enum CoralStationSubPose {
@@ -131,6 +124,8 @@ public class FieldPoseUtil {
   private AprilTags m_aprilTags;
   private Translation2d m_reefCenter;
   private ArrayList<Pose2d> m_coralStations;
+  private Map<AprilTag, ReefPose> m_reefMap;
+  private Map<AprilTag, CoralStationPose> m_coralStationMap;
 
   public FieldPoseUtil() {
     m_alliance = getAlliance();
@@ -144,6 +139,18 @@ public class FieldPoseUtil {
     }
     m_reefCenter = m_aprilTags.reefCenter();
     m_coralStations = m_aprilTags.coralStations();
+    m_reefMap = Map.of(
+      m_aprilTags.reefTwo, ReefPose.TWO,
+      m_aprilTags.reefFour, ReefPose.FOUR,
+      m_aprilTags.reefSix, ReefPose.SIX,
+      m_aprilTags.reefEight, ReefPose.EIGHT,
+      m_aprilTags.reefTen, ReefPose.TEN,
+      m_aprilTags.reefTwelve, ReefPose.TWELVE
+    );
+    m_coralStationMap = Map.of(
+      m_aprilTags.coralStationLeft, CoralStationPose.LEFT,
+      m_aprilTags.coralStationRight, CoralStationPose.RIGHT
+    );
   }
 
   private static Alliance getAlliance() {
@@ -214,42 +221,22 @@ public class FieldPoseUtil {
   }
 
   public ReefPose closestReefHour(Pose2d robotPose) {
-    Map<AprilTag, ReefPose> reefHourList = Map.of(
-      m_aprilTags.reefTwo, ReefPose.TWO,
-      m_aprilTags.reefFour, ReefPose.FOUR,
-      m_aprilTags.reefSix, ReefPose.SIX,
-      m_aprilTags.reefEight, ReefPose.EIGHT,
-      m_aprilTags.reefTen, ReefPose.TEN,
-      m_aprilTags.reefTwelve, ReefPose.TWELVE
-    );
-
     Translation2d robotPos = robotPose.getTranslation();
-    AprilTag nearestReefHour = null;
-
-    for (AprilTag reefTime : reefHourList.keySet()) {
-      if (nearestReefHour == null
-         || reefTime.pose.toPose2d().getTranslation().getDistance(robotPos)
-          < nearestReefHour.pose.toPose2d().getTranslation().getDistance(robotPos)) {
-        nearestReefHour = reefTime;
-      }
-    }
-
-    return reefHourList.get(nearestReefHour);
+    AprilTag nearestReefHour = Collections.min(
+      m_reefMap.keySet(),
+      Comparator.comparing((AprilTag aprilTag) ->
+        robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
+    );
+    return m_reefMap.get(nearestReefHour);
   }
 
   public CoralStationPose closestStation(Pose2d robotPose) {
-    ArrayList<AprilTag> coralStations = new ArrayList<>(List.of(
-      m_aprilTags.coralStationLeft, m_aprilTags.coralStationRight));
     Translation2d robotPos = robotPose.getTranslation();
-    AprilTag nearestStation = coralStations.get(0);
-
-    for (AprilTag station : coralStations) {
-      if (station.pose.toPose2d().getTranslation().getDistance(robotPos)
-          < nearestStation.pose.toPose2d().getTranslation().getDistance(robotPos)) {
-        nearestStation = station;
-      }
-    }
-
-    return CoralStationPose.ofAprilTag(nearestStation, m_aprilTags);
+    AprilTag nearestStation = Collections.min(
+      m_coralStationMap.keySet(),
+      Comparator.comparing((AprilTag aprilTag) ->
+        robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
+    );
+    return m_coralStationMap.get(nearestStation);
   }
 }

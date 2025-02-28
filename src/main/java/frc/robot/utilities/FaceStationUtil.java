@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 
 public class FaceStationUtil {
   private final ArrayList<Pose2d> m_coralStations;
@@ -24,34 +23,14 @@ public class FaceStationUtil {
     return new Rotation2d(MathUtil.angleModulus(rotation.getRadians()));
   }
 
-  private static Translation2d getRobotToCoralStation(Pose2d robotPose, Pose2d station) {
-    Translation2d robotToStation = station.getTranslation().minus(robotPose.getTranslation());
-    return robotToStation;
-  }
-
-  public Pose2d closestStation(Pose2d robotPose) {
-    Translation2d robotPos = robotPose.getTranslation();
-    Pose2d nearestStation = m_coralStations.get(0);
-
-    for (Pose2d station : m_coralStations) {
-      if (station.getTranslation().getDistance(robotPos)
-          < nearestStation.getTranslation().getDistance(robotPos)) {
-        nearestStation = station;
-      }
-    }
-    return nearestStation;
+  private Pose2d closestStation(Pose2d robotPose) {
+    return robotPose.nearest(m_coralStations);
   }
 
   public Rotation2d getRotationDeviation(Pose2d robotPose) {
     Rotation2d currentRotation = robotPose.getRotation();
-    Rotation2d desiredRotation = closestStation(robotPose).getRotation().plus(new Rotation2d(Math.PI));
+    Rotation2d desiredRotation = closestStation(robotPose).getRotation().plus(Rotation2d.kPi);
     Rotation2d rotationDeviation = rotationAngle(currentRotation.minus(desiredRotation));
     return rotationDeviation;
-  }
-
-  public double getStationDistance(Pose2d robotPose) {
-    Translation2d robotToStation = getRobotToCoralStation(robotPose, closestStation(robotPose));
-    double stationDistance = robotToStation.getNorm();
-    return stationDistance;
   }
 }

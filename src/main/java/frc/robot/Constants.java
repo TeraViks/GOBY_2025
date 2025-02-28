@@ -314,6 +314,7 @@ public final class Constants {
     public static final int kManualOperatorMode = kLeftJoy;
     public static final int kSlowModeButton = kRightBumper;
     public static final int kHomeCraneButton = kRightBumper;
+    public static final int kRobotRelativeButton = kLeftJoy;
 
     public static final double kTriggerAcuationValue = 0.5;
 

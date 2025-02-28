@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.function.ObjIntConsumer;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -55,6 +57,8 @@ public class RobotContainer {
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
   double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
+  boolean m_robotRelative = false;
+  double m_speedFactor = DriveConstants.kSlowSpeedFactor;
 
   private CoralStationSubPose m_selectedCoralStationSlot = CoralStationSubPose.FIVE;
 
@@ -105,19 +109,11 @@ public class RobotContainer {
       // Turning is controlled by the X axis of the right stick.
       new RunCommand(
         () -> {
-          if (m_driverController.getRawButton(OIConstants.kSlowModeButton)) {
-            m_robotDrive.drive(
-              getXSpeedInput() * DriveConstants.kSlowSpeedFactor,
-              getYSpeedInput() * DriveConstants.kSlowSpeedFactor,
-              getRotationSpeedInput() * DriveConstants.kSlowSpeedFactor,
-              true);
-          } else {
-            m_robotDrive.drive(
-              getXSpeedInput(),
-              getYSpeedInput(),
-              getRotationSpeedInput(),
-              true);
-          }
+          m_robotDrive.drive(
+            getXSpeedInput() * m_speedFactor,
+            getYSpeedInput() * m_speedFactor,
+            getRotationSpeedInput() * m_speedFactor,
+            m_robotRelative);
         }, m_robotDrive
       )
     );
@@ -143,6 +139,14 @@ public class RobotContainer {
     m_robotDrive.setPIDSlotID(slotID);
   }
 
+  private void setRobotRelative(boolean robotRelative) {
+    m_robotRelative = robotRelative;
+  }
+
+  private void setSpeedFactor(double speedFactor) {
+    m_speedFactor = speedFactor;
+  }
+
   private void configureBindings() {
     new JoystickButton(m_driverController, OIConstants.kZeroGyro)
       .debounce(OIConstants.kDebounceSeconds)
@@ -150,6 +154,16 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
+
+    new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(Commands.runOnce(() -> setRobotRelative(true)))
+      .onFalse(Commands.runOnce(() -> setRobotRelative(false)));
+
+    new JoystickButton(m_driverController, OIConstants.kSlowModeButton)
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor)))
+      .onFalse(Commands.runOnce(() -> setSpeedFactor(1.0)));
 
     new JoystickButton(m_driverController, OIConstants.kFaceReefButton)
       .debounce(OIConstants.kDebounceSeconds)

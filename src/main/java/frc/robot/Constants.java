@@ -530,7 +530,7 @@ public final class Constants {
       0.0025
     );
 
-    public static final PIDF kPivotPIDF = new PIDF(10.5, 0.0, 2.0, 0.0);
+    public static final PIDF kPivotPIDF = new PIDF(9.0, 0.0, 8.5, 0.0);
     public static final PIDF kElevatorPIDF = new PIDF(9.0, 0.0, 0.0, 0.2);
 
     public static final double kPivotHardMax = Units.degreesToRadians(90.5);

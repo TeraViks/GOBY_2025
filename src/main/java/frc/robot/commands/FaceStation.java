@@ -69,7 +69,7 @@ public class FaceStation extends Command {
 
     updateConstants();
 
-    double angleVelocity = m_angleController.calculate(rotationDeviation.getRadians() + Math.PI);
+    double angleVelocity = m_angleController.calculate(rotationDeviation.getRadians());
 
     m_drive.drive(
       m_xVelocitySupplier.get(),

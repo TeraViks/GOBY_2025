@@ -223,7 +223,7 @@ public class RobotContainer {
       // Manual intake coral
       new JoystickButton(m_operatorController, OIConstants.kManualIntake)
         .debounce(OIConstants.kDebounceSeconds)
-        .whileTrue(Commands.runOnce(() ->
+        .onTrue(Commands.runOnce(() ->
           m_handler.intakeCoral(), m_handler))
         .onFalse(Commands.runOnce(() ->
           m_handler.cancelIntake(), m_handler));

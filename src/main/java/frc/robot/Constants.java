@@ -48,7 +48,7 @@ public final class Constants {
 
   public static final class DriveConstants {
     public static final boolean kSquareInputs = false;
-    public static final double kSlowSpeedFactor = 0.25;
+    public static final double kSlowSpeedFactor = 0.125;
 
     public static final double kTrackWidth = 0.629; // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = 0.629; // Distance between front and back wheels on robot

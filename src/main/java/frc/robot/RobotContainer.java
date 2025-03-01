@@ -81,7 +81,8 @@ public class RobotContainer {
     // Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyYAxis))
-      * OIConstants.kMaxMetersPerSec;
+      * OIConstants.kMaxMetersPerSec
+      * m_speedFactor;
   }
 
   private double getYSpeedInput() {
@@ -89,14 +90,16 @@ public class RobotContainer {
     // Y axis control, where left is positive. Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyXAxis))
-      * OIConstants.kMaxMetersPerSec;
+      * OIConstants.kMaxMetersPerSec
+      * m_speedFactor;
   }
 
   private double getRotationSpeedInput() {
     // Moving the joystick to the right causes positive input, which we negate in order to rotate
     // clockwise.
     return -joystickTransform(m_driverController.getRawAxis(OIConstants.kRightJoyXAxis))
-      * OIConstants.kMaxRadPerSec;
+      * OIConstants.kMaxRadPerSec
+      * m_speedFactor;
   }
 
   public RobotContainer() {
@@ -108,9 +111,9 @@ public class RobotContainer {
       new RunCommand(
         () -> {
           m_robotDrive.drive(
-            getXSpeedInput() * m_speedFactor,
-            getYSpeedInput() * m_speedFactor,
-            getRotationSpeedInput() * m_speedFactor,
+            getXSpeedInput(),
+            getYSpeedInput(),
+            getRotationSpeedInput(),
             m_fieldRelative);
         }, m_robotDrive
       )

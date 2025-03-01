@@ -9,8 +9,11 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.CraneConstants;
 import frc.robot.Constants.DriveConstants;
@@ -35,6 +39,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.CoralStationSubPose;
+import frc.robot.utilities.FieldPoseUtil.ReefPose;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 /*
@@ -152,6 +157,14 @@ public class RobotContainer {
     m_speedFactor = speedFactor;
   }
 
+  private boolean withinTolerance(Pose2d referencePose, Pose2d pose, double xTolerance, double yTolerance) {
+    Transform2d posesDifference = referencePose.minus(pose);
+    if (Math.abs(posesDifference.getX()) <= xTolerance && Math.abs(posesDifference.getY()) <= yTolerance) {
+      return true;
+    }
+    return false;
+  }
+
   private void configureBindings() {
     new JoystickButton(m_driverController, OIConstants.kZeroGyro)
       .debounce(OIConstants.kDebounceSeconds)
@@ -159,6 +172,27 @@ public class RobotContainer {
         m_robotDrive.zeroGyro();
       }, m_robotDrive
     ));
+
+    new Trigger(() -> {
+      Pose2d robotPose = m_robotDrive.getPose();
+      ReefPose reefHour = m_fieldPoseUtil.closestReefHour(robotPose);
+      Pose2d desiredPoseA = m_fieldPoseUtil.getTargetPoseAtReef(reefHour, ReefSubPose.A);
+      Pose2d desiredPoseB = m_fieldPoseUtil.getTargetPoseAtReef(reefHour, ReefSubPose.B);
+      if (
+        withinTolerance(desiredPoseA, robotPose, AutoConstants.kxTolerance, AutoConstants.kyTolerance) ||
+        withinTolerance(desiredPoseB, robotPose, AutoConstants.kxTolerance, AutoConstants.kyTolerance)) {
+          return true;
+        }      
+      return false;
+    }) 
+      .onTrue(Commands.run(() -> {
+        m_driverController.setRumble(RumbleType.kBothRumble, 1);
+        m_driverController.setRumble(RumbleType.kBothRumble, 1);
+      }))
+      .onFalse(Commands.run(() -> {
+        m_driverController.setRumble(RumbleType.kBothRumble, 0);
+        m_driverController.setRumble(RumbleType.kBothRumble, 0);
+      }));
 
     // Use m_robotDrive requirement as synchronizer for m_fieldRelative.
     new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)

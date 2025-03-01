@@ -345,6 +345,9 @@ public final class Constants {
     public static final double kReefBranchOffset = 0.164;
 
     public static final double kProcessorWallOffset = 0.1524; // TODO: Tune.
+
+    public static final double kxTolerance = 0.015; //TODO: Tune.
+    public static final double kyTolerance = 0.015; //TODO: Tune.
   }
 
   public static final class CameraConstants {

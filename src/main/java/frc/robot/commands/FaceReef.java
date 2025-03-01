@@ -24,6 +24,7 @@ public class FaceReef extends Command {
   DriveSubsystem m_drive;
   Supplier<Double> m_xVelocitySupplier;
   Supplier<Double> m_yVelocitySupplier;
+  Supplier<Boolean> m_fieldRelativeSupplier;
   FaceReefUtil m_reef;
 
   private static final TunablePIDF turningPIDF = new TunablePIDF("Reef.turningPIDF",
@@ -40,10 +41,11 @@ public class FaceReef extends Command {
 
   public FaceReef(DriveSubsystem drive,
     Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier,
-    FieldPoseUtil fieldPoseUtil) {
+    Supplier<Boolean> fieldRelativeSupplier, FieldPoseUtil fieldPoseUtil) {
     m_drive = drive;
     m_xVelocitySupplier = xVelocitySupplier;
     m_yVelocitySupplier = yVelocitySupplier;
+    m_fieldRelativeSupplier = fieldRelativeSupplier;
     m_reef = new FaceReefUtil(fieldPoseUtil);
 
     addRequirements(m_drive);
@@ -72,7 +74,7 @@ public class FaceReef extends Command {
       m_xVelocitySupplier.get(),
       m_yVelocitySupplier.get(),
       angleVelocity,
-      true);
+      m_fieldRelativeSupplier.get());
   }
 
   private void updateConstants() {

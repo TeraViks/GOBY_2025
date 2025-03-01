@@ -24,6 +24,7 @@ public class FaceStation extends Command {
   DriveSubsystem m_drive;
   Supplier<Double> m_xVelocitySupplier;
   Supplier<Double> m_yVelocitySupplier;
+  Supplier<Boolean> m_fieldRelativeSupplier;
   FaceStationUtil m_station;
 
   private static final TunablePIDF turningPIDF = new TunablePIDF("Station.turningPIDF",
@@ -41,10 +42,11 @@ public class FaceStation extends Command {
 
   public FaceStation(DriveSubsystem drive,
       Supplier<Double> xVelocitySupplier, Supplier<Double> yVelocitySupplier,
-      FieldPoseUtil fieldPoseUtil) {
+      Supplier<Boolean> fieldRelativeSupplier, FieldPoseUtil fieldPoseUtil) {
     m_drive = drive;
     m_xVelocitySupplier = xVelocitySupplier;
     m_yVelocitySupplier = yVelocitySupplier;
+    m_fieldRelativeSupplier = fieldRelativeSupplier;
     m_station = new FaceStationUtil(fieldPoseUtil);
 
     addRequirements(m_drive);
@@ -75,7 +77,7 @@ public class FaceStation extends Command {
       m_xVelocitySupplier.get(),
       m_yVelocitySupplier.get(),
       angleVelocity,
-      true
+      m_fieldRelativeSupplier.get()
     );
   }
 

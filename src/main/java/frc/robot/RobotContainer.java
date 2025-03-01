@@ -140,6 +140,10 @@ public class RobotContainer {
     m_robotDrive.setPIDSlotID(slotID);
   }
 
+  private boolean getFieldRelative() {
+    return m_fieldRelative;
+  }
+
   private void setFieldRelative(boolean fieldRelative) {
     m_fieldRelative = fieldRelative;
   }
@@ -174,6 +178,7 @@ public class RobotContainer {
         m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput(),
+        () -> getFieldRelative(),
         m_fieldPoseUtil));
 
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
@@ -182,6 +187,7 @@ public class RobotContainer {
         m_robotDrive,
         () -> getXSpeedInput(),
         () -> getYSpeedInput(),
+        () -> getFieldRelative(),
         m_fieldPoseUtil));
 
     new Trigger(() -> m_driverController.getPOV() == OIConstants.kCoralIntake2)

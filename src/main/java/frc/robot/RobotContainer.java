@@ -292,6 +292,7 @@ public class RobotContainer {
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kHighAlgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
+          m_handler.cancelIntake();
           m_crane.moveTo(CraneConstants.kPositionHiAlgae);
           m_handler.intakeAlgae();
         }, m_crane, m_handler));
@@ -300,6 +301,7 @@ public class RobotContainer {
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kLowAlgaePOV)
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(Commands.runOnce(() -> {
+        m_handler.cancelIntake();
         m_crane.moveTo(CraneConstants.kPositionLoAlgae);
         m_handler.intakeAlgae();
       }, m_crane, m_handler));

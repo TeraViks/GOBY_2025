@@ -190,7 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param xSpeed Speed of the robot in the x direction (forward), in m/s.
    * @param ySpeed Speed of the robot in the y direction (right), in m/s.
    * @param rot Angular velocity of the robot, in rad/s.
-   * @param fieldRelative Whether the provided x and y speeds are relative to the field.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the field or to the robot.
    */
   @SuppressWarnings("ParameterName")
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
@@ -204,7 +204,8 @@ public class DriveSubsystem extends SubsystemBase {
     ChassisSpeeds chassisSpeeds = fieldRelative
       ? ChassisSpeeds.fromFieldRelativeSpeeds(
         m_idealVelocity.getX(), m_idealVelocity.getY(), m_idealAngularVelocity, getEstimatedRotation2d())
-      : new ChassisSpeeds(m_idealVelocity.getX(), m_idealVelocity.getY(), m_idealAngularVelocity);
+      : ChassisSpeeds.fromRobotRelativeSpeeds(
+        m_idealVelocity.getX(), m_idealVelocity.getY(), m_idealAngularVelocity, getEstimatedRotation2d());
     var swerveModuleStates =
       kDriveKinematics.toSwerveModuleStates(ChassisSpeeds.discretize(chassisSpeeds, Constants.kDt));
 

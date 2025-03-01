@@ -279,7 +279,7 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() -> {
           m_crane.moveTo(CraneConstants.kPositionHiAlgae);
           m_handler.intakeAlgae();
-        }, m_crane));
+        }, m_crane, m_handler));
 
       // Manual low algae
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kLowAlgaePOV)

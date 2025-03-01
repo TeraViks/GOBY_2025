@@ -238,8 +238,9 @@ public class RobotContainer {
       // Manual intake coral
       new JoystickButton(m_operatorController, OIConstants.kManualIntake)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() ->
-          m_handler.intakeCoral(), m_handler))
+        .onTrue(Commands.runOnce(() -> {
+          m_handler.cancelIntake();
+          m_handler.intakeCoral();}, m_handler))
         .onFalse(Commands.runOnce(() ->
           m_handler.cancelIntake(), m_handler));
 
@@ -292,6 +293,7 @@ public class RobotContainer {
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kHighAlgaePOV)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
+          m_handler.cancelIntake();
           m_crane.moveTo(CraneConstants.kPositionHiAlgae);
           m_handler.intakeAlgae();
         }, m_crane, m_handler));
@@ -300,6 +302,7 @@ public class RobotContainer {
       new Trigger(() -> m_operatorController.getPOV() == OIConstants.kLowAlgaePOV)
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(Commands.runOnce(() -> {
+        m_handler.cancelIntake();
         m_crane.moveTo(CraneConstants.kPositionLoAlgae);
         m_handler.intakeAlgae();
       }, m_crane, m_handler));
@@ -324,12 +327,14 @@ public class RobotContainer {
       // Automatic coral intake
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetCoral(m_handler, m_crane, m_selectedCoralStationSlot));
+        .onTrue(Commands.runOnce(() -> m_handler.cancelIntake())
+          .andThen(new GetCoral(m_handler, m_crane, m_selectedCoralStationSlot)));
       
       // Eject
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
+          m_handler.cancelIntake();
           m_handler.eject();
         }, m_handler));
 

@@ -77,21 +77,25 @@ public class RobotContainer {
   }
 
   private double getXSpeedInput() {
+    double robotRelativeReverseFactor = m_fieldRelative ? 1.0 : -1.0;
     // The Y axis on the controller is inverted! Pushing forward (up) generates a negative value.
     // Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyYAxis))
       * OIConstants.kMaxMetersPerSec
-      * m_speedFactor;
+      * m_speedFactor
+      * robotRelativeReverseFactor;
   }
 
   private double getYSpeedInput() {
+    double robotRelativeReverseFactor = m_fieldRelative ? 1.0 : -1.0;
     // The X axis on the controller behaves as expected (right is positive), but we're using it for
     // Y axis control, where left is positive. Negate the input value here.
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyXAxis))
       * OIConstants.kMaxMetersPerSec
-      * m_speedFactor;
+      * m_speedFactor
+      * robotRelativeReverseFactor;
   }
 
   private double getRotationSpeedInput() {

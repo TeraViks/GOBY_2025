@@ -153,15 +153,17 @@ public class RobotContainer {
       }, m_robotDrive
     ));
 
+    // Use m_robotDrive requirement as synchronizer for m_fieldRelative.
     new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(Commands.runOnce(() -> setFieldRelative(false)))
-      .onFalse(Commands.runOnce(() -> setFieldRelative(true)));
+      .onTrue(Commands.runOnce(() -> setFieldRelative(false), m_robotDrive))
+      .onFalse(Commands.runOnce(() -> setFieldRelative(true), m_robotDrive));
 
+    // Use m_robotDrive requirement as synchronizer for m_speedFactor.
     new JoystickButton(m_driverController, OIConstants.kSlowModeButton)
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor)))
-      .onFalse(Commands.runOnce(() -> setSpeedFactor(1.0)));
+      .onTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor), m_robotDrive))
+      .onFalse(Commands.runOnce(() -> setSpeedFactor(1.0), m_robotDrive));
 
     new JoystickButton(m_driverController, OIConstants.kFaceReefButton)
       .debounce(OIConstants.kDebounceSeconds)

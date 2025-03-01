@@ -55,7 +55,7 @@ public class RobotContainer {
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
   double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
-  boolean m_robotRelative = false;
+  boolean m_fieldRelative = true;
   double m_speedFactor = 1.0;
 
   private CoralStationSubPose m_selectedCoralStationSlot = CoralStationSubPose.FIVE;
@@ -111,7 +111,7 @@ public class RobotContainer {
             getXSpeedInput() * m_speedFactor,
             getYSpeedInput() * m_speedFactor,
             getRotationSpeedInput() * m_speedFactor,
-            m_robotRelative);
+            m_fieldRelative);
         }, m_robotDrive
       )
     );
@@ -137,8 +137,8 @@ public class RobotContainer {
     m_robotDrive.setPIDSlotID(slotID);
   }
 
-  private void setRobotRelative(boolean robotRelative) {
-    m_robotRelative = robotRelative;
+  private void setFieldRelative(boolean fieldRelative) {
+    m_fieldRelative = fieldRelative;
   }
 
   private void setSpeedFactor(double speedFactor) {
@@ -155,8 +155,8 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(Commands.runOnce(() -> setRobotRelative(true)))
-      .onFalse(Commands.runOnce(() -> setRobotRelative(false)));
+      .onTrue(Commands.runOnce(() -> setFieldRelative(false)))
+      .onFalse(Commands.runOnce(() -> setFieldRelative(true)));
 
     new JoystickButton(m_driverController, OIConstants.kSlowModeButton)
       .debounce(OIConstants.kDebounceSeconds)

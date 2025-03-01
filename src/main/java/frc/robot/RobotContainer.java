@@ -220,6 +220,14 @@ public class RobotContainer {
         .onTrue(Commands.runOnce(() ->
           m_crane.moveTo(CraneConstants.kPositionL3), m_crane));
 
+      // Manual crane to intake
+      new Trigger(() -> 
+          m_operatorController.getRawButton(OIConstants.kManualOperatorMode) &&
+          m_operatorController.getRawButton(OIConstants.kIntakePosition))
+        .debounce(OIConstants.kDebounceSeconds)
+        .onTrue(Commands.runOnce(() ->
+          m_crane.moveTo(CraneConstants.kPositionIntake), m_crane));
+
       // Manual intake coral
       new JoystickButton(m_operatorController, OIConstants.kManualIntake)
         .debounce(OIConstants.kDebounceSeconds)

@@ -326,7 +326,7 @@ public class RobotContainer {
       // Automatic coral intake
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetCoral(m_handler, m_crane, m_selectedCoralStationSlot));
+        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, m_selectedCoralStationSlot));
       
       // Eject
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)

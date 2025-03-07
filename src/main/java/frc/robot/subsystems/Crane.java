@@ -463,6 +463,8 @@ public class Crane extends SubsystemBase {
     SmartDashboard.putNumber("Crane elevator height", m_elevatorEncoder.getPosition());
     SmartDashboard.putNumber("Crane sensor distance", m_distanceSensor.getDistance());
     SmartDashboard.putNumber("Crane elevator PID reference", m_leftElevatorMotor.getAppliedOutput());
+    SmartDashboard.putNumber("Crane elevator velocity", m_elevatorEncoder.getVelocity());
+    SmartDashboard.putNumber("Crane pivot velocity", m_pivotEncoder.getVelocity());
     switch (m_state) {
       case CRANING: {
         crane();

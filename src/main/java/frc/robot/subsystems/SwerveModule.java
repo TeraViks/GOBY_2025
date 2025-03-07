@@ -150,6 +150,14 @@ public class SwerveModule {
     );
   }
 
+  public void configureDriveMotor(SparkUtil.Config config) {
+    SparkUtil.configureMotor(m_driveMotor, config);
+  }
+
+  public void configureTurningMotor(SparkUtil.Config config) {
+    SparkUtil.configureMotor(m_turningMotor, config);
+  }
+
   public void stop() {
     m_driveMotor.stopMotor();
     m_turningMotor.stopMotor();

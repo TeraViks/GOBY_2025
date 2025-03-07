@@ -44,7 +44,7 @@ public final class Constants {
 
   // Tunable constants are disabled unless this is set to true.
   // Intended to remain false in committed code.
-  public static final boolean kEnableTuning = false;
+  public static final boolean kEnableTuning = true;
 
   public static final class DriveConstants {
     public static final boolean kSquareInputs = false;

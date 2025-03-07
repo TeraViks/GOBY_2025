@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.utilities.ElevatorAccelInterp;
+import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -130,8 +133,72 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  public void updateConstants() {
+    SwerveModule frontLeft = m_modules[0];
+    SwerveModule rearLeft = m_modules[1];
+    SwerveModule rearRight = m_modules[2];
+    SwerveModule frontRight = m_modules[3];
+    if (frontLeft.tunableTeleopDrivePIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoDrivePIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(frontLeft.tunableTeleopDrivePIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kFrontLeftDriveMotorConfig.withPIDFSlots(pidfSlots);
+      frontLeft.configureDriveMotor(config);
+    }
+    if (frontLeft.tunableTeleopTurningPIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoTurningPIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(frontLeft.tunableTeleopTurningPIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kFrontLeftTurningMotorConfig.withPIDFSlots(pidfSlots);
+      frontLeft.configureTurningMotor(config);
+    }
+    if (rearLeft.tunableTeleopDrivePIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoDrivePIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(rearLeft.tunableTeleopDrivePIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kRearLeftDriveMotorConfig.withPIDFSlots(pidfSlots);
+      rearLeft.configureDriveMotor(config);
+    }
+    if (rearLeft.tunableTeleopTurningPIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoTurningPIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(rearLeft.tunableTeleopTurningPIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kRearLeftTurningMotorConfig.withPIDFSlots(pidfSlots);
+      rearLeft.configureTurningMotor(config);
+    }
+    if (rearRight.tunableTeleopDrivePIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoDrivePIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(rearRight.tunableTeleopDrivePIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kRearRightDriveMotorConfig.withPIDFSlots(pidfSlots);
+      rearRight.configureDriveMotor(config);
+    }
+    if (rearRight.tunableTeleopTurningPIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoTurningPIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(rearRight.tunableTeleopTurningPIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kRearRightTurningMotorConfig.withPIDFSlots(pidfSlots);
+      rearRight.configureTurningMotor(config);
+    }
+    if (frontRight.tunableTeleopDrivePIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoDrivePIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(frontRight.tunableTeleopDrivePIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kFrontRightDriveMotorConfig.withPIDFSlots(pidfSlots);
+      frontRight.configureDriveMotor(config);
+    }
+    if (frontRight.tunableTeleopTurningPIDF.hasChanged()) {
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoTurningPIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+        add(new SparkUtil.PIDFSlot(frontRight.tunableTeleopTurningPIDF.get(), SwerveModuleConstants.kTeleopPIDFSlotID));}};
+      SparkUtil.Config config = SwerveModuleConstants.kFrontRightTurningMotorConfig.withPIDFSlots(pidfSlots);
+      frontRight.configureTurningMotor(config);
+    }
+  }
+
   @Override
   public void periodic() {
+    updateConstants();
     // Update turning encoder offsets if the robot is stationary.
     double aggregateSpeedMetersPerSecond = 0.0;
     for (SwerveModuleState moduleState : getModuleStates()) {

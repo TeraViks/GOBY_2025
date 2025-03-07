@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -20,13 +22,17 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 
 public class SwerveModule {
   public static final TunablePIDF tunableTeleopTurningPIDF =
     new TunablePIDF("TeleopTurning", SwerveModuleConstants.kTeleopTurningPIDFSlot.pidf());
+  public static final TunablePIDF tunableTeleopDrivePIDF =
+    new TunablePIDF("TeleopDrive", SwerveModuleConstants.kTeleopDrivePIDFSlot.pidf());
 
   private final SparkMax m_driveMotor;
   private final SparkMax m_turningMotor;
@@ -51,6 +57,7 @@ public class SwerveModule {
   private double m_lastViableDrivePosition = 0.0;
   private double m_lastViableDriveVelocity = 0.0;
   private double m_lastViableTurningPosition = 0.0;
+  private Config m_config;
 
   public record Config(
     int driveMotorChannel,
@@ -63,6 +70,7 @@ public class SwerveModule {
   ) {}
 
   public SwerveModule(Config config) {
+    m_config = config;
     m_driveMotor = new SparkMax(config.driveMotorChannel, MotorType.kBrushless);
     SparkUtil.configureMotor(m_driveMotor, config.driveMotorConfig);
 
@@ -153,6 +161,22 @@ public class SwerveModule {
   public void stop() {
     m_driveMotor.stopMotor();
     m_turningMotor.stopMotor();
+  }
+
+  public void updateTeleopDrivePIDF(PIDF pidf) {
+    ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+      add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoDrivePIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+      add(new SparkUtil.PIDFSlot(pidf, SwerveModuleConstants.kTeleopPIDFSlotID));}};
+    SparkUtil.Config config = m_config.driveMotorConfig.withPIDFSlots(pidfSlots);
+    SparkUtil.configureMotor(m_driveMotor, config);
+  }
+
+  public void updateTeleopTurningPIDF(PIDF pidf) {
+    ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+      add(new SparkUtil.PIDFSlot(SwerveModuleConstants.kAutoTurningPIDFSlot.pidf(), SwerveModuleConstants.kAutoPIDFSlotID));
+      add(new SparkUtil.PIDFSlot(pidf, SwerveModuleConstants.kTeleopPIDFSlotID));}};
+    SparkUtil.Config config = m_config.turningMotorConfig.withPIDFSlots(pidfSlots);
+    SparkUtil.configureMotor(m_turningMotor, config);
   }
 
   public void setDesiredState(SwerveModuleState desiredState) {

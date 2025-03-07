@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.utilities.ElevatorAccelInterp;
+import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -130,8 +133,22 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+  private void updateConstants() {
+    if (SwerveModule.tunableTeleopDrivePIDF.hasChanged()) {
+      for (SwerveModule module : m_modules) {
+        module.updateTeleopDrivePIDF(SwerveModule.tunableTeleopDrivePIDF.get());
+      }
+    }
+    if (SwerveModule.tunableTeleopTurningPIDF.hasChanged()) {
+      for (SwerveModule module : m_modules) {
+        module.updateTeleopTurningPIDF(SwerveModule.tunableTeleopTurningPIDF.get());
+      }
+    }
+  }
+
   @Override
   public void periodic() {
+    updateConstants();
     // Update turning encoder offsets if the robot is stationary.
     double aggregateSpeedMetersPerSecond = 0.0;
     for (SwerveModuleState moduleState : getModuleStates()) {

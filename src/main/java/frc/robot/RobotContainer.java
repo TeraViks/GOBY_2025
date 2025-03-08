@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.CameraConstants;
+import frc.robot.Constants.ClimberConstants;
 import frc.robot.Constants.CraneConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.HandlerConstants;
@@ -29,6 +30,7 @@ import frc.robot.commands.FaceReef;
 import frc.robot.commands.FaceStation;
 import frc.robot.commands.GetCoral;
 import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
@@ -51,6 +53,7 @@ public class RobotContainer {
   private final HandlerSubsystem m_handler = new HandlerSubsystem(
     HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
+  private final ClimberSubsystem m_climber = new ClimberSubsystem();
   private final LightSubsystem m_lightSubsystem = new LightSubsystem();
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
@@ -107,6 +110,10 @@ public class RobotContainer {
       * m_speedFactor;
   }
 
+  private double getClimbInput() {
+    return joystickTransform(-m_operatorController.getRawAxis(OIConstants.kLeftJoyYAxis));
+  }
+
   public RobotContainer() {
     configureBindings();
 
@@ -123,6 +130,18 @@ public class RobotContainer {
         }, m_robotDrive
       )
     );
+
+    if (ClimberConstants.kEnable) {
+      m_climber.setDefaultCommand(
+        new RunCommand(
+          () -> {
+            m_climber.setSpeed(
+              getClimbInput() * ClimberConstants.kMaxSpeed
+            );
+          }, m_climber
+        )
+      );
+    }
 
     NamedCommands.registerCommand("RightHourTwoAuto",
       new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,

@@ -136,8 +136,8 @@ public final class Constants {
     public static final int kDriveMotorCurrentLimit = 40;
     public static final int kTurningMotorCurrentLimit = 20;
 
-    public static final double kDriveMotorRampRate = 0.25;
-    public static final double kTurningMotorRampRate = 0.25;
+    public static final double kDriveMotorRampRate = 0.1;
+    public static final double kTurningMotorRampRate = 0.1;
 
     public static final long kValueCacheTtlMicroseconds = 15;
 
@@ -147,7 +147,7 @@ public final class Constants {
       kAutoPIDFSlotID
     );
     public static final SparkUtil.PIDFSlot kTeleopDrivePIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.375, 0.0, 0.0, 0.25),
+      new PIDF(0.3, 0.0, 0.0, 0.25),
       kTeleopPIDFSlotID
     );
     public static final SparkUtil.Config kFrontLeftDriveMotorConfig = new SparkUtil.Config(
@@ -217,7 +217,7 @@ public final class Constants {
     public static final SwerveModule.Config kFrontRightSwerveConfig = new SwerveModule.Config(
       4, 8, 12,
       kFrontRightDriveMotorConfig, kFrontRightTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.867920))
+      false, new Rotation2d(Units.rotationsToRadians(0.831055))
     );
   }
 
@@ -488,7 +488,7 @@ public final class Constants {
     );
     public static final SparkUtil.Config kPivotMotorConfig = new SparkUtil.Config(
       40,
-      0.1,
+      0.0,
       false,
       ((2.0*Math.PI)/75.0)/60.0,
       (2.0*Math.PI)/75.0,
@@ -514,7 +514,7 @@ public final class Constants {
     );
     public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
       40,
-      0.1,
+      0.0,
       kInvertLeftElevatorMotor,
       0.0233/60.0, // rot/min -> m/s
       0.0233, // rot -> meters: 12:1 gearbox, 22T sprocket, 1/4" chain link, 2-stage elevator.

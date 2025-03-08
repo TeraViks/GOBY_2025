@@ -580,16 +580,16 @@ public final class Constants {
     public static final Translation2d kPositionHome =
       new Translation2d(kPivotHome, kElevatorHome);
     public static final Translation2d kPositionL1 =
-      new Translation2d(Units.degreesToRadians(15.0), 0.454);
+      new Translation2d(Units.degreesToRadians(25.0), 0.36);
     public static final Translation2d kPositionL2 =
-      new Translation2d(Units.degreesToRadians(-40.207), 1.255);
+      new Translation2d(Units.degreesToRadians(-35.0), 1.22);
     public static final Translation2d kPositionL3 =
-      new Translation2d(Units.degreesToRadians(-21.003), 1.496);
+      new Translation2d(Units.degreesToRadians(-35.0), 1.62);
     public static final Translation2d kPositionLoAlgae =
-      new Translation2d(Units.degreesToRadians(-19.564), 0.8231);
+      new Translation2d(Units.degreesToRadians(-20.0), 0.82);
     public static final Translation2d kPositionHiAlgae =
-      new Translation2d(Units.degreesToRadians(-19.155), 1.225);
+      new Translation2d(Units.degreesToRadians(-20.0), 1.22);
     public static final Translation2d kPositionIntake =
-      new Translation2d(Units.degreesToRadians(32.042), 0.6824);
+      new Translation2d(Units.degreesToRadians(35.0), 0.68);
   }
 }

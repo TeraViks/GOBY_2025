@@ -44,7 +44,7 @@ public final class Constants {
 
   // Tunable constants are disabled unless this is set to true.
   // Intended to remain false in committed code.
-  public static final boolean kEnableTuning = true;
+  public static final boolean kEnableTuning = false;
 
   public static final class LightConstants {
     public static final int kBlinkinPWMInput = 0;
@@ -147,7 +147,7 @@ public final class Constants {
       kAutoPIDFSlotID
     );
     public static final SparkUtil.PIDFSlot kTeleopDrivePIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.375, 0.0, 0.0, 0.25),
+      new PIDF(0.3, 0.0, 0.0, 0.25),
       kTeleopPIDFSlotID
     );
     public static final SparkUtil.Config kFrontLeftDriveMotorConfig = new SparkUtil.Config(

@@ -213,7 +213,7 @@ public final class Constants {
     public static final SwerveModule.Config kFrontRightSwerveConfig = new SwerveModule.Config(
       4, 8, 12,
       kFrontRightDriveMotorConfig, kFrontRightTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.867920))
+      false, new Rotation2d(Units.rotationsToRadians(0.831055))
     );
   }
 

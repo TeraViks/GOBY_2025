@@ -25,8 +25,10 @@ import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 
 public class SwerveModule {
-  public static final TunablePIDF tunableTeleopTurningPIDF =
+  public final TunablePIDF tunableTeleopTurningPIDF =
     new TunablePIDF("TeleopTurning", SwerveModuleConstants.kTeleopTurningPIDFSlot.pidf());
+  public final TunablePIDF tunableTeleopDrivePIDF =
+    new TunablePIDF("TeleopDrive", SwerveModuleConstants.kTeleopDrivePIDFSlot.pidf());
 
   private final SparkMax m_driveMotor;
   private final SparkMax m_turningMotor;
@@ -148,6 +150,14 @@ public class SwerveModule {
       m_drivePositionCache.get(),
       getRotation2d()
     );
+  }
+
+  public void configureDriveMotor(SparkUtil.Config config) {
+    SparkUtil.configureMotor(m_driveMotor, config);
+  }
+
+  public void configureTurningMotor(SparkUtil.Config config) {
+    SparkUtil.configureMotor(m_turningMotor, config);
   }
 
   public void stop() {

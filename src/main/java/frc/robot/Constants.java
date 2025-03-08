@@ -44,7 +44,7 @@ public final class Constants {
 
   // Tunable constants are disabled unless this is set to true.
   // Intended to remain false in committed code.
-  public static final boolean kEnableTuning = false;
+  public static final boolean kEnableTuning = true;
 
   public static final class LightConstants {
     public static final int kBlinkinPWMInput = 0;
@@ -217,7 +217,7 @@ public final class Constants {
     public static final SwerveModule.Config kFrontRightSwerveConfig = new SwerveModule.Config(
       4, 8, 12,
       kFrontRightDriveMotorConfig, kFrontRightTurningMotorConfig,
-      false, new Rotation2d(Units.rotationsToRadians(0.867920))
+      false, new Rotation2d(Units.rotationsToRadians(0.831055))
     );
   }
 

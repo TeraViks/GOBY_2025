@@ -106,12 +106,12 @@ public class DriveToPose extends Command {
    * deviate from the intended trajectory, the controller would be incapable of correction. */
   private void scaleXYConstraints(Pose2d robotPose, Translation2d translationDeviation) {
     Rotation2d translationAngle = translationDeviation.getAngle();
-    double xFactor = translationAngle.getCos();
+    double xFactor = Math.abs(translationAngle.getCos());
     m_xController.setConstraints(new TrapezoidProfile.Constraints(
       xFactor * DriveConstants.kMaxSpeedMetersPerSecond,
       xFactor * DriveConstants.kMaxAccelerationMetersPerSecondSquared
     ));
-    double yFactor = translationAngle.getSin();
+    double yFactor = Math.abs(translationAngle.getSin());
     m_yController.setConstraints(new TrapezoidProfile.Constraints(
       yFactor * DriveConstants.kMaxSpeedMetersPerSecond,
       yFactor * DriveConstants.kMaxAccelerationMetersPerSecondSquared
@@ -161,6 +161,7 @@ public class DriveToPose extends Command {
     if (translatingPIDF.hasChanged()) {
       PIDF pidf = translatingPIDF.get();
       m_xController.setPID(pidf.p(), pidf.i(), pidf.d());
+      m_yController.setPID(pidf.p(), pidf.i(), pidf.d());
     }
     if (turningPIDF.hasChanged()) {
       PIDF pidf = turningPIDF.get();

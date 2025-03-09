@@ -161,6 +161,7 @@ public class DriveToPose extends Command {
     if (translatingPIDF.hasChanged()) {
       PIDF pidf = translatingPIDF.get();
       m_xController.setPID(pidf.p(), pidf.i(), pidf.d());
+      m_yController.setPID(pidf.p(), pidf.i(), pidf.d());
     }
     if (turningPIDF.hasChanged()) {
       PIDF pidf = turningPIDF.get();

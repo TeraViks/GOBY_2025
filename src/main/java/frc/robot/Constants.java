@@ -603,21 +603,17 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final boolean kEnable = false;
-    public static final int kMotorID = 0; //TODO: Get motor ID.
+    public static final int kMotorID = 16;
     public static final double kHardMin = 0.0; //TODO: Set.
     public static final double kMaxSpeed = 0.5; //TODO: Set. This number is from ACDC.
-    public static final double kMaxExtendedAngle = 90; //TODO: Set.
-    public static final double kMinRetractedAngle = 0; //TODO: Set
-    public static final double kConstrainedRange = 90; //TODO: Set.
+    public static final double kMaxExtendedAngle = Math.toRadians(90); //TODO: Set.
+    public static final double kMinRetractedAngle = Math.toRadians(0); //TODO: Set
+    public static final double kConstrainedRange = Math.toRadians(0.02); //TODO: Set.
     public static final double kRecalibratingSpeed = 0.5; //TODO: Set.
 
     public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
       ClosedLoopSlot.kSlot0
-    );
-    public static final SparkUtil.PIDFSlot kMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
-      ClosedLoopSlot.kSlot1
     );
 
     //TODO: Set.
@@ -631,7 +627,6 @@ public final class Constants {
       0.0,
       new ArrayList<>() {{
         add(kMotorVelocityPIDFSlot);
-        add(kMotorVoltagePIDFSlot);
       }}
     );
   }

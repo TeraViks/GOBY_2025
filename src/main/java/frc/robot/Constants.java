@@ -23,6 +23,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.subsystems.CameraSubsystem.CameraConfig;
 import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.SwerveModule;
@@ -611,6 +612,11 @@ public final class Constants {
     public static final double kConstrainedRange = Math.toRadians(0.02); //TODO: Set.
     public static final double kRecalibratingSpeed = 0.5; //TODO: Set.
 
+    //TODO: find gear ratio and meters per rotation
+    public static final double kGearRatio = 140.0;
+    // With no gear reduction each motor rotation moves the climber 0.012 meters
+    public static final double kPositionConversionFactor = 0.012 / kGearRatio;
+
     public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
       ClosedLoopSlot.kSlot0
@@ -622,7 +628,7 @@ public final class Constants {
       0.1,
       false,
       0.0,
-      0.0,
+      kPositionConversionFactor,
       0.0,
       0.0,
       new ArrayList<>() {{

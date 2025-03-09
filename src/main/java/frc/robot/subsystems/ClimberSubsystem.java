@@ -1,11 +1,10 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.REVLibError;
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -14,9 +13,8 @@ import frc.robot.utilities.SparkUtil;
 
 public class ClimberSubsystem extends SubsystemBase {
   private final SparkFlex m_motor;
-  private final RelativeEncoder m_encoder;
+  private final AbsoluteEncoder m_encoder;
   private final SparkClosedLoopController m_PIDController;
-  private final SparkLimitSwitch m_limitSwitch;
   private double m_idealSpeed;
 
   private enum State {
@@ -30,19 +28,14 @@ public class ClimberSubsystem extends SubsystemBase {
     m_motor = new SparkFlex(ClimberConstants.kMotorID, MotorType.kBrushless);
     SparkUtil.configureMotor(m_motor, ClimberConstants.kMotorConfig);
 
-    m_encoder = m_motor.getEncoder();
+    m_encoder = m_motor.getAbsoluteEncoder();
     m_PIDController = m_motor.getClosedLoopController();
-    m_limitSwitch = m_motor.getReverseLimitSwitch();
 
     initialize();
   }
 
-  public void zero() {
-    m_encoder.setPosition(0.0);
-  }
-
   public void initialize() {
-    m_encoder.setPosition(ClimberConstants.kHardMin);
+    m_encoder.getPosition();
     m_state = State.OPERATING;
   }
 
@@ -78,7 +71,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public void periodic() {
     switch (m_state) {
       case RECALIBRATING: {
-        if (m_limitSwitch.isPressed()) {
+        if (m_encoder.getPosition() <= (ClimberConstants.kHardMin + ClimberConstants.kConstrainedRange) && 
+            m_encoder.getPosition() >= (ClimberConstants.kHardMin - ClimberConstants.kConstrainedRange)) {
           initialize();
         }
         break;

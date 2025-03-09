@@ -32,6 +32,7 @@ import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
+import frc.robot.subsystems.LightSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.CoralStationSubPose;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
@@ -50,6 +51,7 @@ public class RobotContainer {
   private final HandlerSubsystem m_handler = new HandlerSubsystem(
     HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
+  private final LightSubsystem m_lightSubsystem = new LightSubsystem();
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
@@ -325,8 +327,9 @@ public class RobotContainer {
       // Automatic coral intake
       new JoystickButton(m_operatorController, OIConstants.kIntakeCoralButton)
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, m_selectedCoralStationSlot));
-      
+        .onTrue(new GetCoral(m_robotDrive, m_handler, m_crane, m_lightSubsystem,
+          m_fieldPoseUtil, m_selectedCoralStationSlot));
+
       // Eject
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)
         .debounce(OIConstants.kDebounceSeconds)

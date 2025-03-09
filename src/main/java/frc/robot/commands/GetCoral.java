@@ -20,7 +20,7 @@ public class GetCoral extends SequentialCommandGroup {
   private final FieldPoseUtil m_fieldPoseUtil;
   private final LightSubsystem m_lightSubsystem;
 
-  public GetCoral(LightSubsystem lightSubsystem, DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
+  public GetCoral(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, LightSubsystem lightSubsystem, 
       FieldPoseUtil fieldPoseUtil, CoralStationSubPose subPose) {
     m_drive = drive;
     m_handler = handler;

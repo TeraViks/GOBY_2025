@@ -17,8 +17,6 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 
 public class FieldPoseUtil {
-  private ReefPose m_reefPose = ReefPose.TWO;
-
   public record AprilTags(
     AprilTag reefTwelve,
     AprilTag reefTwo,
@@ -76,8 +74,8 @@ public class FieldPoseUtil {
     DOWN
   }
 
-  public AlgaeHeight whichAlgaeHeight() {
-    switch(m_reefPose) {
+  public AlgaeHeight whichAlgaeHeight(ReefPose reefPose) {
+    switch(reefPose) {
       default: assert(false);
       case TWO: return AlgaeHeight.UP;
       case FOUR: return AlgaeHeight.DOWN;

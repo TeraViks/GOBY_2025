@@ -10,6 +10,7 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.HandlerSubsystem;
 import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.AlgaeHeight;
+import frc.robot.utilities.FieldPoseUtil.ReefPose;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 public class GetAlgae extends SequentialCommandGroup {
@@ -28,13 +29,15 @@ public class GetAlgae extends SequentialCommandGroup {
     m_algaeHeight = null;
     addRequirements(m_drive, m_handler, m_crane);
 
+    ReefPose reefHour = m_fieldPoseUtil.closestReefHour(m_drive.getPose());
+
     Command driveToPose = new DriveToPose(
-      m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), ReefSubPose.ALGAE),
+      m_fieldPoseUtil.getTargetPoseAtReef(reefHour, ReefSubPose.ALGAE),
       drive);
 
     addCommands(
       driveToPose,
-      Commands.runOnce(() -> m_fieldPoseUtil.whichAlgaeHeight()),
+      Commands.runOnce(() -> m_fieldPoseUtil.whichAlgaeHeight(reefHour)),
       Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight())),
       Commands.waitUntil(() -> m_crane.atSetpoint().isPresent()),
       Commands.runOnce(() -> m_handler.intakeAlgae()),
@@ -42,10 +45,7 @@ public class GetAlgae extends SequentialCommandGroup {
     );
   }
  
-  public Translation2d whichElevatorHeight() {
-    if (m_algaeHeight == AlgaeHeight.DOWN) {
-      return CraneConstants.kPositionLoAlgae;
-    }
-    return CraneConstants.kPositionHiAlgae;
+  private Translation2d whichElevatorHeight() {
+    return (m_algaeHeight == AlgaeHeight.DOWN) ? CraneConstants.kPositionLoAlgae : CraneConstants.kPositionHiAlgae;
   }
 }

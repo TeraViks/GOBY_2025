@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ClimberConstants;
+import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TunablePIDF;
 
@@ -48,6 +49,10 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (m_motorPIDF.hasChanged()) {
+      PIDF pidf = m_motorPIDF.get();
+      m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
+    }
     m_motor.set(m_PIDController.calculate(m_encoder.getRaw(), m_idealSpeed));
   }
 }

@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -22,6 +23,7 @@ import frc.robot.utilities.Segment;
 import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.Time;
+import frc.robot.utilities.TunableDouble;
 import frc.robot.utilities.TunablePIDF;
 import frc.robot.utilities.ValueCache;
 import frc.robot.utilities.Vector;
@@ -76,6 +78,11 @@ public class Crane extends SubsystemBase {
     elevatorPIDF.get().d(),
     new TrapezoidProfile.Constraints(0.0, 0.0) // Dynamically scaled.
   );
+  
+  private static final TunableDouble kS = new TunableDouble("Crane.kS", CraneConstants.kS);
+  private static final TunableDouble kG = new TunableDouble("Crane.kG", CraneConstants.kG);
+  private static final TunableDouble kV = new TunableDouble("Crane.kV", CraneConstants.kV);
+  private ElevatorFeedforward m_elevatorFF = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
 
   private Translation2d m_setpoint = new Translation2d(0.0, 0.0);
   private double m_pivotControlFactor; // 1.0 for position-based control.
@@ -313,7 +320,8 @@ public class Crane extends SubsystemBase {
     m_pivotPID.setReference(aVelocity, ControlType.kMAXMotionVelocityControl,
       CraneConstants.kPivotMotorVelocityPIDFSlot.slot());
     m_leftElevatorPID.setReference(hVelocity, ControlType.kMAXMotionVelocityControl,
-      CraneConstants.kElevatorMotorVelocityPIDFSlot.slot());
+      CraneConstants.kElevatorMotorVelocityPIDFSlot.slot(),
+      m_elevatorFF.calculateWithVelocities(m_elevatorEncoder.getVelocity(), m_hController.getSetpoint().velocity));
   }
 
   private void initPivotPosition(double a) {
@@ -450,6 +458,16 @@ public class Crane extends SubsystemBase {
       }};
       SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
       SparkUtil.configureMotor(m_pivotMotor, motorConfig);
+    }
+    
+    if (kS.hasChanged()) {
+      m_elevatorFF.setKs(kS.get());
+    }
+    if (kG.hasChanged()) {
+      m_elevatorFF.setKg(kG.get());
+    }
+    if (kV.hasChanged()) {
+      m_elevatorFF.setKv(kV.get());
     }
   }
 

@@ -528,6 +528,10 @@ public final class Constants {
     public static final double kElevatorHomingVoltage = -0.5;
     public static final double kElevatorMinStalledHomingAmperage = 20.0;
 
+    public static final double kS = 0.0; //TODO: Calculate
+    public static final double kG = 0.0; //TODO: Calculate
+    public static final double kV = 0.0; //TODO: Calculate
+
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
       Units.degreesToRadians(0.5),
       Units.degreesToRadians(0.25)

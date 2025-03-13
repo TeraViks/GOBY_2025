@@ -342,13 +342,13 @@ public final class Constants {
 
     public static final double kStingerCenterOffset = 0.0; // TODO: Tune.
 
-    public static final double kStationWallOffset = 0.1524; // TODO: Tune.
+    public static final double kStationWallOffset = 0.1651; // TODO: Tune.
     public static final double kStationSlotSpacing = 0.202;
 
-    public static final double kReefWallOffset = 0.1524; // TODO: Tune.
+    public static final double kReefWallOffset = 0.1651; // TODO: Tune.
     public static final double kReefBranchOffset = 0.164;
 
-    public static final double kProcessorWallOffset = 0.1524; // TODO: Tune.
+    public static final double kProcessorWallOffset = 0.1651; // TODO: Tune.
   }
 
   public static final class CameraConstants {

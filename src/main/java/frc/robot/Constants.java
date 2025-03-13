@@ -23,7 +23,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import frc.robot.subsystems.CameraSubsystem.CameraConfig;
 import frc.robot.subsystems.Crane;
 import frc.robot.subsystems.SwerveModule;
@@ -605,7 +604,8 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final boolean kEnable = false;
     public static final int kMotorID = 16;
-    public static final double kHardMin = 0.0; //TODO: Set.
+    public static final int kEncoderChannelA = 2;
+    public static final int kEncoderChannelB = 3;
     public static final double kMaxSpeed = 0.5; //TODO: Set. This number is from ACDC.
     public static final double kMaxExtendedAngle = Math.toRadians(90); //TODO: Set.
     public static final double kMinRetractedAngle = Math.toRadians(0); //TODO: Set
@@ -613,9 +613,11 @@ public final class Constants {
     public static final double kRecalibratingSpeed = 0.5; //TODO: Set.
 
     //TODO: find gear ratio and meters per rotation
-    public static final double kGearRatio = 140.0;
+    public static final double kGearRatio = 144.0;
     // With no gear reduction each motor rotation moves the climber 0.012 meters
-    public static final double kPositionConversionFactor = 0.012 / kGearRatio;
+    public static final double kAngleConversionFactor = 2.0 * Math.PI / kGearRatio;
+
+    public static final PIDF kMotorPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
 
     public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
@@ -628,7 +630,7 @@ public final class Constants {
       0.1,
       false,
       0.0,
-      kPositionConversionFactor,
+      kAngleConversionFactor,
       0.0,
       0.0,
       new ArrayList<>() {{

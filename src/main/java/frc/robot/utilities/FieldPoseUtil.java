@@ -17,6 +17,8 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
 
 public class FieldPoseUtil {
+  private ReefPose m_reefPose = ReefPose.TWO;
+
   public record AprilTags(
     AprilTag reefTwelve,
     AprilTag reefTwo,
@@ -66,6 +68,23 @@ public class FieldPoseUtil {
         case EIGHT: return aprilTags.reefEight;
         case TEN: return aprilTags.reefTen;
       }
+    }
+  }
+
+  public enum AlgaeHeight {
+    UP,
+    DOWN
+  }
+
+  public AlgaeHeight whichAlgaeHeight() {
+    switch(m_reefPose) {
+      default: assert(false);
+      case TWO: return AlgaeHeight.UP;
+      case FOUR: return AlgaeHeight.DOWN;
+      case SIX: return AlgaeHeight.UP;
+      case EIGHT: return AlgaeHeight.DOWN;
+      case TEN: return AlgaeHeight.UP;
+      case TWELVE: return AlgaeHeight.DOWN;
     }
   }
 

@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
@@ -59,11 +60,13 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Climber.angle", m_encoder.get());
-    
-    if (m_motorPIDF.hasChanged()) {
-      PIDF pidf = m_motorPIDF.get();
-      m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
+    if (Constants.kEnableTuning) {
+      SmartDashboard.putNumber("Climber.angle", m_encoder.get());
+      SmartDashboard.putNumber("Climber.velocity", m_motorEncoder.getVelocity());
+      if (m_motorPIDF.hasChanged()) {
+        PIDF pidf = m_motorPIDF.get();
+        m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
+      }
     }
     m_motor.set(m_PIDController.calculate(m_motorEncoder.getVelocity(), transformSpeed(m_encoder.get(), m_idealSpeed)));
   }

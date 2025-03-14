@@ -217,16 +217,6 @@ public class HandlerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateConstants();
-    SmartDashboard.putNumber("Front Sensor Distance", m_frontProxSensor.getDistance());
-    SmartDashboard.putNumber("Back Sensor Distance", m_backProxSensor.getDistance());
-    SmartDashboard.putNumber("Algae Sensor Distance", m_algaeProxSensor.getDistance());
-    SmartDashboard.putNumber("Tip Sensor Distance", m_distanceSensor.getDistance());
-
-    SmartDashboard.putBoolean("Front Sensor", m_frontProxSensor.isProximate());
-    SmartDashboard.putBoolean("Back Sensor", m_backProxSensor.isProximate());
-    SmartDashboard.putBoolean("Algae Sensor", m_algaeProxSensor.isProximate());
-    SmartDashboard.putBoolean("Tip Sensor", m_distanceSensor.isProximate());
-
     SmartDashboard.putString("Handler State: ", m_state.name());
     switch (m_state) {
       case EMPTY: {

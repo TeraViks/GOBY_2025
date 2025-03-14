@@ -33,8 +33,7 @@ public class GetCoral extends SequentialCommandGroup {
       Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake)),
       Commands.runOnce(() -> m_handler.intakeCoral()),
       Commands.waitUntil(() -> m_handler.isLoadedCoral()),
-      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionHome)),
-      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent())
+      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionHome))
     );
   }
 }

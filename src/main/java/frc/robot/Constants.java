@@ -610,7 +610,6 @@ public final class Constants {
     public static final double kMinRange = Math.toRadians(0); //TODO: Set
     public static final double kZeroOffset = 0.0;
     public static final double kAngleTolerance = Math.toRadians(0.02); //TODO: Set.
-    public static final double kRecalibratingSpeed = 0.5; //TODO: Set.
 
     //TODO: find gear ratio and meters per rotation
     public static final double kGearRatio = 144.0;

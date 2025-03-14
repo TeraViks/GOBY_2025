@@ -31,10 +31,6 @@ public class ClimberSubsystem extends SubsystemBase {
     SparkUtil.configureMotor(m_motor, ClimberConstants.kMotorConfig);
   }
 
-  public void recalibrate() {
-    setSpeed(ClimberConstants.kRecalibratingSpeed);
-  }
-
   public void stopClimber() {
     m_motor.stopMotor();
   }

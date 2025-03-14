@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -37,8 +36,6 @@ import frc.robot.Constants.CameraConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.utilities.ElevatorAccelInterp;
-import frc.robot.utilities.SparkUtil;
-import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public class DriveSubsystem extends SubsystemBase {

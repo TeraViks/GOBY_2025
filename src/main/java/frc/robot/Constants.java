@@ -503,6 +503,8 @@ public final class Constants {
     public static final double kPivotMinStalledHomingAmperage = 20.0;
     public static final double kPivotHomingDebounceSeconds = kDt;
 
+    public static final double kPivotHomePosition = Math.PI / 2;
+
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.75, 0.0, 8.0, 0.0),

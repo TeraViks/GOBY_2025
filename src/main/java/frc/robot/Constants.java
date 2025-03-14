@@ -33,10 +33,6 @@ import frc.robot.utilities.SparkUtil;
 import frc.robot.utilities.TrapezoidalConstraint;
 
 public final class Constants {
-  // Set to true during actual competition. May disable diagnostics, sanity/safety checks, etc.
-  // in order to eliminate failure modes that should only happen during testing.
-  public static final boolean kCompeting = true;
-
   // Scheduling quantum in seconds.
   public static final double kDt = 0.02;
 
@@ -483,7 +479,7 @@ public final class Constants {
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kPivotMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
+      new PIDF(0.0, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot1
     );
     public static final SparkUtil.Config kPivotMotorConfig = new SparkUtil.Config(
@@ -499,9 +495,15 @@ public final class Constants {
         add(kPivotMotorVoltagePIDFSlot);
       }}
     );
+
     public static final double kPivotHomingVoltage = 0.5;
     public static final double kPivotMinStalledHomingAmperage = 20.0;
     public static final double kPivotHomingDebounceSeconds = kDt;
+
+    public static final int kPivotAbsEncoderChannel = 5;
+    public static final double kPivotEncoderOffsetRadians = 0.0; // TODO: Calibrate.
+
+    public static final double kPivotHomePosition = Math.PI / 2;
 
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
@@ -509,7 +511,7 @@ public final class Constants {
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kElevatorMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.0, 0.0, 0.0, 0.0), // TODO: Tune.
+      new PIDF(0.0, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot1
     );
     public static final SparkUtil.Config kElevatorMotorConfig = new SparkUtil.Config(
@@ -527,6 +529,7 @@ public final class Constants {
     );
     public static final double kElevatorHomingVoltage = -0.5;
     public static final double kElevatorMinStalledHomingAmperage = 20.0;
+    public static final double kElevatorHomingDebounceSeconds = kDt;
 
     public static final double kS = 0.0; //TODO: Calculate
     public static final double kG = 0.0; //TODO: Calculate
@@ -546,14 +549,13 @@ public final class Constants {
 
     public static final double kPivotHardMax = Units.degreesToRadians(90.5);
     public static final double kPivotHiMin = Units.degreesToRadians(-90.0);
+    public static final double kPivotHomeRapid = Units.degreesToRadians(85.0);
     public static final double kPivotHiMax = Units.degreesToRadians(44.0);
     public static final double kPivotLoMin = Units.degreesToRadians(-15.0);
     public static final double kPivotLoMax = Units.degreesToRadians(88.0);
     public static final double kPivotHome = kPivotLoMax;
 
     public static final double kElevatorMax = 1.400;
-    public static final double kElevatorHiPivotHome = 1.250;
-    public static final double kElevatorLoHiThreshold = 0.900;
     public static final double kElevatorHardMin = 0.283;
     public static final double kElevatorHomeRapid = kElevatorHardMin + 0.05;
     public static final double kElevatorSoftMin = kElevatorHardMin + 0.02;

@@ -9,10 +9,12 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -38,32 +40,25 @@ public class Crane extends SubsystemBase {
   private final SparkFlex m_rightElevatorMotor;
 
   private final RelativeEncoder m_pivotEncoder;
+  private final DutyCycleEncoder m_pivotAbsEncoder;
   private final RelativeEncoder m_elevatorEncoder;
+  private final Pololu4079 m_distanceSensor;
 
   private final SparkClosedLoopController m_pivotPID;
   private final SparkClosedLoopController m_leftElevatorPID;
 
-  private final Pololu4079 m_distanceSensor;
-
-  private final ValueCache<Double> m_pivotPositionCache;
-  private final ValueCache<Double> m_pivotVelocityCache;
-  private final ValueCache<Double> m_elevatorPositionCache;
-  private final ValueCache<Double> m_elevatorVelocityCache;
-
+  private static final TunablePIDF pivotVelocityPIDF = new TunablePIDF("Crane.pivotVelocityPIDF",
+    CraneConstants.kPivotMotorVelocityPIDFSlot.pidf());
+  private static final TunablePIDF pivotVoltagePIDF = new TunablePIDF("Crane.pivotVoltagePIDF",
+    CraneConstants.kPivotMotorVoltagePIDFSlot.pidf());
+  private static final TunablePIDF elevatorVelocityPIDF = new TunablePIDF("Crane.elevatorVelocityPIDF",
+    CraneConstants.kElevatorMotorVelocityPIDFSlot.pidf());
+  private static final TunablePIDF elevatorVoltagePIDF = new TunablePIDF("Crane.elevatorVoltagePIDF",
+    CraneConstants.kElevatorMotorVoltagePIDFSlot.pidf());
   private static final TunablePIDF pivotPIDF = new TunablePIDF("Crane.pivotPIDF",
     CraneConstants.kPivotPIDF);
   private static final TunablePIDF elevatorPIDF = new TunablePIDF("Crane.elevatorPIDF",
     CraneConstants.kElevatorPIDF);
-  private static final TunablePIDF pivotVoltagePIDF = new TunablePIDF("Crane.pivotVoltagePIDF",
-    CraneConstants.kPivotMotorVoltagePIDFSlot.pidf());
-  private static final TunablePIDF elevatorVoltagePIDF = new TunablePIDF("Crane.elevatorVoltagePIDF",
-    CraneConstants.kElevatorMotorVoltagePIDFSlot.pidf());
-  private static final TunablePIDF pivotVelocityPIDF = new TunablePIDF("Crane.pivotVelocityPIDF",
-    CraneConstants.kPivotMotorVelocityPIDFSlot.pidf());
-  private static final TunablePIDF elevatorVelocityPIDF = new TunablePIDF("Crane.elevatorVelocityPIDF",
-    CraneConstants.kElevatorMotorVelocityPIDFSlot.pidf());
-
-  private double m_pivotStallStartTime = Double.POSITIVE_INFINITY;
 
   private ProfiledPIDController m_aController = new ProfiledPIDController(
     pivotPIDF.get().p(),
@@ -83,6 +78,8 @@ public class Crane extends SubsystemBase {
   private static final TunableDouble kV = new TunableDouble("Crane.kV", CraneConstants.kV);
   private ElevatorFeedforward m_elevatorFF = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
 
+  private double m_stallStartTime = Double.POSITIVE_INFINITY;
+
   private Translation2d m_setpoint = new Translation2d(0.0, 0.0);
   private double m_pivotControlFactor; // 1.0 for position-based control.
   private double m_elevatorControlFactor; // 1.0 for position-based control.
@@ -93,18 +90,19 @@ public class Crane extends SubsystemBase {
   private int m_currentSerialNum = 0;
   private boolean m_isVelocityControlled = false;
 
+  private final ValueCache<Double> m_pivotPositionCache;
+  private final ValueCache<Double> m_pivotVelocityCache;
+  private final ValueCache<Double> m_elevatorPositionCache;
+  private final ValueCache<Double> m_elevatorVelocityCache;
+
   private enum State {
-    CRANING,             // Normal crane operation.
-    ESTIMATE_H,          // Estimate elevator height to inform homing (skipped if kCompeting).
-                         // Low homing mode:
-    LO_PIVOT_HOME,       //   Home the pivot.
-    LO_ELEVATOR_RAPID,   //   Move close to elevator home (skipped if kCompeting).
-                         // High homing mode (disabled if kCompeting):
-    HI_ELEVATOR_RAPID_A, //   Move the elevator high enough to allow pivot homing.
-    HI_PIVOT_HOME,       //   Home the pivot.
-    HI_PIVOT_0,          //   Move the pivot to the 0 (level) position.
-    HI_ELEVATOR_RAPID_B, //   Move close to elevator home.
-    ELEVATOR_HOME,       // Home the elevator.
+    ESTIMATE_AH,    // Estimate pivot angle and elevator height to inform homing.
+    PIVOT_0,        // Rapidly move pivot to 0 (straight out).
+    ELEVATOR_RAPID, // Rapidly move elevator down to safe h close to home.
+    ELEVATOR_HOME,  // Home the elevator.
+    PIVOT_RAPID,    // Rapidly move pivot up to safe a close to home.
+    PIVOT_HOME,     // Home the pivot.
+    CRANING         // Normal crane operation.
   }
   private State m_state;
 
@@ -123,13 +121,14 @@ public class Crane extends SubsystemBase {
 
     m_pivotEncoder = m_pivotMotor.getEncoder();
     m_pivotEncoder.setPosition(0.0);
+    m_pivotAbsEncoder = new DutyCycleEncoder(CraneConstants.kPivotAbsEncoderChannel,
+      2.0 * Math.PI, CraneConstants.kPivotEncoderOffsetRadians);
     m_elevatorEncoder = m_leftElevatorMotor.getEncoder();
     m_elevatorEncoder.setPosition(0.0);
+    m_distanceSensor = new Pololu4079(CraneConstants.kDistanceSensorInput);
 
     m_pivotPID = m_pivotMotor.getClosedLoopController();
     m_leftElevatorPID = m_leftElevatorMotor.getClosedLoopController();
-
-    m_distanceSensor = new Pololu4079(CraneConstants.kDistanceSensorInput);
 
     m_pivotPositionCache =
       new ValueCache<Double>(() -> {
@@ -148,11 +147,7 @@ public class Crane extends SubsystemBase {
         return m_elevatorEncoder.getVelocity();
       }, CraneConstants.kValueCacheTtlMicroseconds);
 
-    if (Constants.kCompeting) {
-      toStateLoPivotHome();
-    } else {
-      m_state = State.ESTIMATE_H;
-    }
+    m_state = State.ESTIMATE_AH;
   }
 
   // Only increase serial number once while controlling with velocity to avoid the serial
@@ -318,7 +313,8 @@ public class Crane extends SubsystemBase {
       CraneConstants.kPivotMotorVelocityPIDFSlot.slot());
     m_leftElevatorPID.setReference(hVelocity, ControlType.kMAXMotionVelocityControl,
       CraneConstants.kElevatorMotorVelocityPIDFSlot.slot(),
-      m_elevatorFF.calculateWithVelocities(m_elevatorEncoder.getVelocity(), m_hController.getSetpoint().velocity));
+      m_elevatorFF.calculateWithVelocities(m_elevatorEncoder.getVelocity(),
+      m_hController.getSetpoint().velocity));
   }
 
   private void initPivotPosition(double a) {
@@ -351,47 +347,32 @@ public class Crane extends SubsystemBase {
     return getDesiredTranslation().minus(position);
   }
 
+  private double getPivotAbsEncoderRadians() {
+    return MathUtil.angleModulus(m_pivotAbsEncoder.get());
+  }
+
   private void toStateCraning() {
     m_state = State.CRANING;
   }
 
-  private void toStateLoPivotHome() {
-    // Use low voltage to rotate upward slowly.
-    m_pivotPID.setReference(CraneConstants.kPivotHomingVoltage, ControlType.kVoltage,
-      CraneConstants.kPivotMotorVoltagePIDFSlot.slot());
-    m_state = State.LO_PIVOT_HOME;
-  }
-
-  private void toStateLoElevatorRapid() {
-    double h = m_elevatorPositionCache.get();
-    if (h > CraneConstants.kElevatorHomeRapid) {
-      moveElevatorTo(CraneConstants.kElevatorHomeRapid);
-      m_state = State.LO_ELEVATOR_RAPID;
+  private void toStatePivot0() {
+    double a = m_pivotPositionCache.get();
+    if (a < 0.0) {
+      movePivotTo(0.0);
+      m_state = State.PIVOT_0;
     } else {
-      toStateElevatorHome();
+      toStateElevatorRapid();
     }
   }
 
-  private void toStateHiElevatorRapidA() {
-    moveElevatorTo(CraneConstants.kElevatorHiPivotHome);
-    m_state = State.HI_ELEVATOR_RAPID_A;
-  }
-
-  private void toStateHiPivotHome() {
-    // Use low voltage to rotate upward slowly.
-    m_pivotPID.setReference(CraneConstants.kPivotHomingVoltage, ControlType.kVoltage,
-      CraneConstants.kPivotMotorVoltagePIDFSlot.slot());
-    m_state = State.HI_PIVOT_HOME;
-  }
-
-  private void toStateHiPivot0() {
-    movePivotTo(0.0);
-    m_state = State.HI_PIVOT_0;
-  }
-
-  private void toStateHiElevatorRapidB() {
-    moveElevatorTo(CraneConstants.kElevatorHomeRapid);
-    m_state = State.HI_ELEVATOR_RAPID_B;
+  private void toStateElevatorRapid() {
+    double h = m_elevatorPositionCache.get();
+    if (h > CraneConstants.kElevatorHomeRapid) {
+      moveElevatorTo(CraneConstants.kElevatorHomeRapid);
+      m_state = State.ELEVATOR_RAPID;
+    } else {
+      toStateElevatorHome();
+    }
   }
 
   private void toStateElevatorHome() {
@@ -401,71 +382,20 @@ public class Crane extends SubsystemBase {
     m_state = State.ELEVATOR_HOME;
   }
 
-  private void updateConstants() {
-    if (pivotPIDF.hasChanged()) {
-      PIDF pidf = pivotPIDF.get();
-      m_aController.setPID(pidf.p(), pidf.i(), pidf.d());
+  private void toStatePivotRapid() {
+    double a = m_pivotPositionCache.get();
+    if (a < CraneConstants.kPivotHomeRapid) {
+      movePivotTo(CraneConstants.kPivotHomeRapid);
+      m_state = State.PIVOT_RAPID;
+    } else {
+      toStatePivotHome();
     }
-    if (elevatorPIDF.hasChanged()) {
-      PIDF pidf = elevatorPIDF.get();
-      m_hController.setPID(pidf.p(), pidf.i(), pidf.d());
-    }
-    if (elevatorVoltagePIDF.hasChanged()) {
-      PIDF pidf = elevatorVoltagePIDF.get();
-      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
-        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
-        add(new SparkUtil.PIDFSlot(elevatorVelocityPIDF.get(), CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
-      }};
-      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
-      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
-      SparkUtil.configureFollowerMotor(
-        m_rightElevatorMotor,
-        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
-        m_leftElevatorMotor
-      );
-    }
-    if (elevatorVelocityPIDF.hasChanged()) {
-      PIDF pidf = elevatorVelocityPIDF.get();
-      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
-        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
-        add(new SparkUtil.PIDFSlot(elevatorVoltagePIDF.get(), CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
-      }};
-      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
-      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
-      SparkUtil.configureFollowerMotor(
-        m_rightElevatorMotor,
-        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
-        m_leftElevatorMotor
-      );
-    }
-    if (pivotVoltagePIDF.hasChanged()) {
-      PIDF pidf = pivotVoltagePIDF.get();
-      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
-        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
-        add(new SparkUtil.PIDFSlot(pivotVelocityPIDF.get(), CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
-      }};
-      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
-      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
-    }
-    if (pivotVelocityPIDF.hasChanged()) {
-      PIDF pidf = pivotVelocityPIDF.get();
-      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
-        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
-        add(new SparkUtil.PIDFSlot(pivotVoltagePIDF.get(), CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
-      }};
-      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
-      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
-    }
-    
-    if (kS.hasChanged()) {
-      m_elevatorFF.setKs(kS.get());
-    }
-    if (kG.hasChanged()) {
-      m_elevatorFF.setKg(kG.get());
-    }
-    if (kV.hasChanged()) {
-      m_elevatorFF.setKv(kV.get());
-    }
+  }
+
+  private void toStatePivotHome() {
+    m_pivotPID.setReference(CraneConstants.kPivotHomingVoltage, ControlType.kVoltage,
+      CraneConstants.kPivotMotorVoltagePIDFSlot.slot());
+    m_state = State.PIVOT_HOME;
   }
 
   @Override
@@ -477,70 +407,22 @@ public class Crane extends SubsystemBase {
         crane();
         break;
       }
-      case ESTIMATE_H: {
+      case ESTIMATE_AH: {
+        double a = getPivotAbsEncoderRadians();
+        initPivotPosition(a);
         double h = CraneConstants.kDistanceSensorBaseMeasurement + m_distanceSensor.getDistance();
         initElevatorPosition(h);
-        if (h <= CraneConstants.kElevatorLoHiThreshold) {
-          toStateLoPivotHome();
-        } else {
-          toStateHiElevatorRapidA();
-        }
+        toStatePivot0();
         break;
       }
-      case LO_PIVOT_HOME:
-      case HI_PIVOT_HOME: {
-        // Check if motor amperage is spiked due to a stall condition creating a short circuit.
-        if (m_pivotMotor.getOutputCurrent() >= CraneConstants.kPivotMinStalledHomingAmperage) {
-          double currentTime = Time.getTimeSeconds();
-          if (m_pivotStallStartTime == Double.POSITIVE_INFINITY) {
-            m_pivotStallStartTime = currentTime;
-          } else if (currentTime >= m_pivotStallStartTime + CraneConstants.kPivotHomingDebounceSeconds) {
-            m_pivotMotor.stopMotor();
-            initPivotPosition(CraneConstants.kPivotHardMax);
-            movePivotTo(CraneConstants.kPivotHome);
-            switch (m_state) {
-              case LO_PIVOT_HOME: {
-                if (Constants.kCompeting) {
-                  toStateElevatorHome();
-                } else {
-                  toStateLoElevatorRapid();
-                }
-                break;
-              }
-              case HI_PIVOT_HOME: {
-                toStateHiPivot0();
-                break;
-              }
-              default: assert(false);
-            }
-          }
-        } else {
-          m_pivotStallStartTime = Double.POSITIVE_INFINITY;
-        }
-        break;
-      }
-      case LO_ELEVATOR_RAPID: {
+      case PIVOT_0: {
         crane();
         if (atSetpointImpl()) {
-          toStateLoElevatorRapid();
+          toStateElevatorRapid();
         }
         break;
       }
-      case HI_ELEVATOR_RAPID_A: {
-        crane();
-        if (atSetpointImpl()) {
-          toStateHiPivotHome();
-        }
-        break;
-      }
-      case HI_PIVOT_0: {
-        crane();
-        if (atSetpointImpl()) {
-          toStateHiElevatorRapidB();
-        }
-        break;
-      }
-      case HI_ELEVATOR_RAPID_B: {
+      case ELEVATOR_RAPID: {
         crane();
         if (atSetpointImpl()) {
           toStateElevatorHome();
@@ -549,14 +431,117 @@ public class Crane extends SubsystemBase {
       }
       case ELEVATOR_HOME: {
         // Check if motor amperage is spiked due to a stall condition creating a short circuit.
-        if (m_leftElevatorMotor.getOutputCurrent() >= CraneConstants.kElevatorMinStalledHomingAmperage) {
-          m_leftElevatorMotor.stopMotor();
-          initElevatorPosition(CraneConstants.kElevatorHardMin);
-          moveElevatorTo(CraneConstants.kElevatorHome);
-          toStateCraning();
+        if (m_leftElevatorMotor.getOutputCurrent()
+            >= CraneConstants.kElevatorMinStalledHomingAmperage) {
+          double currentTime = Time.getTimeSeconds();
+          if (m_stallStartTime == Double.POSITIVE_INFINITY) {
+            m_stallStartTime = currentTime;
+          } else if (currentTime >= m_stallStartTime
+              + CraneConstants.kElevatorHomingDebounceSeconds) {
+            m_stallStartTime = Double.POSITIVE_INFINITY;
+            m_leftElevatorMotor.stopMotor();
+            initElevatorPosition(CraneConstants.kElevatorHardMin);
+            moveElevatorTo(CraneConstants.kElevatorHome);
+            toStatePivotRapid();
+          }
         }
         break;
       }
+      case PIVOT_RAPID: {
+        crane();
+        if (atSetpointImpl()) {
+          toStatePivotHome();
+        }
+        break;
+      }
+      case PIVOT_HOME: {
+        // Check if motor amperage is spiked due to a stall condition creating a short circuit.
+        if (m_pivotMotor.getOutputCurrent()
+            >= CraneConstants.kPivotMinStalledHomingAmperage) {
+          double currentTime = Time.getTimeSeconds();
+          if (m_stallStartTime == Double.POSITIVE_INFINITY) {
+            m_stallStartTime = currentTime;
+          } else if (currentTime >= m_stallStartTime
+              + CraneConstants.kPivotHomingDebounceSeconds) {
+            m_stallStartTime = Double.POSITIVE_INFINITY;
+            m_pivotMotor.stopMotor();
+            initPivotPosition(CraneConstants.kPivotHardMax);
+            movePivotTo(CraneConstants.kPivotHome);
+            toStateCraning();
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  private void updateConstants() {
+    if (pivotVelocityPIDF.hasChanged()) {
+      PIDF pidf = pivotVelocityPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(pivotVoltagePIDF.get(),
+          CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
+    }
+    if (pivotVoltagePIDF.hasChanged()) {
+      PIDF pidf = pivotVoltagePIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pivotVelocityPIDF.get(),
+          CraneConstants.kPivotMotorVelocityPIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kPivotMotorVoltagePIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kPivotMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_pivotMotor, motorConfig);
+    }
+    if (elevatorVelocityPIDF.hasChanged()) {
+      PIDF pidf = elevatorVelocityPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(elevatorVoltagePIDF.get(),
+          CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
+      SparkUtil.configureFollowerMotor(
+        m_rightElevatorMotor,
+        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
+        m_leftElevatorMotor
+      );
+    }
+    if (elevatorVoltagePIDF.hasChanged()) {
+      PIDF pidf = elevatorVoltagePIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, CraneConstants.kElevatorMotorVoltagePIDFSlot.slot()));
+        add(new SparkUtil.PIDFSlot(elevatorVelocityPIDF.get(),
+          CraneConstants.kElevatorMotorVelocityPIDFSlot.slot()));
+      }};
+      SparkUtil.Config motorConfig = CraneConstants.kElevatorMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_leftElevatorMotor, motorConfig);
+      SparkUtil.configureFollowerMotor(
+        m_rightElevatorMotor,
+        motorConfig.withInvert(!CraneConstants.kInvertLeftElevatorMotor),
+        m_leftElevatorMotor
+      );
+    }
+    if (kS.hasChanged()) {
+      m_elevatorFF.setKs(kS.get());
+    }
+    if (kG.hasChanged()) {
+      m_elevatorFF.setKg(kG.get());
+    }
+    if (kV.hasChanged()) {
+      m_elevatorFF.setKv(kV.get());
+    }
+    if (pivotPIDF.hasChanged()) {
+      PIDF pidf = pivotPIDF.get();
+      m_aController.setPID(pidf.p(), pidf.i(), pidf.d());
+    }
+    if (elevatorPIDF.hasChanged()) {
+      PIDF pidf = elevatorPIDF.get();
+      m_hController.setPID(pidf.p(), pidf.i(), pidf.d());
     }
   }
 }

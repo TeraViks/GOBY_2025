@@ -272,6 +272,10 @@ public class HandlerSubsystem extends SubsystemBase {
     return m_state == State.LOADED_ALGAE;
   }
 
+  public boolean isEmpty() {
+    return m_state == State.EMPTY;
+  }
+
   private void updateConstants() {
     if (motorPIDF.hasChanged()) {
       PIDF pidf = motorPIDF.get();

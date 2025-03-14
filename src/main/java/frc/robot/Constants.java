@@ -599,5 +599,7 @@ public final class Constants {
       new Translation2d(Units.degreesToRadians(-19.155), 1.225);
     public static final Translation2d kPositionIntake =
       new Translation2d(Units.degreesToRadians(32.042), 0.6824);
+    public static final Translation2d kPositionProcessor = 
+      new Translation2d(Units.degreesToRadians(0.0), 0.0); //TODO: Calculate w/ onshape model
   }
 }

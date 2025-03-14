@@ -18,11 +18,16 @@ public class ClimberSubsystem extends SubsystemBase {
   private final SparkFlex m_motor;
   private final RelativeEncoder m_motorEncoder;
   private final DutyCycleEncoder m_encoder = new DutyCycleEncoder(
-    ClimberConstants.kEncoderChannelA,
+    ClimberConstants.kEncoderChannelAbs,
     ClimberConstants.kMaxRange,
     ClimberConstants.kZeroOffset);
   private final TunablePIDF m_motorPIDF = new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kMotorPIDF);
-  private final PIDController m_PIDController = new PIDController(m_motorPIDF.get().p(), m_motorPIDF.get().i(), m_motorPIDF.get().d(), m_motorPIDF.get().ff());
+  private final PIDController m_PIDController = new PIDController(
+    m_motorPIDF.get().p(), 
+    m_motorPIDF.get().i(), 
+    m_motorPIDF.get().d(), 
+    m_motorPIDF.get().ff());
+    
   private double m_idealSpeed;
 
   public ClimberSubsystem() {

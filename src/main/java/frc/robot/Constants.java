@@ -600,4 +600,45 @@ public final class Constants {
     public static final Translation2d kPositionIntake =
       new Translation2d(Units.degreesToRadians(32.042), 0.6824);
   }
+
+  public static final class ClimberConstants {
+    public static final boolean kEnable = false;
+    public static final int kMotorID = 16;
+    public static final int kEncoderChannelAbs = 2;
+    public static final double kMaxSpeed = 0.5; //TODO: Set. This number is from ACDC.
+    public static final double kMaxRange = Math.toRadians(90); //TODO: Set.
+    public static final double kMinRange = Math.toRadians(0); //TODO: Set
+    public static final double kZeroOffset = 0.0;
+    public static final double kAngleTolerance = Math.toRadians(0.02); //TODO: Set.
+
+    //TODO: find gear ratio and meters per rotation
+    public static final double kGearRatio = 144.0;
+    // With no gear reduction each motor rotation moves the climber 0.012 meters
+    public static final double kAngleConversionFactor = 2.0 * Math.PI / kGearRatio;
+
+    // The native velocity units are motor rotations [aka revolutions] per minute (RPM),
+    // but we want meters per second.
+    public static final double kVelocityConversionFactor = kAngleConversionFactor / 60.0;
+
+    public static final PIDF kMotorPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
+
+    public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
+      new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
+      ClosedLoopSlot.kSlot0
+    );
+
+    //TODO: Set.
+    public static final SparkUtil.Config kMotorConfig = new SparkUtil.Config(
+      40,
+      0.1,
+      false,
+      kVelocityConversionFactor,
+      kAngleConversionFactor,
+      0.0,
+      0.0,
+      new ArrayList<>() {{
+        add(kMotorVelocityPIDFSlot);
+      }}
+    );
+  }
 }

@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveCommandConstants;
@@ -21,7 +22,7 @@ public class DriveToPose extends Command {
   private final Pose2d m_pose;
   private final DriveSubsystem m_drive;
   private final double m_squaredTranslationPositionToleranceMeters;
-  private final double m_squaredTranslationVelocityToleranceMetersPerDt;
+  private final double m_squaredTranslationVelocityToleranceMetersPerSecond;
 
   private static final TunablePIDF translatingPIDF = new TunablePIDF("DriveToPose.translatingPIDF",
     DriveCommandConstants.kTranslatingPIDF);
@@ -68,13 +69,13 @@ public class DriveToPose extends Command {
     m_xController.setGoal(pose.getX());
     m_yController.setGoal(pose.getY());
     m_squaredTranslationPositionToleranceMeters = square(translationPosToleranceMeters);
-    m_squaredTranslationVelocityToleranceMetersPerDt =
-      square(Constants.kDt * translationVelToleranceMetersPerSecond);
+    m_squaredTranslationVelocityToleranceMetersPerSecond =
+      square(translationVelToleranceMetersPerSecond);
 
     m_angleController.setGoal(poseAngle(pose));
     m_angleController.enableContinuousInput(-Math.PI, Math.PI);
     m_angleController.setTolerance(anglePosToleranceRadians,
-      Constants.kDt * angleVelToleranceRadiansPerSecond);
+      angleVelToleranceRadiansPerSecond);
 
     addRequirements(m_drive);
   }
@@ -179,7 +180,7 @@ public class DriveToPose extends Command {
     }
     double xVelError = m_xController.getVelocityError();
     double yVelError = m_yController.getVelocityError();
-    if (square(xVelError) + square(yVelError) > m_squaredTranslationVelocityToleranceMetersPerDt) {
+    if (square(xVelError) + square(yVelError) > m_squaredTranslationVelocityToleranceMetersPerSecond) {
       return false;
     }
     return m_angleController.atSetpoint();

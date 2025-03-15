@@ -354,14 +354,14 @@ public final class Constants {
       new CameraConfig(
         "reefCamera",
         new Transform3d(
-          0.279292, -0.137998, 0.315,
+          0.1379980, -0.279292, 0.315,
           new Rotation3d(0.0, 0.0, Units.degreesToRadians(21.5))),
         true
       ),
       new CameraConfig(
         "coralStationCamera",
         new Transform3d(
-          0.283631, -0.130006, 0.996,
+          0.1300060, -0.283631, 0.996,
           new Rotation3d(0.0, Units.degreesToRadians(-22.5), Units.degreesToRadians(9.5))),
         true
       )

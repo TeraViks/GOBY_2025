@@ -87,18 +87,19 @@ public class FieldPoseUtil {
   }
 
   public enum ReefSubPose {
-    A(-1),
-    B(1),
+    A(1),
+    B(-1),
     ALGAE(0);
 
-    int m_offsetDirection; // Negative is left.
+    // Integer multiple of reef branch offset. Negative is right.
+    int m_yBranchDelta;
 
-    ReefSubPose(int offsetDirection) {
-      m_offsetDirection = offsetDirection;
+    ReefSubPose(int yBranchDelta) {
+      m_yBranchDelta = yBranchDelta;
     }
 
-    private int getOffsetDirection() {
-      return m_offsetDirection;
+    private double getYOffset() {
+      return (double)m_yBranchDelta * AutoConstants.kReefBranchOffset;
     }
   }
 
@@ -116,24 +117,25 @@ public class FieldPoseUtil {
   }
 
   public enum CoralStationSubPose {
-    ONE(-4),
-    TWO(-3),
-    THREE(-2),
-    FOUR(-1),
+    ONE(4),
+    TWO(3),
+    THREE(2),
+    FOUR(1),
     FIVE(0), // Center slot, aligned with station AprilTag.
-    SIX(1),
-    SEVEN(2),
-    EIGHT(3),
-    NINE(4);
+    SIX(-1),
+    SEVEN(-2),
+    EIGHT(-3),
+    NINE(-4);
 
-    int m_slotDelta;
+    // Integer multiple of station slot spacing. Negative is right.
+    int m_ySlotDelta;
 
-    CoralStationSubPose(int slotDelta) {
-      m_slotDelta = slotDelta;
+    CoralStationSubPose(int ySlotDelta) {
+      m_ySlotDelta = ySlotDelta;
     }
 
-    private int getSlotDelta() {
-      return m_slotDelta;
+    private double getYOffset() {
+      return (double)m_ySlotDelta * AutoConstants.kStationSlotSpacing;
     }
   }
 
@@ -176,59 +178,6 @@ public class FieldPoseUtil {
     return alliance;
   }
 
-  private Pose2d offsetAprilTagPoseByRobot(Pose2d aprilTagPose, double wallOffset,
-      double parallelOffset) {
-    double distanceFromWall = AutoConstants.kBumperToRobotCenter + wallOffset;
-    double aprilTagRotationRadians = aprilTagPose.getRotation().getRadians();
-
-    double xTranslation = distanceFromWall * Math.cos(aprilTagRotationRadians);
-    double yTranslation = distanceFromWall * Math.sin(aprilTagRotationRadians);
-
-    Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d(Math.PI));
-
-    Pose2d robotPoseFacingAprilTag = aprilTagPose.plus(transform);
-    return offsetPoseParallel(robotPoseFacingAprilTag, parallelOffset);
-  }
-
-  private Pose2d offsetPoseParallel(Pose2d pose, double parallelOffset) {
-    double poseRot = pose.getRotation().getRadians();
-    double xTranslation = parallelOffset * Math.cos(poseRot);
-    double yTranslation = parallelOffset * Math.sin(poseRot);
-
-    Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d());
-
-    return pose.plus(transform);
-  }
-
-  private Pose2d calculateTargetPoseAtStation(AprilTag aprilTag, CoralStationSubPose subpose) {
-    Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset = AutoConstants.kStingerCenterOffset
-      + (double)subpose.getSlotDelta() * AutoConstants.kStationSlotSpacing;
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kStationWallOffset, parallelOffset);
-  }
-
-  private Pose2d calculateTargetPoseAtReef(AprilTag aprilTag, ReefSubPose subpose) {
-    Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset = AutoConstants.kStingerCenterOffset
-      + (double)subpose.getOffsetDirection() * AutoConstants.kReefBranchOffset;
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kReefWallOffset, parallelOffset);
-  }
-
-  public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
-    AprilTag aprilTag = station.mapToAprilTag(m_aprilTags);
-    return calculateTargetPoseAtStation(aprilTag, slot);
-  }
-
-  public Pose2d getTargetPoseAtProcessor() {
-    Pose2d aprilTagPose = m_aprilTags.processor.pose.toPose2d();
-    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kProcessorWallOffset,
-    AutoConstants.kStingerCenterOffset);
-  }
-
-  public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
-    return calculateTargetPoseAtReef(reefTime.mapToAprilTag(m_aprilTags), subpose);
-  }
-
   public Translation2d getReefCenter() {
     return m_reefCenter;
   }
@@ -255,5 +204,30 @@ public class FieldPoseUtil {
         robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
     );
     return m_coralStationMap.get(nearestStation);
+  }
+
+  private static Pose2d rotateByPi(Pose2d pose) {
+    return new Pose2d(pose.getTranslation(), pose.getRotation().plus(Rotation2d.kPi));
+  }
+
+  public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
+    Pose2d reefPose = reefTime.mapToAprilTag(m_aprilTags).pose.toPose2d();
+    double xOffset = AutoConstants.kReefXOffset;
+    double yOffset = AutoConstants.kStingerYOffset + subpose.getYOffset();
+    return rotateByPi(reefPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+  }
+
+  public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
+    Pose2d stationPose = station.mapToAprilTag(m_aprilTags).pose.toPose2d();
+    double xOffset = AutoConstants.kStationXOffset;
+    double yOffset = AutoConstants.kStingerYOffset + slot.getYOffset();
+    return rotateByPi(stationPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+  }
+
+  public Pose2d getTargetPoseAtProcessor() {
+    Pose2d processorPose = m_aprilTags.processor.pose.toPose2d();
+    double xOffset = AutoConstants.kProcessorXOffset;
+    double yOffset = AutoConstants.kStingerYOffset;
+    return rotateByPi(processorPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
   }
 }

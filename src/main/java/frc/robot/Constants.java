@@ -330,21 +330,20 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final PIDConstants kTranslationHolonomicPID= new PIDConstants(5.0, 0.0, 0.0);
-    public static final PIDConstants kRotationHolonomicPID= new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants kTranslationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
+    public static final PIDConstants kRotationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
 
-    public static final double kDriveBaseRadius = 0.4;
-    public static final double kBumperToRobotCenter = 0.461; //TODO: add bumper width / calculate
+    public static final double kFrameToRobotCenter = 0.381;
 
-    public static final double kStingerCenterOffset = 0.0; // TODO: Tune.
+    public static final double kStingerYOffset = -0.008;
 
-    public static final double kStationWallOffset = 0.1651; // TODO: Tune.
-    public static final double kStationSlotSpacing = 0.202;
+    public static final double kReefXOffset = -(0.222 + kFrameToRobotCenter);
+    public static final double kReefBranchOffset = 0.164; // Offset from center.
 
-    public static final double kReefWallOffset = 0.1651; // TODO: Tune.
-    public static final double kReefBranchOffset = 0.164;
+    public static final double kStationXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
+    public static final double kStationSlotSpacing = 0.202; // Distance between slots.
 
-    public static final double kProcessorWallOffset = 0.1651; // TODO: Tune.
+    public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
   }
 
   public static final class CameraConstants {

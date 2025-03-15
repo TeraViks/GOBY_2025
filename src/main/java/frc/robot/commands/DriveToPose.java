@@ -183,7 +183,7 @@ public class DriveToPose extends Command {
     if (square(xVelError) + square(yVelError) > m_squaredTranslationVelocityToleranceMetersPerSecond) {
       return false;
     }
-    return m_angleController.atSetpoint();
+    return m_angleController.atGoal();
   }
 
   @Override

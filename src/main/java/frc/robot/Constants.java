@@ -338,7 +338,7 @@ public final class Constants {
     public static final PIDConstants kRotationHolonomicPID= new PIDConstants(5.0, 0.0, 0.0);
 
     public static final double kDriveBaseRadius = 0.4;
-    public static final double kBumperToRobotCenter = 0.381; //TODO: add bumper width
+    public static final double kBumperToRobotCenter = 0.461; //TODO: add bumper width / calculate
 
     public static final double kStingerCenterOffset = 0.0; // TODO: Tune.
 

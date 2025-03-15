@@ -338,7 +338,7 @@ public final class Constants {
     public static final PIDConstants kRotationHolonomicPID= new PIDConstants(5.0, 0.0, 0.0);
 
     public static final double kDriveBaseRadius = 0.4;
-    public static final double kBumperToRobotCenter = 0.381; //TODO: add bumper width
+    public static final double kBumperToRobotCenter = 0.461; //TODO: add bumper width / calculate
 
     public static final double kStingerCenterOffset = 0.0; // TODO: Tune.
 
@@ -374,14 +374,14 @@ public final class Constants {
 
   public static final class DriveCommandConstants {
     public static final double kDefaultTranslationPositionToleranceMeters = 0.02;
-    public static final double kDefaultTranslationVelocityToleranceMetersPerSecond = 0.01;
+    public static final double kDefaultTranslationVelocityToleranceMetersPerSecond = 0.03;
     public static final double kDefaultAnglePositionToleranceRadians =
       Units.degreesToRadians(2.0);
     public static final double kDefaultAngleVelocityToleranceRadiansPerSecond =
-      Units.degreesToRadians(1.0);
+      Units.degreesToRadians(2.0);
 
-    public static final PIDF kTranslatingPIDF = new PIDF(5.0, 0.0, 0.0, 0.0); //TODO: Tune.
-    public static final PIDF kTurningPIDF = new PIDF(1.0, 0.0, 0.0, 0.0); //TODO: Not fully Tuned
+    public static final PIDF kTranslatingPIDF = new PIDF(4.0, 0.0, 0.1, 0.0); //TODO: Tune.
+    public static final PIDF kTurningPIDF = new PIDF(4.0, 0.0, 0.0, 0.0); //TODO: Not fully Tuned
   }
 
   public static final class FieldConstants {

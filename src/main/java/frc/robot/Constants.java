@@ -380,8 +380,8 @@ public final class Constants {
     public static final double kDefaultAngleVelocityToleranceRadiansPerSecond =
       Units.degreesToRadians(2.0);
 
-    public static final PIDF kTranslatingPIDF = new PIDF(5.0, 0.0, 0.0, 0.0); //TODO: Tune.
-    public static final PIDF kTurningPIDF = new PIDF(1.0, 0.0, 0.0, 0.0); //TODO: Not fully Tuned
+    public static final PIDF kTranslatingPIDF = new PIDF(4.0, 0.0, 0.1, 0.0); //TODO: Tune.
+    public static final PIDF kTurningPIDF = new PIDF(4.0, 0.0, 0.0, 0.0); //TODO: Not fully Tuned
   }
 
   public static final class FieldConstants {

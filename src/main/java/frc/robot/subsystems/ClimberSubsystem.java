@@ -23,7 +23,7 @@ public class ClimberSubsystem extends SubsystemBase {
   private final RelativeEncoder m_motorEncoder;
   private final DutyCycleEncoder m_encoder = new DutyCycleEncoder(
     ClimberConstants.kEncoderChannelAbs,
-    ClimberConstants.kMaxRange,
+    ClimberConstants.kAbsEncoderConversionFactor,
     ClimberConstants.kZeroOffset);
   private final TunablePIDF m_motorPIDF = new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kMotorVelocityPIDFSlot.pidf());
   private final SparkClosedLoopController m_controller;

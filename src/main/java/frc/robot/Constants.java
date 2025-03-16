@@ -604,9 +604,11 @@ public final class Constants {
   public static final class ClimberConstants {
     public static final boolean kEnable = false;
     public static final int kMotorID = 16;
-    public static final int kEncoderChannelAbs = 2;
-    public static final double kMaxSpeed = 0.5; //TODO: Set. This number is from ACDC.
-    public static final double kMaxRange = Math.toRadians(90); //TODO: Set.
+    public static final int kEncoderChannelAbs = 6;
+    public static final double kMaxSpeed = Math.PI / 12.0; //TODO: Set
+    public static final double kMaxAcceleration = Math.PI / 4.0;
+    public static final double kAbsEncoderConversionFactor = 2.0 * Math.PI;
+    public static final double kMaxRange = Math.toRadians(150); //TODO: Set.
     public static final double kMinRange = Math.toRadians(0); //TODO: Set
     public static final double kZeroOffset = 0.0;
     public static final double kAngleTolerance = Math.toRadians(0.02); //TODO: Set.

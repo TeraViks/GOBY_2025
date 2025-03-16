@@ -1,10 +1,13 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -12,6 +15,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TunablePIDF;
 
 public class ClimberSubsystem extends SubsystemBase {
@@ -21,12 +25,8 @@ public class ClimberSubsystem extends SubsystemBase {
     ClimberConstants.kEncoderChannelAbs,
     ClimberConstants.kMaxRange,
     ClimberConstants.kZeroOffset);
-  private final TunablePIDF m_motorPIDF = new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kMotorPIDF);
-  private final PIDController m_PIDController = new PIDController(
-    m_motorPIDF.get().p(), 
-    m_motorPIDF.get().i(), 
-    m_motorPIDF.get().d(), 
-    m_motorPIDF.get().ff());
+  private final TunablePIDF m_motorPIDF = new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kMotorVelocityPIDFSlot.pidf());
+  private final SparkClosedLoopController m_controller;
     
   private double m_idealSpeed;
 
@@ -69,6 +69,6 @@ public class ClimberSubsystem extends SubsystemBase {
         m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
       }
     }
-    m_motor.set(m_PIDController.calculate(m_motorEncoder.getVelocity(), transformSpeed(m_encoder.get(), m_idealSpeed)));
+   m_controller.setReference(transformSpeed(m_encoder.get(), m_idealSpeed), ControlType.kMAXMotionVelocityControl);
   }
 }

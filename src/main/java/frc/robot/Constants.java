@@ -620,11 +620,12 @@ public final class Constants {
     // but we want meters per second.
     public static final double kVelocityConversionFactor = kAngleConversionFactor / 60.0;
 
-    public static final PIDF kMotorPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
+    // public static final PIDF kMotorPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
 
+    public static final ClosedLoopSlot kVelocityPIDFSlot = ClosedLoopSlot.kSlot0;
     public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
-      ClosedLoopSlot.kSlot0
+      kVelocityPIDFSlot
     );
 
     //TODO: Set.
@@ -634,8 +635,8 @@ public final class Constants {
       false,
       kVelocityConversionFactor,
       kAngleConversionFactor,
-      0.0,
-      0.0,
+      kMaxSpeed,
+      kMaxAcceleration,
       new ArrayList<>() {{
         add(kMotorVelocityPIDFSlot);
       }}

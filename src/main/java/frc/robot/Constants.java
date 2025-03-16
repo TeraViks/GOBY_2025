@@ -340,7 +340,7 @@ public final class Constants {
     public static final double kDriveBaseRadius = 0.4;
     public static final double kBumperToRobotCenter = 0.438;
 
-    public static final double kStingerCenterOffset = 0.0;
+    public static final double kStingerCenterOffset = 0.0079;
 
     public static final double kStationWallOffset = 0.1651; // TODO: Tune.
     public static final double kStationSlotSpacing = 0.202;

@@ -175,57 +175,36 @@ public class FieldPoseUtil {
     return alliance;
   }
 
-  private Pose2d offsetAprilTagPoseByRobot(Pose2d aprilTagPose, double wallOffset,
-      double parallelOffset) {
-    double distanceFromWall = AutoConstants.kBumperToRobotCenter + wallOffset;
-    double aprilTagRotationRadians = aprilTagPose.getRotation().getRadians();
-
-    double xTranslation = distanceFromWall * Math.cos(aprilTagRotationRadians);
-    double yTranslation = distanceFromWall * Math.sin(aprilTagRotationRadians);
-
-    Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d(Math.PI));
-
-    Pose2d robotPoseFacingAprilTag = aprilTagPose.plus(transform);
-    return offsetPoseParallel(robotPoseFacingAprilTag, parallelOffset);
-  }
-
-  private Pose2d offsetPoseParallel(Pose2d pose, double parallelOffset) {
-    double poseRot = pose.getRotation().getRadians();
-    double xTranslation = parallelOffset * Math.cos(poseRot);
-    double yTranslation = parallelOffset * Math.sin(poseRot);
-
-    Transform2d transform = new Transform2d(xTranslation, yTranslation, new Rotation2d());
-
-    return pose.plus(transform);
-  }
-
-  private Pose2d calculateTargetPoseAtStation(AprilTag aprilTag, CoralStationSubPose subpose) {
-    Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset = AutoConstants.kStingerCenterOffset
-      + (double)subpose.getSlotDelta() * AutoConstants.kStationSlotSpacing;
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kStationWallOffset, parallelOffset);
-  }
-
-  private Pose2d calculateTargetPoseAtReef(AprilTag aprilTag, ReefSubPose subpose) {
-    Pose2d stationPose = aprilTag.pose.toPose2d();
-    double parallelOffset = AutoConstants.kStingerCenterOffset
-      + (double)subpose.getOffsetDirection() * AutoConstants.kReefBranchOffset;
-    return offsetAprilTagPoseByRobot(stationPose, AutoConstants.kReefWallOffset, parallelOffset);
-  }
-
   public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
-    AprilTag aprilTag = station.mapToAprilTag(m_aprilTags);
-    return calculateTargetPoseAtStation(aprilTag, slot);
+    Pose2d stationPose = station.mapToAprilTag(m_aprilTags).pose.toPose2d();
+    double xOffset = -(AutoConstants.kReefWallOffset + AutoConstants.kBumperToRobotCenter);
+    double yOffset = AutoConstants.kStingerCenterOffset
+      + (double)slot.getSlotDelta() * AutoConstants.kStationSlotSpacing;
+    Pose2d untranslatedRobotPose = new Pose2d(stationPose.getTranslation(), stationPose.getRotation().plus(Rotation2d.kPi));
+    Pose2d transformedPose = untranslatedRobotPose.plus(
+      new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return transformedPose;
   }
 
   public Pose2d getTargetPoseAtProcessor() {
-    Pose2d aprilTagPose = m_aprilTags.processor.pose.toPose2d();
-    return offsetAprilTagPoseByRobot(aprilTagPose, AutoConstants.kProcessorWallOffset,
-    AutoConstants.kStingerCenterOffset);
+    Pose2d processorPose = m_aprilTags.processor.pose.toPose2d();
+    double xOffset = -(AutoConstants.kReefWallOffset + AutoConstants.kBumperToRobotCenter);
+    double yOffset = AutoConstants.kStingerCenterOffset;
+    Pose2d untranslatedRobotPose = new Pose2d(processorPose.getTranslation(), processorPose.getRotation().plus(Rotation2d.kPi));
+    Pose2d transformedPose = untranslatedRobotPose.plus(
+      new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return transformedPose;
   }
 
   public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
-    return calculateTargetPoseAtReef(reefTime.mapToAprilTag(m_aprilTags), subpose);
+    Pose2d reefPose = reefTime.mapToAprilTag(m_aprilTags).pose.toPose2d();
+    double xOffset = -(AutoConstants.kReefWallOffset + AutoConstants.kBumperToRobotCenter);
+    double yOffset = AutoConstants.kStingerCenterOffset
+      + (double)subpose.getYOffsetSign() * AutoConstants.kReefBranchOffset;
+    Pose2d untranslatedRobotPose = new Pose2d(reefPose.getTranslation(), reefPose.getRotation().plus(Rotation2d.kPi));
+    Pose2d transformedPose = untranslatedRobotPose.plus(
+      new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return transformedPose;
   }
 
   public Translation2d getReefCenter() {

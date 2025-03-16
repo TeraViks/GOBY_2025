@@ -87,18 +87,17 @@ public class FieldPoseUtil {
   }
 
   public enum ReefSubPose {
-    A(-1),
-    B(1),
+    A(1),
+    B(-1),
     ALGAE(0);
 
-    int m_offsetDirection; // Negative is left.
-
+    int m_yOffsetSign; // Negative is right;
     ReefSubPose(int offsetDirection) {
-      m_offsetDirection = offsetDirection;
+      m_yOffsetSign = offsetDirection;
     }
 
-    private int getOffsetDirection() {
-      return m_offsetDirection;
+    private int getYOffsetSign() {
+      return m_yOffsetSign;
     }
   }
 

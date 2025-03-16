@@ -610,7 +610,7 @@ public final class Constants {
     public static final double kAbsEncoderConversionFactor = 2.0 * Math.PI;
     public static final double kMaxRange = Math.toRadians(150); //TODO: Set.
     public static final double kMinRange = Math.toRadians(0); //TODO: Set
-    public static final double kZeroOffset = 0.0;
+    public static final double kZeroOffset = 2.5087;
     public static final double kAngleTolerance = Math.toRadians(0.02); //TODO: Set.
 
     //TODO: find gear ratio and meters per rotation

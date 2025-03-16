@@ -66,7 +66,11 @@ public class ClimberSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Climber.velocity", m_motorEncoder.getVelocity());
       if (m_motorPIDF.hasChanged()) {
         PIDF pidf = m_motorPIDF.get();
-        m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
+        ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, ClimberConstants.kVelocityPIDFSlot));
+      }};
+        SparkUtil.Config config = ClimberConstants.kMotorConfig.withPIDFSlots(pidfSlots);
+        SparkUtil.configureMotor(m_motor, config);
       }
     }
    m_controller.setReference(transformSpeed(m_encoder.get(), m_idealSpeed), ControlType.kMAXMotionVelocityControl);

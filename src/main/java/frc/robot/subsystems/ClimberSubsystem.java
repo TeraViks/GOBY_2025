@@ -33,6 +33,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public ClimberSubsystem() {
     m_motor = new SparkFlex(ClimberConstants.kMotorID, MotorType.kBrushless);
     m_motorEncoder = m_motor.getEncoder();
+    m_motorEncoder.setPosition(m_encoder.get());
+    m_controller = m_motor.getClosedLoopController();
     SparkUtil.configureMotor(m_motor, ClimberConstants.kMotorConfig);
   }
 

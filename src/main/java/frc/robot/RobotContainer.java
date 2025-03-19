@@ -53,7 +53,7 @@ public class RobotContainer {
   private final HandlerSubsystem m_handler = new HandlerSubsystem(
     HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
-  private final ClimberSubsystem m_climber = new ClimberSubsystem();
+  private final ClimberSubsystem m_climber = ClimberConstants.kEnable ? new ClimberSubsystem() : null;
   private final LightSubsystem m_lightSubsystem = new LightSubsystem();
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);

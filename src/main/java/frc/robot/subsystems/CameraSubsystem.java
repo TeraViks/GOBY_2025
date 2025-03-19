@@ -52,25 +52,39 @@ public class CameraSubsystem extends SubsystemBase {
 
     public void periodic() {
       for (PhotonPipelineResult pipelineResult : m_camera.getAllUnreadResults()) {
-        Optional<MultiTargetPNPResult> multiTargetResultOpt = pipelineResult.getMultiTagResult();
-        if (multiTargetResultOpt.isPresent()) {
-          if (multiTargetResultOpt.get().estimatedPose.ambiguity > CameraConstants.kMaxAmbiguity) {
-            return;
-          }
-        } else {
+        if (pipelineResult.targets.size() > 0) {
+          double minAmbiguity = Double.POSITIVE_INFINITY;
+          double minAmbiguityTagDistance = Double.POSITIVE_INFINITY;
+          double maxTagDistance = 0.0;
           for (PhotonTrackedTarget target : pipelineResult.targets) {
-            if (target.poseAmbiguity > CameraConstants.kMaxAmbiguity) {
-              return;
+            double tagDistance = target.getBestCameraToTarget().getTranslation().getNorm();
+            if (target.poseAmbiguity < minAmbiguity) {
+              minAmbiguity = target.poseAmbiguity;
+              minAmbiguityTagDistance = tagDistance;
+            }
+            if (tagDistance > maxTagDistance) {
+              maxTagDistance = tagDistance;
             }
           }
-        }
-        // Filter out spurious empty results, such that the most recent non-empty result is
-        // used as the estimate. PhotonVision may return multiple pipeline results (some
-        // empty) per periodic update, and a result that's a few milliseconds old is better
-        // than no result at all.
-        Optional<EstimatedRobotPose> estimate = m_photonPoseEstimator.update(pipelineResult);
-        if (estimate.isPresent()) {
-          m_estimate = estimate;
+          Optional<MultiTargetPNPResult> multiTargetResultOpt = pipelineResult.getMultiTagResult();
+          Optional<EstimatedRobotPose> estimate = Optional.empty();
+          if (multiTargetResultOpt.isEmpty() || maxTagDistance > CameraConstants.kMaxTagDistance) {
+            // Empty multi-tag estimate, or estimate incorporates tag(s) too far away to trust.
+            if (minAmbiguity <= CameraConstants.kMaxAmbiguity
+                && minAmbiguityTagDistance < CameraConstants.kMaxTagDistance) {
+              m_photonPoseEstimator.setPrimaryStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+              estimate = m_photonPoseEstimator.update(pipelineResult);
+            }
+          } else if (multiTargetResultOpt.get().estimatedPose.ambiguity
+              <= CameraConstants.kMaxAmbiguity) {
+            m_photonPoseEstimator.setPrimaryStrategy(PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR);
+            estimate = m_photonPoseEstimator.update(pipelineResult);
+          }
+          // In addition to the above filtering causing empty estimates, PhotonVision may return
+          // multiple pipeline results (some empty) per periodic update.
+          if (estimate.isPresent()) {
+            m_estimate = estimate;
+          }
         }
       }
     }

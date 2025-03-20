@@ -622,7 +622,7 @@ public final class Constants {
     // but we want meters per second.
     public static final double kVelocityConversionFactor = kAngleConversionFactor / 60.0;
 
-    public static final PIDF kVelocityPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
+    public static final PIDF kVelocityPIDF = new PIDF(0.2, 0.0 , 0.0, 0.175);
 
     public static final ClosedLoopSlot kVelocitySlot = ClosedLoopSlot.kSlot0;
     public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(

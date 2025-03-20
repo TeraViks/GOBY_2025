@@ -351,6 +351,10 @@ public class Crane extends SubsystemBase {
     return MathUtil.angleModulus(m_pivotAbsEncoder.get());
   }
 
+  private double getElevatorLidarHeight() {
+    return CraneConstants.kDistanceSensorBaseMeasurement + m_distanceSensor.getDistance();
+  }
+
   private void toStateCraning() {
     m_state = State.CRANING;
   }
@@ -410,7 +414,7 @@ public class Crane extends SubsystemBase {
       case ESTIMATE_AH: {
         double a = getPivotAbsEncoderRadians();
         initPivotPosition(a);
-        double h = CraneConstants.kDistanceSensorBaseMeasurement + m_distanceSensor.getDistance();
+        double h = getElevatorLidarHeight();
         initElevatorPosition(h);
         toStatePivot0();
         break;

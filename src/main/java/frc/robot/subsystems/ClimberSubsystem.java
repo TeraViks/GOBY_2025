@@ -82,7 +82,7 @@ public class ClimberSubsystem extends SubsystemBase {
       SparkUtil.configureMotor(m_leftMotor, leftMotorConfig);
       SparkUtil.Config rightMotorConfig =
         leftMotorConfig.withInvert(!ClimberConstants.kInvertLeftMotor);
-      SparkUtil.configureMotor(m_rightMotor, rightMotorConfig);
+      SparkUtil.configureFollowerMotor(m_rightMotor, rightMotorConfig, m_leftMotor);
     }
   }
 

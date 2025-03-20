@@ -508,7 +508,7 @@ public final class Constants {
 
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.75, 0.0, 8.0, 0.0),
+      new PIDF(0.21, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kElevatorMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
@@ -532,9 +532,10 @@ public final class Constants {
     public static final double kElevatorMinStalledHomingAmperage = 20.0;
     public static final double kElevatorHomingDebounceSeconds = kDt;
 
-    public static final double kS = 0.0; //TODO: Calculate
-    public static final double kG = 0.0; //TODO: Calculate
-    public static final double kV = 0.0; //TODO: Calculate
+    // Static/gravity/velocity gain for ElevatorFeedForward.
+    public static final double kS = 0.1;
+    public static final double kG = 0.323;
+    public static final double kV = 7.0;
 
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
       Units.degreesToRadians(0.5),

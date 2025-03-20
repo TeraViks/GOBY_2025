@@ -3,15 +3,13 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
@@ -25,11 +23,6 @@ public class ClimberSubsystem extends SubsystemBase {
   private final RelativeEncoder m_encoder;
   private final TunablePIDF m_motorPIDF =
     new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kVelocityPIDF);
-  private final PIDController m_PIDController = new PIDController(
-    m_motorPIDF.get().p(),
-    m_motorPIDF.get().i(),
-    m_motorPIDF.get().d(),
-    m_motorPIDF.get().ff());
 
   private double m_idealSpeed;
 

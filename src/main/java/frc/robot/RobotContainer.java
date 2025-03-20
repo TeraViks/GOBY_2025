@@ -136,7 +136,7 @@ public class RobotContainer {
         new RunCommand(
           () -> {
             m_climber.setSpeed(
-              getClimbInput() * ClimberConstants.kMaxSpeed
+              getClimbInput() * ClimberConstants.kMaxSpeedRadiansPerSecond
             );
           }, m_climber
         )

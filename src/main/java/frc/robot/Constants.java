@@ -606,41 +606,39 @@ public final class Constants {
 
   public static final class ClimberConstants {
     public static final boolean kEnable = false;
-    public static final int kMotorID = 16;
-    public static final int kEncoderChannelAbs = 2;
-    public static final double kMaxSpeed = 0.5; //TODO: Set. This number is from ACDC.
-    public static final double kMaxRange = Math.toRadians(90); //TODO: Set.
-    public static final double kMinRange = Math.toRadians(0); //TODO: Set
-    public static final double kZeroOffset = 0.0;
-    public static final double kAngleTolerance = Math.toRadians(0.02); //TODO: Set.
+    public static final int kLeftMotorID = 16;
+    public static final int kRightMotorID = 17;
+    public static final double kMaxSpeedRadiansPerSecond = Math.toRadians(Math.PI);
+    public static final double kMaxRange = Math.toRadians(-15.0);
+    public static final double kMinRange = Math.toRadians(135.0);
+    public static final double kInitialAngle = 0.0;
+    public static final double kAngleTolerance = Math.toRadians(0.02);
 
-    //TODO: find gear ratio and meters per rotation
-    public static final double kGearRatio = 144.0;
-    // With no gear reduction each motor rotation moves the climber 0.012 meters
+    public static final double kGearRatio = 9.0 * 4.0 * 3.0;
     public static final double kAngleConversionFactor = 2.0 * Math.PI / kGearRatio;
 
     // The native velocity units are motor rotations [aka revolutions] per minute (RPM),
     // but we want meters per second.
     public static final double kVelocityConversionFactor = kAngleConversionFactor / 60.0;
 
-    public static final PIDF kMotorPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
+    public static final PIDF kVelocityPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
 
-    public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.1, 0.0, 0.0, 0.0), //TODO: Tune.
+    public static final SparkUtil.PIDFSlot kMotorVelocityPIDF = new SparkUtil.PIDFSlot(
+      kVelocityPIDF,
       ClosedLoopSlot.kSlot0
     );
 
-    //TODO: Set.
+    public static final boolean kInvertLeftMotor = false;
     public static final SparkUtil.Config kMotorConfig = new SparkUtil.Config(
       40,
       0.1,
-      false,
+      kInvertLeftMotor,
       kVelocityConversionFactor,
       kAngleConversionFactor,
       0.0,
       0.0,
       new ArrayList<>() {{
-        add(kMotorVelocityPIDFSlot);
+        add(kMotorVelocityPIDF);
       }}
     );
   }

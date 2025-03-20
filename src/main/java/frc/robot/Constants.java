@@ -556,13 +556,13 @@ public final class Constants {
     public static final double kPivotLoMax = Units.degreesToRadians(88.0);
     public static final double kPivotHome = kPivotLoMax;
 
-    public static final double kElevatorMax = 1.400;
-    public static final double kElevatorHardMin = 0.283;
+    public static final double kElevatorMax = 1.635;
+    public static final double kElevatorHardMin = 0.326;
     public static final double kElevatorHomeRapid = kElevatorHardMin + 0.05;
     public static final double kElevatorSoftMin = kElevatorHardMin + 0.02;
     public static final double kElevatorHome = kElevatorSoftMin;
     // Actual elevator height for a distance sensor measurement of 0.
-    public static final double kDistanceSensorBaseMeasurement = kElevatorHardMin - 0.03;
+    public static final double kDistanceSensorBaseMeasurement = 0.344;
 
     // Valid configuration space boundaries.
     public static final Segment kPivotLoBoundary = new Segment(

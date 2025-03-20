@@ -52,15 +52,20 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   private double transformSpeed(double position, double speed) {
-    if (position >= ClimberConstants.kMaxRange - ClimberConstants.kAngleTolerance &&
-        speed > 0.0) {
-      return speed * ((ClimberConstants.kMaxRange - position) /
-        ClimberConstants.kAngleTolerance);
-    } else if (
-        position <= ClimberConstants.kMinRange + ClimberConstants.kAngleTolerance &&
-        speed < 0.0) {
-      return speed * ((position - ClimberConstants.kMinRange) /
-        ClimberConstants.kAngleTolerance);
+    // if (position >= ClimberConstants.kMaxRange - ClimberConstants.kAngleTolerance &&
+    //     speed > 0.0) {
+    //   return speed * (ClimberConstants.kMaxRange - position);
+    // } else if (
+    //     position <= ClimberConstants.kMinRange + ClimberConstants.kAngleTolerance &&
+    //     speed < 0.0) {
+    //   return speed * (position - ClimberConstants.kMinRange);
+    // } else {
+    //   return speed;
+    // }
+    if (position < ClimberConstants.kMinRange && speed < 0.0) {
+      return 0.0;
+    } else if (position > ClimberConstants.kMaxRange && speed > 0.0) {
+      return 0.0;
     } else {
       return speed;
     }

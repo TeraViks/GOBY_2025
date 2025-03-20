@@ -605,7 +605,7 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final boolean kEnable = false;
+    public static final boolean kEnable = true;
     public static final int kLeftMotorID = 16;
     public static final int kRightMotorID = 17;
     public static final double kMaxSpeedRadiansPerSecond = Math.PI;

@@ -51,17 +51,7 @@ public class ClimberSubsystem extends SubsystemBase {
     m_idealSpeed = speed;
   }
 
-  private double transformSpeed(double position, double speed) {
-    // if (position >= ClimberConstants.kMaxRange - ClimberConstants.kAngleTolerance &&
-    //     speed > 0.0) {
-    //   return speed * (ClimberConstants.kMaxRange - position);
-    // } else if (
-    //     position <= ClimberConstants.kMinRange + ClimberConstants.kAngleTolerance &&
-    //     speed < 0.0) {
-    //   return speed * (position - ClimberConstants.kMinRange);
-    // } else {
-    //   return speed;
-    // }
+  private double clampSpeed(double position, double speed) {
     if (position < ClimberConstants.kMinRange && speed < 0.0) {
       return 0.0;
     } else if (position > ClimberConstants.kMaxRange && speed > 0.0) {
@@ -89,7 +79,7 @@ public class ClimberSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateConstants();
-    m_controller.setReference(transformSpeed(m_encoder.getPosition(), m_idealSpeed),
+    m_controller.setReference(clampSpeed(m_encoder.getPosition(), m_idealSpeed),
      ControlType.kMAXMotionVelocityControl);
   }
 }

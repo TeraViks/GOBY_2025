@@ -1,7 +1,11 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -11,11 +15,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.utilities.PIDF;
 import frc.robot.utilities.SparkUtil;
+import frc.robot.utilities.SparkUtil.PIDFSlot;
 import frc.robot.utilities.TunablePIDF;
 
 public class ClimberSubsystem extends SubsystemBase {
   private final SparkFlex m_leftMotor;
   private final SparkFlex m_rightMotor;
+  private final SparkClosedLoopController m_controller;
   private final RelativeEncoder m_encoder;
   private final TunablePIDF m_motorPIDF =
     new TunablePIDF("Climber.velocityPIDF", ClimberConstants.kVelocityPIDF);
@@ -37,6 +43,8 @@ public class ClimberSubsystem extends SubsystemBase {
       ClimberConstants.kMotorConfig.withInvert(!ClimberConstants.kInvertLeftMotor),
       m_leftMotor
     );
+
+    m_controller = m_leftMotor.getClosedLoopController();
 
     m_encoder = m_leftMotor.getEncoder();
     m_encoder.setPosition(ClimberConstants.kInitialAngle);
@@ -65,18 +73,25 @@ public class ClimberSubsystem extends SubsystemBase {
     }
   }
 
+  private void updateConstants() {
+    SmartDashboard.putNumber("Climber.velocity", m_encoder.getVelocity());
+    if (m_motorPIDF.hasChanged()) {
+      PIDF pidf = m_motorPIDF.get();
+      ArrayList<PIDFSlot> pidfSlots = new ArrayList<>() {{
+        add(new SparkUtil.PIDFSlot(pidf, ClimberConstants.kVelocitySlot));
+      }};
+      SparkUtil.Config leftMotorConfig = ClimberConstants.kMotorConfig.withPIDFSlots(pidfSlots);
+      SparkUtil.configureMotor(m_leftMotor, leftMotorConfig);
+      SparkUtil.Config rightMotorConfig =
+        leftMotorConfig.withInvert(!ClimberConstants.kInvertLeftMotor);
+      SparkUtil.configureMotor(m_rightMotor, rightMotorConfig);
+    }
+  }
+
   @Override
   public void periodic() {
-    if (Constants.kEnableTuning) {
-      SmartDashboard.putNumber("Climber.velocity", m_encoder.getVelocity());
-      if (m_motorPIDF.hasChanged()) {
-        PIDF pidf = m_motorPIDF.get();
-        m_PIDController.setPID(pidf.p(), pidf.i(), pidf.d());
-      }
-    }
-    m_leftMotor.set(m_PIDController.calculate(
-      m_encoder.getVelocity(),
-      transformSpeed(m_encoder.getPosition(), m_idealSpeed)
-    ));
+    updateConstants();
+    m_controller.setReference(transformSpeed(m_encoder.getPosition(), m_idealSpeed),
+     ControlType.kMAXMotionVelocityControl);
   }
 }

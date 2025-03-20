@@ -608,7 +608,8 @@ public final class Constants {
     public static final boolean kEnable = false;
     public static final int kLeftMotorID = 16;
     public static final int kRightMotorID = 17;
-    public static final double kMaxSpeedRadiansPerSecond = Math.toRadians(Math.PI);
+    public static final double kMaxSpeedRadiansPerSecond = Math.PI;
+    public static final double kMaxAccelerationRadiansPerSecondSquared = 4.0 * Math.PI;
     public static final double kMaxRange = Math.toRadians(-15.0);
     public static final double kMinRange = Math.toRadians(135.0);
     public static final double kInitialAngle = 0.0;
@@ -623,9 +624,10 @@ public final class Constants {
 
     public static final PIDF kVelocityPIDF = new PIDF(0.0, 0.0 , 0.0, 0.0);
 
-    public static final SparkUtil.PIDFSlot kMotorVelocityPIDF = new SparkUtil.PIDFSlot(
+    public static final ClosedLoopSlot kVelocitySlot = ClosedLoopSlot.kSlot0;
+    public static final SparkUtil.PIDFSlot kMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       kVelocityPIDF,
-      ClosedLoopSlot.kSlot0
+      kVelocitySlot
     );
 
     public static final boolean kInvertLeftMotor = false;
@@ -635,10 +637,10 @@ public final class Constants {
       kInvertLeftMotor,
       kVelocityConversionFactor,
       kAngleConversionFactor,
-      0.0,
-      0.0,
+      kMaxSpeedRadiansPerSecond,
+      kMaxAccelerationRadiansPerSecondSquared,
       new ArrayList<>() {{
-        add(kMotorVelocityPIDF);
+        add(kMotorVelocityPIDFSlot);
       }}
     );
   }

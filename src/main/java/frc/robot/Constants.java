@@ -605,13 +605,13 @@ public final class Constants {
   }
 
   public static final class ClimberConstants {
-    public static final boolean kEnable = false;
+    public static final boolean kEnable = true;
     public static final int kLeftMotorID = 16;
-    public static final int kRightMotorID = 17;
     public static final double kMaxSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAccelerationRadiansPerSecondSquared = 4.0 * Math.PI;
     public static final double kMaxRange = Math.toRadians(-15.0);
     public static final double kMinRange = Math.toRadians(135.0);
+    public static final int kRightMotorID = 19;
     public static final double kInitialAngle = 0.0;
     public static final double kAngleTolerance = Math.toRadians(0.02);
 

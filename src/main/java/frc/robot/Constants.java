@@ -506,11 +506,9 @@ public final class Constants {
     public static final double kPivotAbsEncoderOffsetRadians = Units.degreesToRadians(12.29);
     public static final double kPivotEndoderFlexRadians = Units.degreesToRadians(3.97);
 
-    public static final double kPivotHomePosition = Math.PI / 2;
-
     public static final boolean kInvertLeftElevatorMotor = false;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.21, 0.0, 0.0, 0.0),
+      new PIDF(0.3, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kElevatorMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
@@ -535,8 +533,8 @@ public final class Constants {
     public static final double kElevatorHomingDebounceSeconds = kDt;
 
     // Static/gravity/velocity gain for ElevatorFeedForward.
-    public static final double kS = 0.1;
-    public static final double kG = 0.323;
+    public static final double kS = 0.2;
+    public static final double kG = 0.32;
     public static final double kV = 7.0;
 
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
@@ -544,12 +542,12 @@ public final class Constants {
       Units.degreesToRadians(0.25)
     );
     public static final Crane.Tolerance kDefaultElevatorTolerance = new Crane.Tolerance(
-      0.005,
-      0.0025
+      0.01,
+      Double.POSITIVE_INFINITY
     );
 
     public static final PIDF kPivotPIDF = new PIDF(9.0, 0.0, 8.5, 0.0);
-    public static final PIDF kElevatorPIDF = new PIDF(9.0, 0.0, 0.0, 0.2);
+    public static final PIDF kElevatorPIDF = new PIDF(10.0, 0.0, 0.0, 0.0);
 
     public static final double kPivotHardMax = Units.degreesToRadians(90.5);
     public static final double kPivotHiMin = Units.degreesToRadians(-90.0);

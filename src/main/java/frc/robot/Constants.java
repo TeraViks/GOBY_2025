@@ -478,7 +478,7 @@ public final class Constants {
     // rot -> radians: 75:1 gearbox.
     public static final double kPivotPositionConversionFactor = (2.0 * Math.PI) / 75.0;
     public static final SparkUtil.PIDFSlot kPivotMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
-      new PIDF(0.1, 0.0, 0.0, 0.0),
+      new PIDF(0.1, 0.0, 0.0, 0.25),
       ClosedLoopSlot.kSlot0
     );
     public static final SparkUtil.PIDFSlot kPivotMotorVoltagePIDFSlot = new SparkUtil.PIDFSlot(
@@ -543,22 +543,21 @@ public final class Constants {
 
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
       Units.degreesToRadians(0.5),
-      Units.degreesToRadians(0.25)
+      Double.POSITIVE_INFINITY
     );
     public static final Crane.Tolerance kDefaultElevatorTolerance = new Crane.Tolerance(
       0.01,
       Double.POSITIVE_INFINITY
     );
 
-    public static final PIDF kPivotPIDF = new PIDF(9.0, 0.0, 8.5, 0.0);
+    public static final PIDF kPivotPIDF = new PIDF(5.0, 0.0, 0.0, 0.0);
     public static final PIDF kElevatorPIDF = new PIDF(10.0, 0.0, 0.0, 0.0);
 
-    public static final double kPivotHardMax = Units.degreesToRadians(90.5);
     public static final double kPivotHiMin = Units.degreesToRadians(-90.0);
-    public static final double kPivotHomeRapid = Units.degreesToRadians(85.0);
+    public static final double kPivotHomeRapid = Units.degreesToRadians(75.0);
     public static final double kPivotHiMax = Units.degreesToRadians(44.0);
     public static final double kPivotLoMin = Units.degreesToRadians(-15.0);
-    public static final double kPivotLoMax = Units.degreesToRadians(88.0);
+    public static final double kPivotLoMax = Units.degreesToRadians(90.0);
     public static final double kPivotHome = kPivotLoMax;
 
     public static final double kElevatorMax = 1.635;

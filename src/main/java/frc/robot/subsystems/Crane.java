@@ -122,7 +122,8 @@ public class Crane extends SubsystemBase {
     m_pivotEncoder = m_pivotMotor.getEncoder();
     m_pivotEncoder.setPosition(0.0);
     m_pivotAbsEncoder = new DutyCycleEncoder(CraneConstants.kPivotAbsEncoderChannel,
-      2.0 * Math.PI, CraneConstants.kPivotEncoderOffsetRadians);
+      2.0 * Math.PI, CraneConstants.kPivotAbsEncoderOffsetRadians);
+    m_pivotAbsEncoder.setInverted(CraneConstants.kPivotAbsEncoderInverted);
     m_elevatorEncoder = m_leftElevatorMotor.getEncoder();
     m_elevatorEncoder.setPosition(0.0);
     m_distanceSensor = new Pololu4079(CraneConstants.kDistanceSensorInput);
@@ -468,8 +469,9 @@ public class Crane extends SubsystemBase {
           } else if (currentTime >= m_stallStartTime
               + CraneConstants.kPivotHomingDebounceSeconds) {
             m_stallStartTime = Double.POSITIVE_INFINITY;
+            double a = getPivotAbsEncoderRadians();
+            initPivotPosition(a + CraneConstants.kPivotEndoderFlexRadians);
             m_pivotMotor.stopMotor();
-            initPivotPosition(CraneConstants.kPivotHardMax);
             movePivotTo(CraneConstants.kPivotHome);
             toStateCraning();
           }

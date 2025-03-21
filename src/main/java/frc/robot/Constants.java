@@ -499,10 +499,12 @@ public final class Constants {
 
     public static final double kPivotHomingVoltage = 0.5;
     public static final double kPivotMinStalledHomingAmperage = 20.0;
-    public static final double kPivotHomingDebounceSeconds = kDt;
+    public static final double kPivotHomingDebounceSeconds = 0.2;
 
     public static final int kPivotAbsEncoderChannel = 5;
-    public static final double kPivotEncoderOffsetRadians = 0.0; // TODO: Calibrate.
+    public static final boolean kPivotAbsEncoderInverted = true;
+    public static final double kPivotAbsEncoderOffsetRadians = Units.degreesToRadians(12.29);
+    public static final double kPivotEndoderFlexRadians = Units.degreesToRadians(3.97);
 
     public static final double kPivotHomePosition = Math.PI / 2;
 

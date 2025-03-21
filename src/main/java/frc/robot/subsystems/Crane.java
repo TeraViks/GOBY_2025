@@ -131,9 +131,11 @@ public class Crane extends SubsystemBase {
     m_pivotPID = m_pivotMotor.getClosedLoopController();
     m_leftElevatorPID = m_leftElevatorMotor.getClosedLoopController();
 
+    m_aController.enableContinuousInput(-Math.PI, Math.PI);
+
     m_pivotPositionCache =
       new ValueCache<Double>(() -> {
-        return m_pivotEncoder.getPosition();
+        return MathUtil.angleModulus(m_pivotEncoder.getPosition());
       }, CraneConstants.kValueCacheTtlMicroseconds);
     m_pivotVelocityCache =
       new ValueCache<Double>(() -> {

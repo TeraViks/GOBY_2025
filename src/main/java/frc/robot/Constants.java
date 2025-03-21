@@ -475,6 +475,8 @@ public final class Constants {
     public static final double kElevatorMaxAcccelerationMetersPerSecondSquared =
       kElevatorMaxSpeedMetersPerSecond / kAccelerationSeconds; // Do not change.
 
+    // rot -> radians: 75:1 gearbox.
+    public static final double kPivotPositionConversionFactor = (2.0 * Math.PI) / 75.0;
     public static final SparkUtil.PIDFSlot kPivotMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.1, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot0
@@ -487,10 +489,10 @@ public final class Constants {
       40,
       0.0,
       false,
-      ((2.0*Math.PI)/75.0)/60.0,
-      (2.0*Math.PI)/75.0,
-      Math.PI / 2.0,
-      2.0 * Math.PI,
+      kPivotPositionConversionFactor / 60.0, // rot/min -> rad/s
+      kPivotPositionConversionFactor,
+      kPivotMaxSpeedRadiansPerSecond,
+      kPivotMaxAccelerationRadiansPerSecondSquared,
       new ArrayList<>() {{
         add(kPivotMotorVelocityPIDFSlot);
         add(kPivotMotorVoltagePIDFSlot);
@@ -507,6 +509,8 @@ public final class Constants {
     public static final double kPivotEndoderFlexRadians = Units.degreesToRadians(3.97);
 
     public static final boolean kInvertLeftElevatorMotor = false;
+    // rot -> meters: 12:1 gearbox, 22T sprocket, 1/4" chain link, 2-stage elevator.
+    public static final double kElevatorPositionConversionFactor = 0.0233;
     public static final SparkUtil.PIDFSlot kElevatorMotorVelocityPIDFSlot = new SparkUtil.PIDFSlot(
       new PIDF(0.3, 0.0, 0.0, 0.0),
       ClosedLoopSlot.kSlot0
@@ -519,10 +523,10 @@ public final class Constants {
       40,
       0.0,
       kInvertLeftElevatorMotor,
-      0.0233/60.0, // rot/min -> m/s
-      0.0233, // rot -> meters: 12:1 gearbox, 22T sprocket, 1/4" chain link, 2-stage elevator.
-      1.0,
-      4.0,
+      kElevatorPositionConversionFactor / 60.0, // rot/min -> m/s
+      kElevatorPositionConversionFactor,
+      kElevatorMaxSpeedMetersPerSecond,
+      kElevatorMaxAcccelerationMetersPerSecondSquared,
       new ArrayList<>() {{
         add(kElevatorMotorVelocityPIDFSlot);
         add(kElevatorMotorVoltagePIDFSlot);

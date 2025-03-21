@@ -40,7 +40,7 @@ public class GetCoral extends SequentialCommandGroup {
       Commands.waitUntil(() -> m_handler.isLoadedCoral()),
       Commands.runOnce(() -> m_lightSubsystem.setColor(Color.OFF)),
       Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionHome)),
-      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent())
+      Commands.waitUntil(() -> m_crane.atGoal().isPresent())
       .finallyDo(interrupted -> {
         if (interrupted) {
           m_lightSubsystem.setColor(Color.OFF);

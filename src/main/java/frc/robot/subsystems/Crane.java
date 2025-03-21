@@ -80,7 +80,7 @@ public class Crane extends SubsystemBase {
 
   private double m_stallStartTime = Double.POSITIVE_INFINITY;
 
-  private Translation2d m_setpoint = new Translation2d(0.0, 0.0);
+  private Translation2d m_goal = new Translation2d(0.0, 0.0);
   private double m_pivotControlFactor; // 1.0 for position-based control.
   private double m_elevatorControlFactor; // 1.0 for position-based control.
 
@@ -166,12 +166,12 @@ public class Crane extends SubsystemBase {
     return m_currentSerialNum;
   }
 
-  private int moveTo(Translation2d setpoint,
+  private int moveTo(Translation2d goal,
       Tolerance pivotTolerance, Tolerance elevatorTolerance,
       double pivotVelocityFactor, double elevatorVelocityFactor) {
-    m_setpoint = setpoint;
-    m_aController.setGoal(m_setpoint.getX());
-    m_hController.setGoal(m_setpoint.getY());
+    m_goal = goal;
+    m_aController.setGoal(m_goal.getX());
+    m_hController.setGoal(m_goal.getY());
     m_aController.setTolerance(pivotTolerance.position,
       Constants.kDt * pivotTolerance.velocity);
     m_hController.setTolerance(elevatorTolerance.position,
@@ -183,40 +183,40 @@ public class Crane extends SubsystemBase {
     return allocateSerialNum(velocityControl);
   }
 
-  public int moveTo(Translation2d setpoint,
-      Tolerance pivTolerance, Tolerance elevatorTolerance) {
-    return moveTo(setpoint, pivTolerance, elevatorTolerance,
+  public int moveTo(Translation2d goal,
+      Tolerance pivotTolerance, Tolerance elevatorTolerance) {
+    return moveTo(goal, pivotTolerance, elevatorTolerance,
       1.0, 1.0);
   }
 
-  public int moveTo(Translation2d setpoint) {
-    return moveTo(setpoint,
+  public int moveTo(Translation2d goal) {
+    return moveTo(goal,
       CraneConstants.kDefaultPivotTolerance, CraneConstants.kDefaultElevatorTolerance);
   }
 
-  private void updatePivotSetpoint(double pivotAngle) {
-    Translation2d setpoint = new Translation2d(pivotAngle, m_setpoint.getY());
-    m_setpoint = setpoint;
+  private void updatePivotGoal(double pivotAngle) {
+    Translation2d goal = new Translation2d(pivotAngle, m_goal.getY());
+    m_goal = goal;
   }
 
   public int movePivotTo(double pivotAngle) {
-    Translation2d setpoint = new Translation2d(pivotAngle, m_setpoint.getY());
-    return moveTo(setpoint);
+    Translation2d goal = new Translation2d(pivotAngle, m_goal.getY());
+    return moveTo(goal);
   }
 
-  private void updateElevatorSetpoint(double elevatorHeight) {
-    Translation2d setpoint = new Translation2d(m_setpoint.getX(), elevatorHeight);
-    m_setpoint = setpoint;
+  private void updateElevatorGoal(double elevatorHeight) {
+    Translation2d goal = new Translation2d(m_goal.getX(), elevatorHeight);
+    m_goal = goal;
   }
 
   public int moveElevatorTo(double elevatorHeight) {
-    Translation2d setpoint = new Translation2d(m_setpoint.getX(), elevatorHeight);
-    return moveTo(setpoint);
+    Translation2d goal = new Translation2d(m_goal.getX(), elevatorHeight);
+    return moveTo(goal);
   }
 
-  private void moveTo(Translation2d setpoint,
+  private void moveTo(Translation2d goal,
       double pivotVelocityFactor, double elevatorVelocityFactor) {
-    moveTo(setpoint,
+    moveTo(goal,
       CraneConstants.kDefaultPivotTolerance, CraneConstants.kDefaultElevatorTolerance,
       pivotVelocityFactor, elevatorVelocityFactor);
   }
@@ -229,10 +229,10 @@ public class Crane extends SubsystemBase {
       );
       Vector v = new Vector(getPosition(), velocity.getAngle());
       for (Segment boundary : CraneConstants.kBoundaries) {
-        Optional<Translation2d> setpointOpt = boundary.intersection(v);
-        if (setpointOpt.isPresent()) {
-          Translation2d setpoint = setpointOpt.get();
-          moveTo(setpoint, pivotVelocityFactor, elevatorVelocityFactor);
+        Optional<Translation2d> goalOpt = boundary.intersection(v);
+        if (goalOpt.isPresent()) {
+          Translation2d goal = goalOpt.get();
+          moveTo(goal, pivotVelocityFactor, elevatorVelocityFactor);
           return;
         }
       }
@@ -252,12 +252,16 @@ public class Crane extends SubsystemBase {
     move(0.0, elevatorVelocityMetersPerSecond);
   }
 
-  private boolean atSetpointImpl() {
-    return m_aController.atSetpoint() && m_hController.atSetpoint();
+  private boolean pivotAtGoal() {
+    return m_aController.atGoal();
   }
 
-  public Optional<Integer> atSetpoint() {
-    if (atSetpointImpl()) {
+  private boolean elevatorAtGoal() {
+    return m_hController.atGoal();
+  }
+
+  public Optional<Integer> atGoal() {
+    if (pivotAtGoal() && elevatorAtGoal()) {
       return Optional.of(m_currentSerialNum);
     } else {
       return Optional.empty();
@@ -315,20 +319,20 @@ public class Crane extends SubsystemBase {
     m_leftElevatorPID.setReference(hVelocity, ControlType.kMAXMotionVelocityControl,
       CraneConstants.kElevatorMotorVelocityPIDFSlot.slot(),
       m_elevatorFF.calculateWithVelocities(m_elevatorEncoder.getVelocity(),
-      m_hController.getSetpoint().velocity));
+      m_hController.getGoal().velocity));
   }
 
   private void initPivotPosition(double a) {
     m_pivotEncoder.setPosition(a);
     m_pivotPositionCache.flush();
-    updatePivotSetpoint(a);
+    updatePivotGoal(a);
     resetCrane();
   }
 
   private void initElevatorPosition(double h) {
     m_elevatorEncoder.setPosition(h);
     m_elevatorPositionCache.flush();
-    updateElevatorSetpoint(h);
+    updateElevatorGoal(h);
     resetCrane();
   }
 
@@ -341,7 +345,7 @@ public class Crane extends SubsystemBase {
   }
 
   private Translation2d getDesiredTranslation() {
-    return m_setpoint;
+    return m_goal;
   }
 
   private Translation2d getDeviation(Translation2d position) {
@@ -422,14 +426,14 @@ public class Crane extends SubsystemBase {
       }
       case PIVOT_0: {
         crane();
-        if (atSetpointImpl()) {
+        if (pivotAtGoal()) {
           toStateElevatorRapid();
         }
         break;
       }
       case ELEVATOR_RAPID: {
         crane();
-        if (atSetpointImpl()) {
+        if (elevatorAtGoal()) {
           toStateElevatorHome();
         }
         break;
@@ -454,7 +458,7 @@ public class Crane extends SubsystemBase {
       }
       case PIVOT_RAPID: {
         crane();
-        if (atSetpointImpl()) {
+        if (pivotAtGoal()) {
           toStatePivotHome();
         }
         break;

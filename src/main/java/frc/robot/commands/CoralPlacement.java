@@ -33,7 +33,7 @@ public class CoralPlacement extends SequentialCommandGroup {
       new Strafe(handler, drive)
         .until(() -> m_handler.isReefAligned()),
       Commands.runOnce(() -> m_crane.moveTo(cranePosition)),
-      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent()),
+      Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
       Commands.runOnce(() -> m_handler.eject()),
       Commands.waitUntil(() -> !m_handler.isLoadedCoral())
     );

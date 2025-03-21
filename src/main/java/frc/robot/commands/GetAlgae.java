@@ -39,7 +39,7 @@ public class GetAlgae extends SequentialCommandGroup {
       driveToPose,
       Commands.runOnce(() -> m_fieldPoseUtil.whichAlgaeHeight(reefHour)),
       Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight())),
-      Commands.waitUntil(() -> m_crane.atSetpoint().isPresent()),
+      Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
       Commands.runOnce(() -> m_handler.intakeAlgae()),
       Commands.waitUntil(() -> m_handler.isLoadedAlgae())
     );

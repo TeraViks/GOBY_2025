@@ -222,6 +222,7 @@ public final class Constants {
     public static final int kMotorID = 17;
     public static final double kIntakeSpeedCoral = 0.5;
     public static final double kEjectSpeedCoral = -0.4;
+    public static final double kSlowEjectSpeedCoral = -0.2; //TODO: Tune.
     public static final double kIntakeSpeedAlgae = -0.4;
     public static final double kEjectSpeedAlgae = 0.2;
     public static final double kTestSpeed = 0.0;
@@ -348,6 +349,7 @@ public final class Constants {
     public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
 
     public static final Transform2d kAlgaeIntakeMove = new Transform2d(0.1, 0.0, Rotation2d.kZero);
+    public static final Transform2d kCoralL1PlacementMove = new Transform2d(-0.1, 0.0, Rotation2d.kZero);
   }
 
   public static final class CameraConstants {
@@ -598,8 +600,10 @@ public final class Constants {
 
     public static final Translation2d kPositionHome =
       new Translation2d(kPivotHome, kElevatorHome);
-    public static final Translation2d kPositionL1 =
+    public static final Translation2d kPositionL1a =
       new Translation2d(Units.degreesToRadians(25.0), 0.36);
+    public static final Translation2d kPositionL1b = 
+      new Translation2d(Units.degreesToRadians(15.0), 0.36);
     public static final Translation2d kPositionL2 =
       new Translation2d(Units.degreesToRadians(-35.0), 1.22);
     public static final Translation2d kPositionL3 =

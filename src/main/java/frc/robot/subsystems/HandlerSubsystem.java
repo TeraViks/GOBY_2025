@@ -228,7 +228,7 @@ public class HandlerSubsystem extends SubsystemBase {
     }
   }
 
-  public void eject() {
+  public void ejectImpl(double ejectSpeedCoral) {
     switch (m_state) {
       case EMPTY:
       case INTAKING_CORAL:
@@ -254,7 +254,7 @@ public class HandlerSubsystem extends SubsystemBase {
       }
       case LOADED_CORAL: {
         m_motorController.setReference(
-          HandlerConstants.kEjectSpeedCoral,
+          ejectSpeedCoral,
           ControlType.kMAXMotionVelocityControl,
           HandlerConstants.kPIDFSlotVelocity);
         m_ejectDelayStartTime = Time.getTimeSeconds();
@@ -262,6 +262,14 @@ public class HandlerSubsystem extends SubsystemBase {
         break;
       }
     }
+  }
+
+  public void slowEject() {
+    ejectImpl(HandlerConstants.kSlowEjectSpeedCoral);
+  }
+
+  public void eject() {
+    ejectImpl(HandlerConstants.kEjectSpeedCoral);
   }
 
   public boolean isLoadedCoral() {

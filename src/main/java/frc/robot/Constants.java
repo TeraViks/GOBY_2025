@@ -620,7 +620,7 @@ public final class Constants {
     public static final double kInitialAngle = 0.0;
     public static final double kAngleTolerance = Math.toRadians(0.02);
 
-    public static final double kGearRatio = 9.0 * 4.0 * 3.0;
+    public static final double kGearRatio = 9.0 * 4.0 * 4.0;
     public static final double kAngleConversionFactor = 2.0 * Math.PI / kGearRatio;
 
     // The native velocity units are motor rotations [aka revolutions] per minute (RPM),

@@ -345,6 +345,8 @@ public final class Constants {
     public static final double kStationSlotSpacing = 0.202; // Distance between slots.
 
     public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
+
+    public static final double kAlgaeIntakePositionTwo = 0.1; //TODO: Tune.
   }
 
   public static final class CameraConstants {

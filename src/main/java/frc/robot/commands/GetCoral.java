@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import java.util.Set;
+
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.CraneConstants;
@@ -28,12 +29,10 @@ public class GetCoral extends SequentialCommandGroup {
     m_fieldPoseUtil = fieldPoseUtil;
     addRequirements(m_drive, m_handler, m_crane, m_lightSubsystem);
 
-    Command driveToPose = new DriveToPose(
-      m_fieldPoseUtil.getTargetPoseAtStation(m_fieldPoseUtil.closestStation(m_drive.getPose()), subPose),
-      drive);
-
     addCommands(
-      driveToPose,
+      Commands.defer((() -> {return new DriveToPose(
+        m_fieldPoseUtil.getTargetPoseAtStation(m_fieldPoseUtil.closestStation(m_drive.getPose()), subPose),
+        drive);}), Set.of(drive)),
       Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake)),
       Commands.runOnce(() -> m_lightSubsystem.setColor(Color.GREEN)),
       Commands.runOnce(() -> m_handler.intakeCoral()),

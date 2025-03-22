@@ -186,6 +186,11 @@ public class DriveToPose extends Command {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    m_drive.drive(0.0, 0.0, 0.0, true);
+  }
+
+  @Override
   public boolean isFinished() {
     return atSetpoint();
   }

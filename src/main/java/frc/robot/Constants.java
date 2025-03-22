@@ -615,8 +615,8 @@ public final class Constants {
     public static final int kRightMotorID = 19;
     public static final double kMaxSpeedRadiansPerSecond = Math.PI / 3;
     public static final double kMaxAccelerationRadiansPerSecondSquared = Math.PI;
-    public static final double kMinRange = Math.toRadians(-15.0);
-    public static final double kMaxRange = Math.toRadians(135.0);
+    public static final double kMinRange = Math.toRadians(-25.0);
+    public static final double kMaxRange = Math.toRadians(105.0);
     public static final double kInitialAngle = 0.0;
     public static final double kAngleTolerance = Math.toRadians(0.02);
 

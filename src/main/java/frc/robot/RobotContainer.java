@@ -206,19 +206,6 @@ public class RobotContainer {
         () -> getFieldRelative(),
         m_fieldPoseUtil));
 
-    // new JoystickButton(m_driverController, OIConstants.kLeftBumper)
-    //   .debounce(OIConstants.kDebounceSeconds)
-    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(ReefPose.EIGHT, ReefSubPose.A), m_robotDrive));
-
-    // new JoystickButton(m_driverController, OIConstants.kA)
-    //   .debounce(OIConstants.kDebounceSeconds)
-    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(ReefPose.EIGHT, ReefSubPose.B), m_robotDrive));
-    
-    // new JoystickButton(m_driverController, OIConstants.kB)
-    //   .debounce(OIConstants.kDebounceSeconds)
-    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtStation(CoralStationPose.LEFT, CoralStationSubPose.FIVE), m_robotDrive));
-      
-
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceStation(

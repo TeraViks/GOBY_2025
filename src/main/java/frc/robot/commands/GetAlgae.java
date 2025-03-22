@@ -1,7 +1,8 @@
 package frc.robot.commands;
 
+import java.util.Set;
+
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.CraneConstants;
@@ -31,12 +32,10 @@ public class GetAlgae extends SequentialCommandGroup {
 
     ReefPose reefHour = m_fieldPoseUtil.closestReefHour(m_drive.getPose());
 
-    Command driveToPose = new DriveToPose(
-      m_fieldPoseUtil.getTargetPoseAtReef(reefHour, ReefSubPose.ALGAE),
-      drive);
-
     addCommands(
-      driveToPose,
+      Commands.defer((() -> {return new DriveToPose(
+        m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), ReefSubPose.ALGAE),
+        drive);}), Set.of(drive)),
       Commands.runOnce(() -> m_fieldPoseUtil.whichAlgaeHeight(reefHour)),
       Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight())),
       Commands.waitUntil(() -> m_crane.atGoal().isPresent()),

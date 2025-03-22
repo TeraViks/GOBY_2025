@@ -637,7 +637,7 @@ public final class Constants {
 
     public static final boolean kInvertLeftMotor = false;
     public static final SparkUtil.Config kMotorConfig = new SparkUtil.Config(
-      40,
+      80,
       0.1,
       kInvertLeftMotor,
       kVelocityConversionFactor,

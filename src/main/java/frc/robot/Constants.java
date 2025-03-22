@@ -19,6 +19,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
@@ -346,7 +347,7 @@ public final class Constants {
 
     public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
 
-    public static final double kAlgaeIntakePositionTwo = 0.1; //TODO: Tune.
+    public static final Transform2d kAlgaeIntakeMove = new Transform2d(0.1, 0.0, Rotation2d.kZero);
   }
 
   public static final class CameraConstants {

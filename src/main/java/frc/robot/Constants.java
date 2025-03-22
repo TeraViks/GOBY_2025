@@ -316,6 +316,7 @@ public final class Constants {
     public static final int kHomeCraneButton = kRightBumper;
     public static final int kRobotRelativeButton = kLeftJoy;
     public static final int kManualIntake = kB;
+    public static final int kAutoDriveButton = kA;
 
     public static final double kTriggerAcuationValue = 0.5;
 
@@ -340,7 +341,7 @@ public final class Constants {
     public static final double kReefXOffset = -(0.352 + kFrameToRobotCenter);
     public static final double kReefBranchOffset = 0.164; // Offset from center.
 
-    public static final double kStationXOffset = -(0.415 + kFrameToRobotCenter); // TODO: Tune.
+    public static final double kStationXOffset = -(0.415 + kFrameToRobotCenter);
     public static final double kStationSlotSpacing = 0.202; // Distance between slots.
 
     public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.

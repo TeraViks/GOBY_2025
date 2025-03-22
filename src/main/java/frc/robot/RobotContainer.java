@@ -28,7 +28,6 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.CoralPlacement;
 import frc.robot.commands.FaceReef;
 import frc.robot.commands.FaceStation;
-import frc.robot.commands.GetCoral;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.Crane;
@@ -207,6 +206,19 @@ public class RobotContainer {
         () -> getFieldRelative(),
         m_fieldPoseUtil));
 
+    // new JoystickButton(m_driverController, OIConstants.kLeftBumper)
+    //   .debounce(OIConstants.kDebounceSeconds)
+    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(ReefPose.EIGHT, ReefSubPose.A), m_robotDrive));
+
+    // new JoystickButton(m_driverController, OIConstants.kA)
+    //   .debounce(OIConstants.kDebounceSeconds)
+    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtReef(ReefPose.EIGHT, ReefSubPose.B), m_robotDrive));
+    
+    // new JoystickButton(m_driverController, OIConstants.kB)
+    //   .debounce(OIConstants.kDebounceSeconds)
+    //   .whileTrue(new DriveToPose(m_fieldPoseUtil.getTargetPoseAtStation(CoralStationPose.LEFT, CoralStationSubPose.FIVE), m_robotDrive));
+      
+
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceStation(
@@ -232,6 +244,11 @@ public class RobotContainer {
      .debounce(OIConstants.kDebounceSeconds)
      .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
 
+    
+    new JoystickButton(m_operatorController, OIConstants.kX)
+      .debounce(OIConstants.kDebounceSeconds)
+      .onTrue(Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake), m_crane));
+
       // Manual move crane
       new JoystickButton(m_operatorController, OIConstants.kManualCraneMode)
         .debounce(OIConstants.kDebounceSeconds)
@@ -246,10 +263,10 @@ public class RobotContainer {
           m_crane.moveTo(CraneConstants.kPositionL1), m_crane));
 
       // Manual crane to level two
-      new JoystickButton(m_operatorController, OIConstants.kLevel2Button)
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() ->
-          m_crane.moveTo(CraneConstants.kPositionL2), m_crane));
+      // new JoystickButton(m_operatorController, OIConstants.kLevel2Button)
+      //   .debounce(OIConstants.kDebounceSeconds)
+      //   .onTrue(Commands.runOnce(() ->
+      //     m_crane.moveTo(CraneConstants.kPositionL2), m_crane));
 
       // Manual crane to level three
       new JoystickButton(m_operatorController, OIConstants.kLevel3Button)
@@ -272,12 +289,13 @@ public class RobotContainer {
           m_crane.moveTo(CraneConstants.kPositionHome), m_crane));
 
       // // Automatic level two A placement
-      // new Trigger(() ->
-      //     m_operatorController.getRawButton(OIConstants.kASideButton) &&
-      //     m_operatorController.getRawButton(OIConstants.kLevel2Button))
-      //   .debounce(OIConstants.kDebounceSeconds)
-      //   .onTrue(new CoralPlacement(
-      //     m_handler, m_crane, ReefSubPose.A, CraneConstants.kPositionL2));
+      new Trigger(() ->
+          m_operatorController.getRawButton(OIConstants.kASideButton) &&
+          m_operatorController.getRawButton(OIConstants.kLevel2Button) &&
+          m_driverController.getRawButton(OIConstants.kAutoDriveButton))
+        .debounce(OIConstants.kDebounceSeconds)
+        .whileTrue(new CoralPlacement(m_robotDrive,
+          m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.A, CraneConstants.kPositionL2));
 
       // // Automatic level three A placement
       // new Trigger(() ->

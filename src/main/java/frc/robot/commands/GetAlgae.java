@@ -43,9 +43,8 @@ public class GetAlgae extends SequentialCommandGroup {
           ReefSubPose.ALGAE),
           drive);
         return driveToPose;
-      }), Set.of(drive)),
-
-      Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight(m_algaeHeight))),
+      }), Set.of(drive)).alongWith(
+      Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight(m_algaeHeight)))),
       Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
 
       Commands.runOnce(() -> m_handler.intakeAlgae()),

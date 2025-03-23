@@ -9,8 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -28,7 +26,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.HandlerConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.CoralPlacement;
-import frc.robot.commands.DriveToPose;
 import frc.robot.commands.FaceReef;
 import frc.robot.commands.FaceStation;
 import frc.robot.commands.GetAlgae;
@@ -223,21 +220,21 @@ public class RobotContainer {
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(
-        new GetCoral(m_robotDrive, m_handler, m_crane, m_lightSubsystem, m_fieldPoseUtil, CoralStationSubPose.TWO));
+        new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.TWO));
 
     new Trigger(() -> 
         m_operatorController.getPOV() == OIConstants.kCoralIntake5 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(
-        new GetCoral(m_robotDrive, m_handler, m_crane, m_lightSubsystem, m_fieldPoseUtil, CoralStationSubPose.FIVE));
+        new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
 
     new Trigger(() -> 
         m_operatorController.getPOV() == OIConstants.kCoralIntake8 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(
-        new GetCoral(m_robotDrive, m_handler, m_crane, m_lightSubsystem, m_fieldPoseUtil, CoralStationSubPose.EIGHT));
+        new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.EIGHT));
 
     new JoystickButton(m_driverController, OIConstants.kFaceProcessorButton)
      .debounce(OIConstants.kDebounceSeconds)

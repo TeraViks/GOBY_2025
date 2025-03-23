@@ -228,32 +228,11 @@ public class RobotContainer {
       .onTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.EIGHT));
 
-    new JoystickButton(m_driverController, OIConstants.kFaceProcessorButton)
-     .debounce(OIConstants.kDebounceSeconds)
-     .whileTrue(new Command() {}); //TODO: Create a command to align to the processor
-
-    
-    new JoystickButton(m_operatorController, OIConstants.kX)
-      .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake), m_crane));
-
       // Manual crane to level one
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() ->
           m_crane.moveTo(CraneConstants.kPositionL1a), m_crane));
-
-      // Manual crane to level two
-      // new JoystickButton(m_operatorController, OIConstants.kLevel2Button)
-      //   .debounce(OIConstants.kDebounceSeconds)
-      //   .onTrue(Commands.runOnce(() ->
-      //     m_crane.moveTo(CraneConstants.kPositionL2), m_crane));
-
-      // Manual crane to level three
-      new JoystickButton(m_operatorController, OIConstants.kLevel3Button)
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() ->
-          m_crane.moveTo(CraneConstants.kPositionL3), m_crane));
 
       // Manual intake coral
       new JoystickButton(m_operatorController, OIConstants.kManualIntake)
@@ -317,23 +296,7 @@ public class RobotContainer {
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           m_handler.eject();
-        }, m_handler));
-
-      new Trigger(() ->
-          m_operatorController.getRawAxis(OIConstants.kExtendClimberAxis) >=
-          OIConstants.kTriggerAcuationValue)
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() -> {
-          //m_climber.extendClimber()
-        })); //TODO: Requirements needs to include m_climber
-
-      new Trigger(() ->
-          m_operatorController.getRawAxis(OIConstants.kRetractClimberAxis) >=
-          OIConstants.kTriggerAcuationValue)
-        .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(Commands.runOnce(() -> {
-          //m_climber.retractClimber()
-        })); //TODO: Requirements needs to include m_climber
+        }, m_handler)); 
     }
 
   public Command getAutonomousCommand() {

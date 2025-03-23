@@ -77,12 +77,12 @@ public class FieldPoseUtil {
   public AlgaeHeight whichAlgaeHeight(ReefPose reefPose) {
     switch(reefPose) {
       default: assert(false);
+      case TWELVE: return AlgaeHeight.DOWN;
       case TWO: return AlgaeHeight.UP;
       case FOUR: return AlgaeHeight.DOWN;
       case SIX: return AlgaeHeight.UP;
       case EIGHT: return AlgaeHeight.DOWN;
       case TEN: return AlgaeHeight.UP;
-      case TWELVE: return AlgaeHeight.DOWN;
     }
   }
 
@@ -159,12 +159,12 @@ public class FieldPoseUtil {
     m_reefCenter = m_aprilTags.reefCenter();
     m_coralStations = m_aprilTags.coralStations();
     m_reefMap = Map.of(
+      m_aprilTags.reefTwelve, ReefPose.TWELVE,
       m_aprilTags.reefTwo, ReefPose.TWO,
       m_aprilTags.reefFour, ReefPose.FOUR,
       m_aprilTags.reefSix, ReefPose.SIX,
       m_aprilTags.reefEight, ReefPose.EIGHT,
-      m_aprilTags.reefTen, ReefPose.TEN,
-      m_aprilTags.reefTwelve, ReefPose.TWELVE
+      m_aprilTags.reefTen, ReefPose.TEN
     );
     m_coralStationMap = Map.of(
       m_aprilTags.coralStationLeft, CoralStationPose.LEFT,

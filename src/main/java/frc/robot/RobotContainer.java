@@ -71,14 +71,6 @@ public class RobotContainer {
     return transformedValue;
   }
 
-  private double getElevatorAxis() {
-    return m_operatorController.getRawAxis(OIConstants.kRightJoyYAxis);
-  }
-
-  private double getPivotAxis() {
-    return m_operatorController.getRawAxis(OIConstants.kLeftJoyYAxis);
-  }
-
   private double getXSpeedInput() {
     double robotRelativeReverseFactor = m_fieldRelative ? 1.0 : -1.0;
     // The Y axis on the controller is inverted! Pushing forward (up) generates a negative value.
@@ -244,13 +236,6 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, OIConstants.kX)
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionIntake), m_crane));
-
-      // Manual move crane
-      new JoystickButton(m_operatorController, OIConstants.kManualCraneMode)
-        .debounce(OIConstants.kDebounceSeconds)
-        .whileTrue(Commands.run(() -> {
-          m_crane.move(getPivotAxis(), getElevatorAxis());
-        }, m_crane));
 
       // Manual crane to level one
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)

@@ -209,21 +209,21 @@ public class RobotContainer {
         m_operatorController.getPOV() == OIConstants.kCoralIntake2 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(
+      .whileTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.TWO));
 
     new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake5 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(
+      .whileTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
 
     new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake8 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(
+      .whileTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.EIGHT));
 
       // Manual crane to level one

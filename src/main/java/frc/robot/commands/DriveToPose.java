@@ -49,6 +49,8 @@ public class DriveToPose extends Command {
       DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared),
     Constants.kDt);
 
+  private boolean m_initialized = false;
+
   private static double square(double x) {
     return x * x;
   }
@@ -137,6 +139,7 @@ public class DriveToPose extends Command {
       poseAngle(robotPose),
       m_drive.getAngularVelocity()
     );
+    m_initialized = true;
   }
 
   @Override
@@ -192,6 +195,6 @@ public class DriveToPose extends Command {
 
   @Override
   public boolean isFinished() {
-    return atGoal();
+    return m_initialized && atGoal();
   }
 }

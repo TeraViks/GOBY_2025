@@ -31,7 +31,7 @@ public class LevelOnePlacement extends SequentialCommandGroup {
       Commands.defer((() -> {
         return new DriveToPose(
           m_fieldPoseUtil.getTargetPoseAtReef(
-            m_fieldPoseUtil.closestReefHour(m_drive.getPose()), 
+            m_fieldPoseUtil.closestReefHour(m_drive.getPose()),
             subPose),
           drive);
       }), Set.of(drive)),

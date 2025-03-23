@@ -205,21 +205,21 @@ public class RobotContainer {
         () -> getFieldRelative(),
         m_fieldPoseUtil));
 
-    new Trigger(() -> 
+    new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake2 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.TWO));
 
-    new Trigger(() -> 
+    new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake5 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
 
-    new Trigger(() -> 
+    new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake8 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
@@ -283,7 +283,7 @@ public class RobotContainer {
           m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.B, CraneConstants.kPositionL3));
 
       // Auto Algae
-      new Trigger(() -> 
+      new Trigger(() ->
           m_operatorController.getPOV() == OIConstants.kAlgaePOV &&
           m_driverController.getRawButton(OIConstants.kAutoDriveButton))
         .debounce(OIConstants.kDebounceSeconds)
@@ -294,7 +294,7 @@ public class RobotContainer {
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() -> {
           m_handler.eject();
-        }, m_handler)); 
+        }, m_handler));
     }
 
   public Command getAutonomousCommand() {

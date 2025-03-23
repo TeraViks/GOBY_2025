@@ -292,7 +292,7 @@ public class RobotContainer {
           m_operatorController.getPOV() == OIConstants.kAlgaePOV &&
           m_driverController.getRawButton(OIConstants.kAutoDriveButton))
         .debounce(OIConstants.kDebounceSeconds)
-        .onTrue(new GetAlgae(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil));
+        .whileTrue(new GetAlgae(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil));
 
       // Eject
       new JoystickButton(m_operatorController, OIConstants.kEjectButton)

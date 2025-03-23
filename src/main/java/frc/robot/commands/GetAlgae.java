@@ -24,7 +24,7 @@ public class GetAlgae extends SequentialCommandGroup {
   private final FieldPoseUtil m_fieldPoseUtil;
   private AlgaeHeight m_algaeHeight;
 
-  public GetAlgae(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, 
+  public GetAlgae(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
       FieldPoseUtil fieldPoseUtil) {
     m_drive = drive;
     m_handler = handler;
@@ -39,7 +39,7 @@ public class GetAlgae extends SequentialCommandGroup {
         ReefPose reefHour = m_fieldPoseUtil.closestReefHour(pose);
         m_algaeHeight = m_fieldPoseUtil.whichAlgaeHeight(reefHour);
         Command driveToPose = new DriveToPose(
-          m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(pose), 
+          m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(pose),
           ReefSubPose.ALGAE),
           drive);
         return driveToPose;
@@ -55,7 +55,7 @@ public class GetAlgae extends SequentialCommandGroup {
       Commands.waitUntil(() -> m_handler.isLoadedAlgae())
     );
   }
- 
+
   private Translation2d whichElevatorHeight(AlgaeHeight algaeHeight) {
     return (algaeHeight == AlgaeHeight.DOWN)
       ? CraneConstants.kPositionLoAlgae

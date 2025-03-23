@@ -19,14 +19,14 @@ public class LevelOnePlacement extends SequentialCommandGroup {
   private final Crane m_crane;
   private final FieldPoseUtil m_fieldPoseUtil;
 
-  public LevelOnePlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane, 
+  public LevelOnePlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
     FieldPoseUtil fieldPoseUtil, ReefSubPose subPose) {
     m_handler = handler;
     m_drive = drive;
     m_crane = crane;
     m_fieldPoseUtil = fieldPoseUtil;
     addRequirements(m_drive, m_handler, m_crane);
-    
+
     addCommands(
       Commands.defer((() -> {
         return new DriveToPose(

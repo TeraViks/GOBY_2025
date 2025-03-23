@@ -28,8 +28,8 @@ public class CoralPlacement extends SequentialCommandGroup {
     addCommands(
       Commands.defer((() -> {return new DriveToPose(
         m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), subPose),
-        drive);}), Set.of(drive)),
-      Commands.runOnce(() -> m_crane.moveTo(cranePosition)),
+        drive);}), Set.of(drive)).alongWith(
+          Commands.runOnce(() -> m_crane.moveTo(cranePosition))),
       Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
       Commands.runOnce(() -> m_handler.eject()),
       Commands.waitUntil(() -> !m_handler.isLoadedCoral())

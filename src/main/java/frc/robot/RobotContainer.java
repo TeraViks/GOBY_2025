@@ -187,6 +187,7 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(() -> setSpeedFactor(DriveConstants.kSlowSpeedFactor), m_robotDrive))
       .onFalse(Commands.runOnce(() -> setSpeedFactor(1.0), m_robotDrive));
 
+    // Face reef button
     new JoystickButton(m_driverController, OIConstants.kFaceReefButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceReef(
@@ -196,6 +197,7 @@ public class RobotContainer {
         () -> getFieldRelative(),
         m_fieldPoseUtil));
 
+    // Face coral station button
     new JoystickButton(m_driverController, OIConstants.kFaceCoralStationButton)
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new FaceStation(
@@ -205,6 +207,7 @@ public class RobotContainer {
         () -> getFieldRelative(),
         m_fieldPoseUtil));
 
+    // Coral station slot two intake button
     new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake2 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
@@ -212,6 +215,7 @@ public class RobotContainer {
       .whileTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.TWO));
 
+    // Coral station slot five intake button
     new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake5 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
@@ -219,6 +223,7 @@ public class RobotContainer {
       .whileTrue(
         new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
 
+    // Coral station slot eight intake button
     new Trigger(() ->
         m_operatorController.getPOV() == OIConstants.kCoralIntake8 &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))

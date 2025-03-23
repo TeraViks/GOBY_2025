@@ -169,7 +169,7 @@ public class DriveToPose extends Command {
     }
   }
 
-  private boolean atSetpoint() {
+  private boolean atGoal() {
     // Extract error values from the x,y controllers and combine them such that the tolerance
     // defines a circle rather than a square.
     double xPosError = m_xController.getPositionError();
@@ -192,6 +192,6 @@ public class DriveToPose extends Command {
 
   @Override
   public boolean isFinished() {
-    return atSetpoint();
+    return atGoal();
   }
 }

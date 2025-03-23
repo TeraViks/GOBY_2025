@@ -61,8 +61,6 @@ public class RobotContainer {
   boolean m_fieldRelative = true;
   double m_speedFactor = 1.0;
 
-  private CoralStationSubPose m_selectedCoralStationSlot = CoralStationSubPose.FIVE;
-
   private static double joystickTransform(double value) {
     double transformedValue = MathUtil.applyDeadband(value, OIConstants.kJoystickDeadband);
     if (DriveConstants.kSquareInputs) {

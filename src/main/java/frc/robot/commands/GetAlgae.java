@@ -18,41 +18,40 @@ import frc.robot.utilities.FieldPoseUtil.ReefPose;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 public class GetAlgae extends SequentialCommandGroup {
-  private final DriveSubsystem m_drive;
-  private final HandlerSubsystem m_handler;
-  private final Crane m_crane;
-  private final FieldPoseUtil m_fieldPoseUtil;
+  private Pose2d m_initialPose;
   private AlgaeHeight m_algaeHeight;
 
   public GetAlgae(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
       FieldPoseUtil fieldPoseUtil) {
-    m_drive = drive;
-    m_handler = handler;
-    m_crane = crane;
-    m_fieldPoseUtil = fieldPoseUtil;
     m_algaeHeight = null;
-    addRequirements(m_drive, m_handler, m_crane);
+    addRequirements(drive, handler, crane);
 
     addCommands(
+      Commands.defer(() -> {
+        return Commands.runOnce(() -> {
+          m_initialPose = drive.getPose();
+          ReefPose reefHour = fieldPoseUtil.closestReefHour(m_initialPose);
+          m_algaeHeight = fieldPoseUtil.whichAlgaeHeight(reefHour);
+        });
+      }, Set.of(drive)),
+      Commands.parallel(
+        Commands.defer((() -> {
+          Command driveToPose = new DriveToPose(
+            fieldPoseUtil.getTargetPoseAtReef(fieldPoseUtil.closestReefHour(m_initialPose),
+            ReefSubPose.ALGAE),
+            drive);
+          return driveToPose;
+        }), Set.of(drive)),
+        Commands.runOnce(() -> crane.moveTo(whichElevatorHeight(m_algaeHeight)), crane)
+      ),
+      Commands.waitUntil(() -> crane.atGoal().isPresent()),
+      Commands.runOnce(() -> handler.intakeAlgae(), handler),
       Commands.defer((() -> {
-        Pose2d pose = m_drive.getPose();
-        ReefPose reefHour = m_fieldPoseUtil.closestReefHour(pose);
-        m_algaeHeight = m_fieldPoseUtil.whichAlgaeHeight(reefHour);
-        Command driveToPose = new DriveToPose(
-          m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(pose),
-          ReefSubPose.ALGAE),
-          drive);
-        return driveToPose;
-      }), Set.of(drive)).alongWith(
-      Commands.runOnce(() -> m_crane.moveTo(whichElevatorHeight(m_algaeHeight)))),
-      Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
-
-      Commands.runOnce(() -> m_handler.intakeAlgae()),
-      Commands.defer((() -> {
-        Command driveToPose = new DriveToPose(m_drive.getPose().plus(AutoConstants.kAlgaeIntakeMove), m_drive);
+        Command driveToPose =
+          new DriveToPose(drive.getPose().plus(AutoConstants.kAlgaeIntakeMove), drive);
         return driveToPose;
       }), Set.of(drive)),
-      Commands.waitUntil(() -> m_handler.isLoadedAlgae())
+      Commands.waitUntil(() -> handler.isLoadedAlgae())
     );
   }
 

@@ -247,7 +247,7 @@ public class RobotContainer {
       new JoystickButton(m_operatorController, OIConstants.kLevel1Button)
         .debounce(OIConstants.kDebounceSeconds)
         .onTrue(Commands.runOnce(() ->
-          m_crane.moveTo(CraneConstants.kPositionL1), m_crane));
+          m_crane.moveTo(CraneConstants.kPositionL1a), m_crane));
 
       // Manual crane to level two
       // new JoystickButton(m_operatorController, OIConstants.kLevel2Button)

@@ -12,27 +12,24 @@ import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 public class CoralPlacement extends SequentialCommandGroup {
-  private final HandlerSubsystem m_handler;
-  private final DriveSubsystem m_drive;
-  private final Crane m_crane;
-  private final FieldPoseUtil m_fieldPoseUtil;
-
   public CoralPlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
       FieldPoseUtil fieldPoseUtil, ReefSubPose subPose, Translation2d cranePosition) {
-    m_handler = handler;
-    m_drive = drive;
-    m_crane = crane;
-    m_fieldPoseUtil = fieldPoseUtil;
-    addRequirements(m_drive, m_handler, m_crane);
+    addRequirements(drive, handler, crane);
 
     addCommands(
-      Commands.defer((() -> {return new DriveToPose(
-        m_fieldPoseUtil.getTargetPoseAtReef(m_fieldPoseUtil.closestReefHour(m_drive.getPose()), subPose),
-        drive);}), Set.of(drive)).alongWith(
-          Commands.runOnce(() -> m_crane.moveTo(cranePosition))),
-      Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
-      Commands.runOnce(() -> m_handler.eject()),
-      Commands.waitUntil(() -> !m_handler.isLoadedCoral())
+      Commands.parallel(
+        Commands.defer((() -> {
+          return new DriveToPose(
+            fieldPoseUtil.getTargetPoseAtReef(
+              fieldPoseUtil.closestReefHour(drive.getPose()),
+              subPose),
+            drive);
+        }), Set.of(drive)),
+        Commands.runOnce(() -> crane.moveTo(cranePosition), crane)
+      ),
+      Commands.waitUntil(() -> crane.atGoal().isPresent()),
+      Commands.runOnce(() -> handler.eject(), handler),
+      Commands.waitUntil(() -> !handler.isLoadedCoral())
     );
   }
 }

@@ -39,7 +39,7 @@ public class LevelOnePlacement extends SequentialCommandGroup {
       Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionL1a)),
       Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
       Commands.runOnce(() -> m_handler.slowEject()),
-      Commands.waitUntil(() -> !m_handler.isLoadedCoral()),
+      Commands.waitUntil(() -> m_handler.isEmpty()),
       Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionL1b)),
 
       Commands.defer((() -> {

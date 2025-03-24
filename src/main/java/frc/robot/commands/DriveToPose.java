@@ -20,8 +20,6 @@ import frc.robot.utilities.TunablePIDF;
 public class DriveToPose extends Command {
   private final Pose2d m_pose;
   private final DriveSubsystem m_drive;
-  private final double m_squaredTranslationPositionToleranceMeters;
-  private final double m_squaredTranslationVelocityToleranceMetersPerSecond;
 
   private static final TunablePIDF translatingPIDF = new TunablePIDF("DriveToPose.translatingPIDF",
     DriveCommandConstants.kTranslatingPIDF);
@@ -49,12 +47,6 @@ public class DriveToPose extends Command {
       DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared),
     Constants.kDt);
 
-  private boolean m_controllersInitialized = false;
-
-  private static double square(double x) {
-    return x * x;
-  }
-
   // Get pose angle, constrained to [-pi..pi]. This is necessary in conjunction with
   // ProfiledPIDController.enableContinuousInput().
   private static double poseAngle(Pose2d pose) {
@@ -68,10 +60,12 @@ public class DriveToPose extends Command {
     m_drive = drive;
 
     m_xController.setGoal(pose.getX());
+    m_xController.setTolerance(translationPosToleranceMeters,
+      translationVelToleranceMetersPerSecond);
+
     m_yController.setGoal(pose.getY());
-    m_squaredTranslationPositionToleranceMeters = square(translationPosToleranceMeters);
-    m_squaredTranslationVelocityToleranceMetersPerSecond =
-      square(translationVelToleranceMetersPerSecond);
+    m_yController.setTolerance(translationPosToleranceMeters,
+      translationVelToleranceMetersPerSecond);
 
     m_angleController.setGoal(poseAngle(pose));
     m_angleController.enableContinuousInput(-Math.PI, Math.PI);
@@ -157,7 +151,6 @@ public class DriveToPose extends Command {
       yVelocity,
       angleVelocity,
       true);
-    m_controllersInitialized = true; // calculate() methods must be called for this to be true.
   }
 
   private void updateConstants() {
@@ -173,22 +166,9 @@ public class DriveToPose extends Command {
   }
 
   private boolean atGoal() {
-    if (!m_controllersInitialized) {
-      return false;
-    }
-    // Extract error values from the x,y controllers and combine them such that the tolerance
-    // defines a circle rather than a square.
-    double xPosError = m_xController.getPositionError();
-    double yPosError = m_yController.getPositionError();
-    if (square(xPosError) + square(yPosError) > m_squaredTranslationPositionToleranceMeters) {
-      return false;
-    }
-    double xVelError = m_xController.getVelocityError();
-    double yVelError = m_yController.getVelocityError();
-    if (square(xVelError) + square(yVelError) > m_squaredTranslationVelocityToleranceMetersPerSecond) {
-      return false;
-    }
-    return m_angleController.atGoal();
+    return m_xController.atGoal()
+      && m_yController.atGoal()
+      && m_angleController.atGoal();
   }
 
   @Override

@@ -49,7 +49,7 @@ public class DriveToPose extends Command {
       DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared),
     Constants.kDt);
 
-  private boolean m_initialized = false;
+  private boolean m_controllersInitialized = false;
 
   private static double square(double x) {
     return x * x;
@@ -139,7 +139,6 @@ public class DriveToPose extends Command {
       poseAngle(robotPose),
       m_drive.getAngularVelocity()
     );
-    m_initialized = true;
   }
 
   @Override
@@ -158,6 +157,7 @@ public class DriveToPose extends Command {
       yVelocity,
       angleVelocity,
       true);
+    m_controllersInitialized = true; // calculate() methods must be called for this to be true.
   }
 
   private void updateConstants() {
@@ -173,6 +173,9 @@ public class DriveToPose extends Command {
   }
 
   private boolean atGoal() {
+    if (!m_controllersInitialized) {
+      return false;
+    }
     // Extract error values from the x,y controllers and combine them such that the tolerance
     // defines a circle rather than a square.
     double xPosError = m_xController.getPositionError();
@@ -195,6 +198,6 @@ public class DriveToPose extends Command {
 
   @Override
   public boolean isFinished() {
-    return m_initialized && atGoal();
+    return atGoal();
   }
 }

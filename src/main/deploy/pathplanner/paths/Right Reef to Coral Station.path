@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.185227272727272,
-        "y": 2.429545454545455
+        "x": 5.554176136363636,
+        "y": 2.1453551136363624
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.9303977272727275,
-        "y": 1.0224431818181825
+        "x": 4.447329545454545,
+        "y": 1.7464914772727262
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "right midpoint"
     },
     {
       "anchor": {
-        "x": 1.240909090909091,
-        "y": 1.0446022727272726
+        "x": 1.7151136363636363,
+        "y": 1.3276846590909088
       },
       "prevControl": {
-        "x": 1.6730113636363637,
-        "y": 1.5099431818181825
+        "x": 2.4729545454545456,
+        "y": 1.5370880681818175
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "Autos with commands",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 120.2564371635294
+    "rotation": 120.73548770192009
   },
   "useDefaultConstraints": true
 }

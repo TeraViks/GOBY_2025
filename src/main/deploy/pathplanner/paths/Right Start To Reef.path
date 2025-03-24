@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.533672961771741,
-        "y": 1.3326704545454549
+        "x": 7.498636363636364,
+        "y": 1.4174289772727264
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.2184659090909085,
-        "y": 2.4517045454545463
+        "x": 5.554176136363636,
+        "y": 2.1453551136363624
       },
       "prevControl": {
-        "x": 5.362499999999999,
-        "y": 2.0971590909090914
+        "x": 6.002897727272727,
+        "y": 1.9658664772727275
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "right midpoint"
     }
   ],
   "rotationTargets": [],

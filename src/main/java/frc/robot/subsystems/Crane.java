@@ -41,6 +41,7 @@ public class Crane extends SubsystemBase {
 
   private final RelativeEncoder m_pivotEncoder;
   private final DutyCycleEncoder m_pivotAbsEncoder;
+  private final double m_dutyCycleInitTime;
   private final RelativeEncoder m_elevatorEncoder;
   private final Pololu4079 m_distanceSensor;
 
@@ -106,6 +107,16 @@ public class Crane extends SubsystemBase {
   }
   private State m_state;
 
+  private record DeferredMoveTo(
+    Translation2d goal,
+    Tolerance pivotTolerance,
+    Tolerance elevatorTolerance,
+    double pivotVelocityFactor,
+    double elevatorVelocityFactor,
+    int serialNum
+  ) {}
+  private Optional<DeferredMoveTo> m_deferredMoveTo = Optional.empty();
+
   public Crane() {
     m_pivotMotor = new SparkFlex(CraneConstants.kPivotMotorID, MotorType.kBrushless);
     SparkUtil.configureMotor(m_pivotMotor, CraneConstants.kPivotMotorConfig);
@@ -123,6 +134,7 @@ public class Crane extends SubsystemBase {
     m_pivotEncoder.setPosition(0.0);
     m_pivotAbsEncoder = new DutyCycleEncoder(CraneConstants.kPivotAbsEncoderChannel,
       2.0 * Math.PI, CraneConstants.kPivotAbsEncoderOffsetRadians);
+    m_dutyCycleInitTime = Time.getTimeSeconds();
     m_pivotAbsEncoder.setInverted(CraneConstants.kPivotAbsEncoderInverted);
     m_elevatorEncoder = m_leftElevatorMotor.getEncoder();
     m_elevatorEncoder.setPosition(0.0);
@@ -155,7 +167,8 @@ public class Crane extends SubsystemBase {
 
   // Only increase serial number once while controlling with velocity to avoid the serial
   // number rapidly increasing.
-  private int allocateSerialNum(boolean velocityControl) {
+  private int allocateSerialNum(double pivotVelocityFactor, double elevatorVelocityFactor) {
+    boolean velocityControl = pivotVelocityFactor != 1.0 || elevatorVelocityFactor != 1.0;
     if (velocityControl) {
       if (!m_isVelocityControlled) {
         m_isVelocityControlled = true;
@@ -168,9 +181,10 @@ public class Crane extends SubsystemBase {
     return m_currentSerialNum;
   }
 
-  private int moveTo(Translation2d goal,
+  private int moveToNow(Translation2d goal,
       Tolerance pivotTolerance, Tolerance elevatorTolerance,
-      double pivotVelocityFactor, double elevatorVelocityFactor) {
+      double pivotVelocityFactor, double elevatorVelocityFactor,
+      int serialNum) {
     m_goal = goal;
     m_aController.setGoal(m_goal.getX());
     m_hController.setGoal(m_goal.getY());
@@ -181,8 +195,39 @@ public class Crane extends SubsystemBase {
     );
     m_pivotControlFactor = pivotVelocityFactor;
     m_elevatorControlFactor = elevatorVelocityFactor;
-    boolean velocityControl = pivotVelocityFactor != 1.0 || elevatorVelocityFactor != 1.0;
-    return allocateSerialNum(velocityControl);
+    return serialNum;
+  }
+
+  private void moveToNow(Translation2d goal) {
+    moveToNow(goal,
+      CraneConstants.kDefaultPivotTolerance, CraneConstants.kDefaultElevatorTolerance,
+      1.0, 1.0,
+      0
+    );
+  }
+
+  private void movePivotToNow(double pivotAngle) {
+    Translation2d goal = new Translation2d(pivotAngle, m_goal.getY());
+    moveToNow(goal);
+  }
+
+  private void moveElevatorToNow(double elevatorHeight) {
+    Translation2d goal = new Translation2d(m_goal.getX(), elevatorHeight);
+    moveToNow(goal);
+  }
+
+  public int moveTo(Translation2d goal,
+      Tolerance pivotTolerance, Tolerance elevatorTolerance,
+      double pivotVelocityFactor, double elevatorVelocityFactor) {
+    int serialNum = allocateSerialNum(pivotVelocityFactor, elevatorVelocityFactor);
+    if (m_state != State.CRANING) {
+      m_deferredMoveTo = Optional.of(new DeferredMoveTo(
+        goal, pivotTolerance, elevatorTolerance, pivotVelocityFactor, elevatorVelocityFactor,
+        serialNum));
+      return serialNum;
+    }
+    return moveToNow(goal, pivotTolerance, elevatorTolerance, pivotVelocityFactor,
+      elevatorVelocityFactor, serialNum);
   }
 
   public int moveTo(Translation2d goal,
@@ -363,13 +408,25 @@ public class Crane extends SubsystemBase {
   }
 
   private void toStateCraning() {
+    if (m_deferredMoveTo.isPresent()) {
+      DeferredMoveTo d = m_deferredMoveTo.get();
+      moveToNow(
+        d.goal,
+        d.pivotTolerance,
+        d.elevatorTolerance,
+        d.pivotVelocityFactor,
+        d.elevatorVelocityFactor,
+        d.serialNum
+      );
+      m_deferredMoveTo = Optional.empty();
+    }
     m_state = State.CRANING;
   }
 
   private void toStatePivot0() {
     double a = m_pivotPositionCache.get();
     if (a < 0.0) {
-      movePivotTo(0.0);
+      movePivotToNow(0.0);
       m_state = State.PIVOT_0;
     } else {
       toStateElevatorRapid();
@@ -379,7 +436,7 @@ public class Crane extends SubsystemBase {
   private void toStateElevatorRapid() {
     double h = m_elevatorPositionCache.get();
     if (h > CraneConstants.kElevatorHomeRapid) {
-      moveElevatorTo(CraneConstants.kElevatorHomeRapid);
+      moveElevatorToNow(CraneConstants.kElevatorHomeRapid);
       m_state = State.ELEVATOR_RAPID;
     } else {
       toStateElevatorHome();
@@ -396,7 +453,7 @@ public class Crane extends SubsystemBase {
   private void toStatePivotRapid() {
     double a = m_pivotPositionCache.get();
     if (a < CraneConstants.kPivotHomeRapid) {
-      movePivotTo(CraneConstants.kPivotHomeRapid);
+      movePivotToNow(CraneConstants.kPivotHomeRapid);
       m_state = State.PIVOT_RAPID;
     } else {
       toStatePivotHome();
@@ -419,11 +476,16 @@ public class Crane extends SubsystemBase {
         break;
       }
       case ESTIMATE_AH: {
-        double a = getPivotAbsEncoderRadians();
-        initPivotPosition(a);
-        double h = getElevatorLidarHeight();
-        initElevatorPosition(h);
-        toStatePivot0();
+        // Give the duty cycle encoder time to accurately estimate PWM frequency.
+        double currentTime = Time.getTimeSeconds();
+        if (currentTime >= m_dutyCycleInitTime
+          + CraneConstants.kDutyCycleInitDelaySeconds) {
+            double a = getPivotAbsEncoderRadians();
+            initPivotPosition(a);
+            double h = getElevatorLidarHeight();
+            initElevatorPosition(h);
+            toStatePivot0();
+        }
         break;
       }
       case PIVOT_0: {
@@ -452,7 +514,7 @@ public class Crane extends SubsystemBase {
             m_stallStartTime = Double.POSITIVE_INFINITY;
             m_leftElevatorMotor.stopMotor();
             initElevatorPosition(CraneConstants.kElevatorHardMin);
-            moveElevatorTo(CraneConstants.kElevatorHome);
+            moveElevatorToNow(CraneConstants.kElevatorHome);
             toStatePivotRapid();
           }
         }
@@ -478,7 +540,7 @@ public class Crane extends SubsystemBase {
             double a = getPivotAbsEncoderRadians();
             initPivotPosition(a + CraneConstants.kPivotEndoderFlexRadians);
             m_pivotMotor.stopMotor();
-            movePivotTo(CraneConstants.kPivotHome);
+            movePivotToNow(CraneConstants.kPivotHome);
             toStateCraning();
           }
         }

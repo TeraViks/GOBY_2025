@@ -503,6 +503,8 @@ public final class Constants {
       }}
     );
 
+    public static final double kDutyCycleInitDelaySeconds = 2.0;
+
     public static final double kPivotHomingVoltage = 0.5;
     public static final double kPivotMinStalledHomingAmperage = 20.0;
     public static final double kPivotHomingDebounceSeconds = 0.2;

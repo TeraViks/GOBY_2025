@@ -7,19 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right Start To Reef"
+            "pathName": "Left Start To H10"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "RightHourTwoAuto"
+            "name": "Place B2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Right Reef to Coral Station"
+            "pathName": "H10 To Coral Station"
           }
         }
       ]

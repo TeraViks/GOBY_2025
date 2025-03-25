@@ -132,18 +132,32 @@ public class RobotContainer {
       );
     }
 
-    NamedCommands.registerCommand("RightHourTwoAuto",
+    NamedCommands.registerCommand("Place A2",
       new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
       ReefSubPose.A, CraneConstants.kPositionL2));
-    NamedCommands.registerCommand("LeftHourTenAuto",
+    NamedCommands.registerCommand("Place B2",
       new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
       ReefSubPose.B, CraneConstants.kPositionL2));
+    NamedCommands.registerCommand("Place B3",
+      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+      ReefSubPose.B, CraneConstants.kPositionL3));
+    NamedCommands.registerCommand("GetAlgae",
+      new GetAlgae(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil));
+    NamedCommands.registerCommand("Eject",
+      Commands.sequence(
+        Commands.runOnce(() -> {m_handler.eject();}, m_handler),
+        Commands.waitUntil(() -> m_handler.isEmpty())
+      )
+    );
+    NamedCommands.registerCommand("Intake S5",
+      new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
     m_chooser.setDefaultOption("Empty Auto", new PathPlannerAuto("Empty Auto"));
     m_chooser.addOption("Right Cross The Line", new PathPlannerAuto("Right Cross The Line"));
     m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
     m_chooser.addOption("Left Cross The Line", new PathPlannerAuto("Left Cross The Line"));
-    m_chooser.addOption("Right auto with place", new PathPlannerAuto("Right Start and Place"));
-    m_chooser.addOption("Left auto with place", new PathPlannerAuto("Left Start and Place"));
+    m_chooser.addOption("Right 2A2", new PathPlannerAuto("Right 2A2"));
+    m_chooser.addOption("Left 10B2", new PathPlannerAuto("Left 10B2"));
+    m_chooser.addOption("Left 10B2 8B3", new PathPlannerAuto("Left 10B2 8B3"));
     SmartDashboard.putData(m_chooser);
   }
 

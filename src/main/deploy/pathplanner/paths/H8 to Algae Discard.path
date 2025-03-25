@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.121306818181818,
-        "y": 1.3326704545454549
+        "x": 3.582727581521739,
+        "y": 5.542145040760869
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.498636363636364,
-        "y": 1.4174289772727264
+        "x": 3.8092561141304357,
+        "y": 5.899821671195652
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.554176136363636,
-        "y": 2.1453551136363624
+        "x": 3.0044836956521737,
+        "y": 6.162117866847825
       },
       "prevControl": {
-        "x": 6.002897727272727,
-        "y": 1.9658664772727275
+        "x": 3.2906250000000004,
+        "y": 6.4244140625
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "right midpoint"
+      "linkedName": "H8 Algae Discard"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 120.73548770192009
+    "rotation": 45.0
   },
   "reversed": false,
   "folder": "Autos with commands",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -179.26547896574516
+    "rotation": -60.16446089973853
   },
   "useDefaultConstraints": true
 }

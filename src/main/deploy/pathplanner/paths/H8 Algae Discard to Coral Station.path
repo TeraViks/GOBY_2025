@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 8.099147727272728,
-        "y": 6.6619318181818175
+        "x": 3.0044836956521737,
+        "y": 6.162117866847825
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.3490625,
-        "y": 6.463053977272727
+        "x": 2.7898777173913043,
+        "y": 5.846170176630434
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "H8 Algae Discard"
     },
     {
       "anchor": {
-        "x": 5.783522727272728,
-        "y": 6.074161931818181
+        "x": 1.913569972826087,
+        "y": 6.597291100543478
       },
       "prevControl": {
-        "x": 6.541363636363636,
-        "y": 6.303508522727273
+        "x": 2.5275815217391306,
+        "y": 5.750789741847825
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "left midpoint"
+      "linkedName": "Left Coral Station"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -120.96375653207352
+    "rotation": 125.00000000000001
   },
   "reversed": false,
   "folder": "Autos with commands",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 45.0
   },
   "useDefaultConstraints": true
 }

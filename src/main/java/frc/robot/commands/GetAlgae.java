@@ -34,16 +34,14 @@ public class GetAlgae extends SequentialCommandGroup {
           m_algaeHeight = fieldPoseUtil.whichAlgaeHeight(reefHour);
         });
       }, Set.of(drive)),
-      Commands.parallel(
-        Commands.defer((() -> {
-          Command driveToPose = new DriveToPose(
-            fieldPoseUtil.getTargetPoseAtReef(fieldPoseUtil.closestReefHour(m_initialPose),
-            ReefSubPose.ALGAE),
-            drive);
-          return driveToPose;
-        }), Set.of(drive)),
-        Commands.runOnce(() -> crane.moveTo(whichElevatorHeight(m_algaeHeight)), crane)
-      ),
+      Commands.runOnce(() -> crane.moveTo(whichElevatorHeight(m_algaeHeight)), crane),
+      Commands.defer((() -> {
+        Command driveToPose = new DriveToPose(
+          fieldPoseUtil.getTargetPoseAtReef(fieldPoseUtil.closestReefHour(m_initialPose),
+          ReefSubPose.ALGAE),
+          drive);
+        return driveToPose;
+      }), Set.of(drive)),
       Commands.waitUntil(() -> crane.atGoal().isPresent()),
       Commands.runOnce(() -> handler.intakeAlgae(), handler),
       Commands.defer((() -> {

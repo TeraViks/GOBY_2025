@@ -473,11 +473,11 @@ public final class Constants {
     // be proportional between the pivot and elevator in order to achieve "linear" movement,
     // hence the shared constant. Both pivot and elevator must be capable of this acceleration
     // for the crane to move smoothly.
-    public static final double kAccelerationSeconds = 0.25;
+    public static final double kAccelerationSeconds = 0.05;
     public static final double kPivotMaxSpeedRadiansPerSecond = Math.PI;
     public static final double kPivotMaxAccelerationRadiansPerSecondSquared =
       kPivotMaxSpeedRadiansPerSecond / kAccelerationSeconds; // Do not change.
-    public static final double kElevatorMaxSpeedMetersPerSecond = 1.0;
+    public static final double kElevatorMaxSpeedMetersPerSecond = 1.5;
     public static final double kElevatorMaxAcccelerationMetersPerSecondSquared =
       kElevatorMaxSpeedMetersPerSecond / kAccelerationSeconds; // Do not change.
 
@@ -545,9 +545,9 @@ public final class Constants {
     public static final double kElevatorHomingDebounceSeconds = kDt;
 
     // Static/gravity/velocity gain for ElevatorFeedForward.
-    public static final double kS = 0.2;
+    public static final double kS = 0.4;
     public static final double kG = 0.32;
-    public static final double kV = 7.0;
+    public static final double kV = 12.0;
 
     public static final Crane.Tolerance kDefaultPivotTolerance = new Crane.Tolerance(
       Units.degreesToRadians(0.5),

@@ -14,36 +14,28 @@ import frc.robot.utilities.FieldPoseUtil;
 import frc.robot.utilities.FieldPoseUtil.ReefSubPose;
 
 public class LevelOnePlacement extends SequentialCommandGroup {
-  private final HandlerSubsystem m_handler;
-  private final DriveSubsystem m_drive;
-  private final Crane m_crane;
-  private final FieldPoseUtil m_fieldPoseUtil;
-
   public LevelOnePlacement(DriveSubsystem drive, HandlerSubsystem handler, Crane crane,
     FieldPoseUtil fieldPoseUtil, ReefSubPose subPose) {
-    m_handler = handler;
-    m_drive = drive;
-    m_crane = crane;
-    m_fieldPoseUtil = fieldPoseUtil;
-    addRequirements(m_drive, m_handler, m_crane);
+    addRequirements(drive, handler, crane);
 
     addCommands(
-      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionL1a)),
+      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1a)),
       Commands.defer((() -> {
         return new DriveToPose(
-          m_fieldPoseUtil.getTargetPoseAtReef(
-            m_fieldPoseUtil.closestReefHour(m_drive.getPose()),
+          fieldPoseUtil.getTargetPoseAtReef(
+            fieldPoseUtil.closestReefHour(drive.getPose()),
             subPose).plus(AutoConstants.kL1ExtraReefOffset),  
           drive);
       }), Set.of(drive)),
 
-      Commands.waitUntil(() -> m_crane.atGoal().isPresent()),
-      Commands.runOnce(() -> m_handler.slowEject()),
-      Commands.waitUntil(() -> m_handler.isEmpty()),
-      Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionL1b)),
+      Commands.waitUntil(() -> crane.atGoal().isPresent()),
+      Commands.runOnce(() -> handler.slowEject()),
+      Commands.waitUntil(() -> handler.isEmpty()),
+      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1b)),
 
       Commands.defer((() -> {
-        Command driveToPose = new DriveToPose(m_drive.getPose().plus(AutoConstants.kCoralL1PlacementMove), m_drive);
+        Command driveToPose =
+          new DriveToPose(drive.getPose().plus(AutoConstants.kCoralL1PlacementMove), drive);
         return driveToPose;
       }), Set.of(drive))
     );

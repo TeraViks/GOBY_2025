@@ -266,12 +266,32 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(() ->
         m_crane.moveTo(CraneConstants.kPositionL1a), m_crane));
 
-    // Auto place Level 1
-    new Trigger(() -> 
+    // Auto place Level 1 w/ algae offset
+    new Trigger(() ->
+        m_driverController.getRawButton(OIConstants.kAutoDriveButton) &&
         m_operatorController.getRawButton(OIConstants.kLevel1Button) && 
-        m_driverController.getRawButton(OIConstants.kAutoDriveButton))
+        !m_operatorController.getRawButton(OIConstants.kASideButton) &&
+        !m_operatorController.getRawButton(OIConstants.kBSideButton))
       .debounce(OIConstants.kDebounceSeconds)
       .whileTrue(new LevelOnePlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.ALGAE));
+    
+    // Auto place Level 1 w/ A offset
+    new Trigger(() -> 
+        m_driverController.getRawButton(OIConstants.kAutoDriveButton) &&
+        m_operatorController.getRawButton(OIConstants.kLevel1Button) && 
+        m_operatorController.getRawButton(OIConstants.kASideButton) &&
+        !m_operatorController.getRawButton(OIConstants.kBSideButton))
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(new LevelOnePlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.A));
+    
+    // Auto place Level 1 w/ B offset
+    new Trigger(() -> 
+        m_driverController.getRawButton(OIConstants.kAutoDriveButton) &&
+        m_operatorController.getRawButton(OIConstants.kLevel1Button) && 
+        !m_operatorController.getRawButton(OIConstants.kASideButton) &&
+        m_operatorController.getRawButton(OIConstants.kBSideButton))
+      .debounce(OIConstants.kDebounceSeconds)
+      .whileTrue(new LevelOnePlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.B));
 
     // Manual intake coral
     new JoystickButton(m_operatorController, OIConstants.kManualIntake)

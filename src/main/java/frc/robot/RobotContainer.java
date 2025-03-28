@@ -9,8 +9,6 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -58,7 +56,7 @@ public class RobotContainer {
   GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
   FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
-  double m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
+  double m_reverseFactor = 1.0;
   boolean m_fieldRelative = true;
   double m_speedFactor = 1.0;
 

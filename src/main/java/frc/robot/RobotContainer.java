@@ -308,6 +308,7 @@ public class RobotContainer {
     // Automatic level two A placement
     new Trigger(() ->
         m_operatorController.getRawButton(OIConstants.kASideButton) &&
+        !m_operatorController.getRawButton(OIConstants.kBSideButton) &&
         m_operatorController.getRawButton(OIConstants.kLevel2Button) &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
@@ -316,6 +317,7 @@ public class RobotContainer {
 
     // Automatic level two B placement
     new Trigger(() ->
+        !m_operatorController.getRawButton(OIConstants.kASideButton) &&
         m_operatorController.getRawButton(OIConstants.kBSideButton) &&
         m_operatorController.getRawButton(OIConstants.kLevel2Button) &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
@@ -326,6 +328,7 @@ public class RobotContainer {
     // Automatic level three A placement
     new Trigger(() ->
         m_operatorController.getRawButton(OIConstants.kASideButton) &&
+        !m_operatorController.getRawButton(OIConstants.kBSideButton) &&
         m_operatorController.getRawButton(OIConstants.kLevel3Button) &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))
       .debounce(OIConstants.kDebounceSeconds)
@@ -334,6 +337,7 @@ public class RobotContainer {
 
     // Automatic level three B placement
     new Trigger(() ->
+        !m_operatorController.getRawButton(OIConstants.kASideButton) &&
         m_operatorController.getRawButton(OIConstants.kBSideButton) &&
         m_operatorController.getRawButton(OIConstants.kLevel3Button) &&
         m_driverController.getRawButton(OIConstants.kAutoDriveButton))

@@ -35,6 +35,7 @@ public class GetAlgae extends SequentialCommandGroup {
         });
       }, Set.of(drive)),
       Commands.runOnce(() -> crane.moveTo(whichElevatorHeight(m_algaeHeight)), crane),
+      Commands.waitUntil(() -> crane.atGoal().isPresent()),
       Commands.defer((() -> {
         Command driveToPose = new DriveToPose(
           fieldPoseUtil.getTargetPoseAtReef(fieldPoseUtil.closestReefHour(m_initialPose),
@@ -42,7 +43,6 @@ public class GetAlgae extends SequentialCommandGroup {
           drive);
         return driveToPose;
       }), Set.of(drive)),
-      Commands.waitUntil(() -> crane.atGoal().isPresent()),
       Commands.runOnce(() -> handler.intakeAlgae(), handler),
       Commands.defer((() -> {
         Command driveToPose =

@@ -19,7 +19,7 @@ public class LevelOnePlacement extends SequentialCommandGroup {
     addRequirements(drive, handler, crane);
 
     addCommands(
-      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1a)),
+      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1a), crane),
       Commands.defer((() -> {
         return new DriveToPose(
           fieldPoseUtil.getTargetPoseAtReef(
@@ -29,9 +29,9 @@ public class LevelOnePlacement extends SequentialCommandGroup {
       }), Set.of(drive)),
 
       Commands.waitUntil(() -> crane.atGoal().isPresent()),
-      Commands.runOnce(() -> handler.slowEject()),
+      Commands.runOnce(() -> handler.slowEject(), handler),
       Commands.waitUntil(() -> handler.isEmpty()),
-      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1b)),
+      Commands.runOnce(() -> crane.moveTo(CraneConstants.kPositionL1b), crane),
 
       Commands.defer((() -> {
         Command driveToPose =

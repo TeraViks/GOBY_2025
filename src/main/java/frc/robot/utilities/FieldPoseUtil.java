@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Optional;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.FieldConstants;
@@ -139,95 +137,124 @@ public class FieldPoseUtil {
     }
   }
 
-  private Alliance m_alliance;
-  private AprilTags m_aprilTags;
-  private Translation2d m_reefCenter;
-  private ArrayList<Pose2d> m_coralStations;
-  private Map<AprilTag, ReefPose> m_reefMap;
-  private Map<AprilTag, CoralStationPose> m_coralStationMap;
+  private class AlliancePoseUtil {
+    private final AprilTags m_aprilTags;
+    private final Translation2d m_reefCenter;
+    private final ArrayList<Pose2d> m_coralStations;
+    private final Map<AprilTag, ReefPose> m_reefMap;
+    private final Map<AprilTag, CoralStationPose> m_coralStationMap;
 
-  public FieldPoseUtil() {
-    m_alliance = getAlliance();
-    switch (m_alliance) {
-      case Blue:
-        m_aprilTags = FieldConstants.kBlueAprilTags;
-        break;
-      case Red:
-        m_aprilTags = FieldConstants.kRedAprilTags;
-        break;
+    public AlliancePoseUtil(AprilTags aprilTags) {
+      m_aprilTags = aprilTags;
+      m_reefCenter = m_aprilTags.reefCenter();
+      m_coralStations = m_aprilTags.coralStations();
+      m_reefMap = Map.of(
+        m_aprilTags.reefTwelve, ReefPose.TWELVE,
+        m_aprilTags.reefTwo, ReefPose.TWO,
+        m_aprilTags.reefFour, ReefPose.FOUR,
+        m_aprilTags.reefSix, ReefPose.SIX,
+        m_aprilTags.reefEight, ReefPose.EIGHT,
+        m_aprilTags.reefTen, ReefPose.TEN
+      );
+      m_coralStationMap = Map.of(
+        m_aprilTags.coralStationLeft, CoralStationPose.LEFT,
+        m_aprilTags.coralStationRight, CoralStationPose.RIGHT
+      );
     }
-    m_reefCenter = m_aprilTags.reefCenter();
-    m_coralStations = m_aprilTags.coralStations();
-    m_reefMap = Map.of(
-      m_aprilTags.reefTwelve, ReefPose.TWELVE,
-      m_aprilTags.reefTwo, ReefPose.TWO,
-      m_aprilTags.reefFour, ReefPose.FOUR,
-      m_aprilTags.reefSix, ReefPose.SIX,
-      m_aprilTags.reefEight, ReefPose.EIGHT,
-      m_aprilTags.reefTen, ReefPose.TEN
-    );
-    m_coralStationMap = Map.of(
-      m_aprilTags.coralStationLeft, CoralStationPose.LEFT,
-      m_aprilTags.coralStationRight, CoralStationPose.RIGHT
-    );
+
+    public Translation2d getReefCenter() {
+      return m_reefCenter;
+    }
+
+    public ArrayList<Pose2d> getCoralStations() {
+      return m_coralStations;
+    }
+
+    public ReefPose closestReefHour(Pose2d robotPose) {
+      Translation2d robotPos = robotPose.getTranslation();
+      AprilTag nearestReefHour = Collections.min(
+        m_reefMap.keySet(),
+        Comparator.comparing((AprilTag aprilTag) ->
+          robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
+      );
+      return m_reefMap.get(nearestReefHour);
+    }
+
+    public CoralStationPose closestStation(Pose2d robotPose) {
+      Translation2d robotPos = robotPose.getTranslation();
+      AprilTag nearestStation = Collections.min(
+        m_coralStationMap.keySet(),
+        Comparator.comparing((AprilTag aprilTag) ->
+          robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
+      );
+      return m_coralStationMap.get(nearestStation);
+    }
+
+    private static Pose2d rotateByPi(Pose2d pose) {
+      return new Pose2d(pose.getTranslation(), pose.getRotation().plus(Rotation2d.kPi));
+    }
+
+    public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
+      Pose2d reefPose = reefTime.mapToAprilTag(m_aprilTags).pose.toPose2d();
+      double xOffset = AutoConstants.kReefXOffset;
+      double yOffset = AutoConstants.kStingerYOffset + subpose.getYOffset();
+      return rotateByPi(reefPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    }
+
+    public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
+      Pose2d stationPose = station.mapToAprilTag(m_aprilTags).pose.toPose2d();
+      double xOffset = AutoConstants.kStationXOffset;
+      double yOffset = AutoConstants.kStingerYOffset + slot.getYOffset();
+      return rotateByPi(stationPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    }
+
+    public Pose2d getTargetPoseAtProcessor() {
+      Pose2d processorPose = m_aprilTags.processor.pose.toPose2d();
+      double xOffset = AutoConstants.kProcessorXOffset;
+      double yOffset = AutoConstants.kStingerYOffset;
+      return rotateByPi(processorPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    }
   }
 
-  private static Alliance getAlliance() {
-    Optional<Alliance> allianceOpt = DriverStation.getAlliance();
-    Alliance alliance = allianceOpt.isPresent() ? allianceOpt.get() : Alliance.Blue;
-    return alliance;
+  private final AlliancePoseUtil kBluePoseUtil =
+    new AlliancePoseUtil(FieldConstants.kBlueAprilTags);
+  private final AlliancePoseUtil kRedPoseUtil =
+    new AlliancePoseUtil(FieldConstants.kRedAprilTags);
+
+  private AlliancePoseUtil m_alliancePoseUtil = null;
+
+  public FieldPoseUtil() {}
+
+  // Must be called before any of the following methods are called.
+  public void initializeAlliance(Alliance alliance) {
+    m_alliancePoseUtil = alliance == Alliance.Blue ? kBluePoseUtil : kRedPoseUtil;
   }
 
   public Translation2d getReefCenter() {
-    return m_reefCenter;
+    return m_alliancePoseUtil.getReefCenter();
   }
 
   public ArrayList<Pose2d> getCoralStations() {
-    return m_coralStations;
+    return m_alliancePoseUtil.getCoralStations();
   }
 
   public ReefPose closestReefHour(Pose2d robotPose) {
-    Translation2d robotPos = robotPose.getTranslation();
-    AprilTag nearestReefHour = Collections.min(
-      m_reefMap.keySet(),
-      Comparator.comparing((AprilTag aprilTag) ->
-        robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
-    );
-    return m_reefMap.get(nearestReefHour);
+    return m_alliancePoseUtil.closestReefHour(robotPose);
   }
 
   public CoralStationPose closestStation(Pose2d robotPose) {
-    Translation2d robotPos = robotPose.getTranslation();
-    AprilTag nearestStation = Collections.min(
-      m_coralStationMap.keySet(),
-      Comparator.comparing((AprilTag aprilTag) ->
-        robotPos.getDistance(aprilTag.pose.toPose2d().getTranslation()))
-    );
-    return m_coralStationMap.get(nearestStation);
-  }
-
-  private static Pose2d rotateByPi(Pose2d pose) {
-    return new Pose2d(pose.getTranslation(), pose.getRotation().plus(Rotation2d.kPi));
+    return m_alliancePoseUtil.closestStation(robotPose);
   }
 
   public Pose2d getTargetPoseAtReef(ReefPose reefTime, ReefSubPose subpose) {
-    Pose2d reefPose = reefTime.mapToAprilTag(m_aprilTags).pose.toPose2d();
-    double xOffset = AutoConstants.kReefXOffset;
-    double yOffset = AutoConstants.kStingerYOffset + subpose.getYOffset();
-    return rotateByPi(reefPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return m_alliancePoseUtil.getTargetPoseAtReef(reefTime, subpose);
   }
 
   public Pose2d getTargetPoseAtStation(CoralStationPose station, CoralStationSubPose slot) {
-    Pose2d stationPose = station.mapToAprilTag(m_aprilTags).pose.toPose2d();
-    double xOffset = AutoConstants.kStationXOffset;
-    double yOffset = AutoConstants.kStingerYOffset + slot.getYOffset();
-    return rotateByPi(stationPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return m_alliancePoseUtil.getTargetPoseAtStation(station, slot);
   }
 
   public Pose2d getTargetPoseAtProcessor() {
-    Pose2d processorPose = m_aprilTags.processor.pose.toPose2d();
-    double xOffset = AutoConstants.kProcessorXOffset;
-    double yOffset = AutoConstants.kStingerYOffset;
-    return rotateByPi(processorPose).plus(new Transform2d(xOffset, yOffset, Rotation2d.kZero));
+    return m_alliancePoseUtil.getTargetPoseAtProcessor();
   }
 }

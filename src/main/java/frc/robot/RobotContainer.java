@@ -4,12 +4,16 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -53,12 +57,13 @@ public class RobotContainer {
     HandlerConstants.kMotorID, HandlerConstants.kmotorConfig);
   private final Crane m_crane = new Crane();
   private final ClimberSubsystem m_climber = ClimberConstants.kEnable ? new ClimberSubsystem() : null;
-  GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
-  GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
-  FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
-  double m_reverseFactor = 1.0;
-  boolean m_fieldRelative = true;
-  double m_speedFactor = 1.0;
+  private final GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
+  private final GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
+  private Optional<Alliance> m_alliance = Optional.empty();
+  private final FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
+  private double m_reverseFactor = 1.0;
+  private boolean m_fieldRelative = true;
+  private double m_speedFactor = 1.0;
 
   private static double joystickTransform(double value) {
     double transformedValue = MathUtil.applyDeadband(value, OIConstants.kJoystickDeadband);
@@ -172,6 +177,15 @@ public class RobotContainer {
     m_chooser.addOption("Right 2A2 2A3", new PathPlannerAuto("Right 2A2 2A3"));
     m_chooser.addOption("Center 1", new PathPlannerAuto("Center 1"));
     SmartDashboard.putData(m_chooser);
+  }
+
+  public void initializeAlliance() {
+    if (m_alliance.isEmpty() && DriverStation.isDSAttached()) {
+      m_alliance = DriverStation.getAlliance();
+      Alliance alliance = m_alliance.get();
+      m_fieldPoseUtil.initializeAlliance(alliance);
+      m_reverseFactor = alliance == Alliance.Blue ? 1.0 : -1.0;
+    }
   }
 
   public void initializePreloaded() {

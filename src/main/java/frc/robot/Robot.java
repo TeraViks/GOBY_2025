@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -32,7 +30,11 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    // Optimistically attempt to initialize the alliance. This will gracefully fail if the driver
+    // station is not yet connected.
+    m_robotContainer.initializeAlliance();
+  }
 
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
@@ -62,9 +64,13 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // Initialize the alliance if the attempt in robotInit() was unsuccessful. The driver station
+    // is always connected before autonomousInit() is called, so alliance initialization is
+    // guaranteed to succeed.
+    m_robotContainer.initializeAlliance();
+    m_robotContainer.initializePreloaded();
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kAutoPIDFSlotID);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-    m_robotContainer.initializePreloaded();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -79,9 +85,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.m_reverseFactor = DriverStation.getAlliance().get() == Alliance.Blue ? 1 : -1;
+    if (!m_didAutonomousInit) {
+      m_robotContainer.initializeAlliance();
+      m_robotContainer.initializePreloaded();
+    }
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kTeleopPIDFSlotID);
-    if (!m_didAutonomousInit) m_robotContainer.initializePreloaded();
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove

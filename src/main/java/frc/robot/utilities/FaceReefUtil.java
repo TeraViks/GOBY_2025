@@ -10,10 +10,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class FaceReefUtil {
-  private final Translation2d m_reef;
+  private final FieldPoseUtil m_fieldPoseUtil;
 
   public FaceReefUtil(FieldPoseUtil fieldPoseUtil) {
-    m_reef = fieldPoseUtil.getReefCenter();
+    m_fieldPoseUtil = fieldPoseUtil;
   }
 
   // Get rotation angle, constrained to [-pi..pi]. This is necessary in conjunction with
@@ -23,7 +23,7 @@ public class FaceReefUtil {
   }
 
   private Translation2d getRobotToReef(Pose2d robotPose) {
-    Translation2d robotToReef = m_reef.minus(robotPose.getTranslation());
+    Translation2d robotToReef = m_fieldPoseUtil.getReefCenter().minus(robotPose.getTranslation());
     return robotToReef;
   }
 

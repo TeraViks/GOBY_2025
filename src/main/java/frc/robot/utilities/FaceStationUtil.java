@@ -4,17 +4,15 @@
 
 package frc.robot.utilities;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class FaceStationUtil {
-  private final ArrayList<Pose2d> m_coralStations;
+  private final FieldPoseUtil m_fieldPoseUtil;
 
   public FaceStationUtil(FieldPoseUtil fieldPoseUtil) {
-    m_coralStations = fieldPoseUtil.getCoralStations();
+    m_fieldPoseUtil = fieldPoseUtil;
   }
 
   // Get rotation angle, constrained to [-pi..pi]. This is necessary in conjunction with
@@ -24,7 +22,7 @@ public class FaceStationUtil {
   }
 
   private Pose2d closestStation(Pose2d robotPose) {
-    return robotPose.nearest(m_coralStations);
+    return robotPose.nearest(m_fieldPoseUtil.getCoralStations());
   }
 
   public Rotation2d getRotationDeviation(Pose2d robotPose) {

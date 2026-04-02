@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Optimistically attempt to initialize the alliance. This will gracefully fail if the driver
     // station is not yet connected.
-    m_robotContainer.initializeAlliance();
+   // m_robotContainer.initializeAlliance();
   }
 
   /**
@@ -67,8 +67,8 @@ public class Robot extends TimedRobot {
     // Initialize the alliance if the attempt in robotInit() was unsuccessful. The driver station
     // is always connected before autonomousInit() is called, so alliance initialization is
     // guaranteed to succeed.
-    m_robotContainer.initializeAlliance();
-    m_robotContainer.initializePreloaded();
+    // m_robotContainer.initializeAlliance();
+    // m_robotContainer.initializePreloaded();
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kAutoPIDFSlotID);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     if (!m_didAutonomousInit) {
-      m_robotContainer.initializeAlliance();
+     // m_robotContainer.initializeAlliance();
       m_robotContainer.initializePreloaded();
     }
     m_robotContainer.setPIDSlotID(SwerveModuleConstants.kTeleopPIDFSlotID);

@@ -10,9 +10,9 @@ import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+// import com.pathplanner.lib.auto.AutoBuilder;
+// import com.pathplanner.lib.config.RobotConfig;
+// import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -57,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
   private Translation2d m_idealVelocity = new Translation2d(0.0, 0.0);
   private double m_idealAngularVelocity = 0.0;
 
-  // The gyro sensor uses NavX
+  // The gyro sensor == NavX
   private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
   private Pose2d m_initialPose = new Pose2d();
   private CameraSubsystem m_cameraSystem;
@@ -88,41 +88,41 @@ public class DriveSubsystem extends SubsystemBase {
     m_cameraSystem = cameraSystem;
     m_velocityProfile = new TrapezoidalConstraint(
       DriveConstants.kMaxSpeedMetersPerSecond,
-      () -> ElevatorAccelInterp.heightToMaxAcceleration(0.0), //TODO: Get actual elevator height
+      () -> ElevatorAccelInterp.heightToMaxAcceleration(0.0),
       () -> ElevatorAccelInterp.heightToMaxDeceleration(0.0)
     );
 
     m_gyro.enableBoardlevelYawReset(true);
-    // We have to wait for the gyro to callibrate before we can reset the gyro
+    // We have to wait for the gyro to calibrate before we can reset the gyro
     while (m_gyro.isCalibrating()) {Thread.yield();}
     zeroGyro();
 
     // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
-    RobotConfig config = null;
-    try {
-      config = RobotConfig.fromGUISettings();
-    } catch (Exception e) {
-      // Handle exception as needed
-      e.printStackTrace();
-    }
+    // RobotConfig config = null;
+    // try {
+    //   config = RobotConfig.fromGUISettings();
+    // } catch (Exception e) {
+    //   // Handle exception as needed
+    //   e.printStackTrace();
+    // }
 
-    AutoBuilder.configure(
-      this::getPose, // Robot pose supplier
-      this::initOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-      this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-      new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-          AutoConstants.kTranslationHolonomicPID, // Translation PID constants
-          AutoConstants.kRotationHolonomicPID // Rotation PID constants
-      ), // Drive base radius in meters. Distance from robot center to furthest module.
-      config, // Default path replanning config. See the API for the options here
-      () -> {
-        return DriverStation.getAlliance().get() == Alliance.Red;
-      },
-      this // Reference to this subsystem to set requirements
-    );
-  }
+    // AutoBuilder.configure(
+    //   this::getPose, // Robot pose supplier
+    //   this::initOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+    //   this::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    //   (speeds, feedforwards) -> driveRobotRelative(speeds), 
+    // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    //   new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+    //       AutoConstants.kTranslationHolonomicPID, // Translation PID constants
+    //       AutoConstants.kRotationHolonomicPID // Rotation PID constants
+    //   ), // Drive base radius in meters. Distance from robot center to furthest module.
+    //   config, // Default path replanning config. See the API for the options here
+    //   () -> {
+    //     return DriverStation.getAlliance().get() == Alliance.Red;},
+    //   this // Reference to this subsystem to set requirements
+    // );
+  }  // end Drive Subsys constructor
 
   public void setPIDSlotID(ClosedLoopSlot slotID) {
     for (SwerveModule module : m_modules) {
@@ -146,7 +146,7 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     updateConstants();
-    // Update turning encoder offsets if the robot is stationary.
+    // Update turning encoder offsets if the robot is stationary
     double aggregateSpeedMetersPerSecond = 0.0;
     for (SwerveModuleState moduleState : getModuleStates()) {
       aggregateSpeedMetersPerSecond += moduleState.speedMetersPerSecond;
@@ -199,7 +199,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Method to drive the robot using joystick info.
+   * Method to drive the robot using joystick input
    *
    * @param xSpeed Speed of the robot in the x direction (forward), in m/s.
    * @param ySpeed Speed of the robot in the y direction (right), in m/s.

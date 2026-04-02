@@ -4,16 +4,16 @@
 
 package frc.robot;
 
-import java.util.Optional;
+//import java.util.Optional;
 
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
+// import com.pathplanner.lib.auto.NamedCommands;
+// import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.revrobotics.spark.ClosedLoopSlot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
+//import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+//import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,7 +31,7 @@ import frc.robot.commands.CoralPlacement;
 import frc.robot.commands.FaceReef;
 import frc.robot.commands.FaceStation;
 import frc.robot.commands.GetAlgae;
-import frc.robot.commands.GetAlgaeParallel;
+//import frc.robot.commands.GetAlgaeParallel;
 import frc.robot.commands.GetCoral;
 import frc.robot.commands.LevelOnePlacement;
 import frc.robot.subsystems.CameraSubsystem;
@@ -60,11 +60,11 @@ public class RobotContainer {
   private final ClimberSubsystem m_climber = ClimberConstants.kEnable ? new ClimberSubsystem() : null;
   private final GenericHID m_driverController = new GenericHID(OIConstants.kDriverControllerPort);
   private final GenericHID m_operatorController = new GenericHID(OIConstants.kOperatorControllerPort);
-  private Optional<Alliance> m_alliance = Optional.empty();
+ // private Optional<Alliance> m_alliance = Optional.empty();
   private final FieldPoseUtil m_fieldPoseUtil = new FieldPoseUtil();
-  private double m_reverseFactor = 1.0;
-  private boolean m_fieldRelative = true;
-  private double m_speedFactor = 1.0;
+  private double m_reverseFactor = 0.5;
+  private boolean m_fieldRelative = false;
+  private double m_speedFactor = 0.5;
 
   private static double joystickTransform(double value) {
     double transformedValue = MathUtil.applyDeadband(value, OIConstants.kJoystickDeadband);
@@ -76,8 +76,8 @@ public class RobotContainer {
 
   private double getXSpeedInput() {
     double robotRelativeReverseFactor = m_fieldRelative ? 1.0 : -1.0;
-    // The Y axis on the controller is inverted! Pushing forward (up) generates a negative value.
-    // Negate the input value here.
+    // The Y axis on the controller is inverted == pushing forward (up) sends negative value
+    // so we Negate here
     return m_reverseFactor
       * joystickTransform(-m_driverController.getRawAxis(OIConstants.kLeftJoyYAxis))
       * OIConstants.kMaxMetersPerSec
@@ -113,7 +113,7 @@ public class RobotContainer {
 
     m_robotDrive.setDefaultCommand(
       // The left stick controls translation of the robot.
-      // Turning is controlled by the X axis of the right stick.
+      // rotation on axis is controlled by the X axis of the right stick.
       new RunCommand(
         () -> {
           m_robotDrive.drive(
@@ -123,7 +123,7 @@ public class RobotContainer {
             m_fieldRelative);
         }, m_robotDrive
       )
-    );
+    );  // end setDefault
 
     if (ClimberConstants.kEnable) {
       m_climber.setDefaultCommand(
@@ -137,57 +137,57 @@ public class RobotContainer {
       );
     }
 
-    NamedCommands.registerCommand("Place A2",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-      ReefSubPose.A, CraneConstants.kPositionL2));
-    NamedCommands.registerCommand("Place A3",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-      ReefSubPose.A, CraneConstants.kPositionL3));
-    NamedCommands.registerCommand("Place B2",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-      ReefSubPose.B, CraneConstants.kPositionL2));
-    NamedCommands.registerCommand("Place B3",
-      new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
-      ReefSubPose.B, CraneConstants.kPositionL3));
-    NamedCommands.registerCommand("Place 1", 
-    new LevelOnePlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.ALGAE));
-    NamedCommands.registerCommand("GetAlgae",
-      new GetAlgaeParallel(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil));
-    NamedCommands.registerCommand("Eject",
-      Commands.sequence(
-        Commands.runOnce(() -> {m_handler.eject();}, m_handler),
-        Commands.waitUntil(() -> m_handler.isEmpty())
-      )
-    );
-    NamedCommands.registerCommand("Crane to Low Algae", 
-      Commands.sequence(
-        Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionLoAlgae), m_crane),
-        Commands.waitUntil(() -> m_crane.atGoal().isPresent())
-      )
-    );
-    NamedCommands.registerCommand("Intake S5",
-      new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
-    m_chooser.setDefaultOption("Empty Auto", Commands.none());
-    m_chooser.addOption("Right Cross The Line", new PathPlannerAuto("Right Cross The Line"));
-    m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
-    m_chooser.addOption("Left Cross The Line", new PathPlannerAuto("Left Cross The Line"));
-    m_chooser.addOption("Right 2A2", new PathPlannerAuto("Right 2A2"));
-    m_chooser.addOption("Left 10B2", new PathPlannerAuto("Left 10B2"));
-    m_chooser.addOption("Left 10B2 8B3", new PathPlannerAuto("Left 10B2 8B3"));
-    m_chooser.addOption("Left 10B2 10B3", new PathPlannerAuto("Left 10B2 10B3"));
-    m_chooser.addOption("Right 2A2 2A3", new PathPlannerAuto("Right 2A2 2A3"));
-    m_chooser.addOption("Center 1", new PathPlannerAuto("Center 1"));
+    // NamedCommands.registerCommand("Place A2",
+    //   new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+    //   ReefSubPose.A, CraneConstants.kPositionL2));
+    // NamedCommands.registerCommand("Place A3",
+    //   new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+    //   ReefSubPose.A, CraneConstants.kPositionL3));
+    // NamedCommands.registerCommand("Place B2",
+    //   new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+    //   ReefSubPose.B, CraneConstants.kPositionL2));
+    // NamedCommands.registerCommand("Place B3",
+    //   new CoralPlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil,
+    //   ReefSubPose.B, CraneConstants.kPositionL3));
+    // NamedCommands.registerCommand("Place 1", 
+    // new LevelOnePlacement(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, ReefSubPose.ALGAE));
+    // NamedCommands.registerCommand("GetAlgae",
+    //   new GetAlgaeParallel(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil));
+    // NamedCommands.registerCommand("Eject",
+    //   Commands.sequence(
+    //     Commands.runOnce(() -> {m_handler.eject();}, m_handler),
+    //     Commands.waitUntil(() -> m_handler.isEmpty())
+    //   )
+    // );
+    // NamedCommands.registerCommand("Crane to Low Algae", 
+    //   Commands.sequence(
+    //     Commands.runOnce(() -> m_crane.moveTo(CraneConstants.kPositionLoAlgae), m_crane),
+    //     Commands.waitUntil(() -> m_crane.atGoal().isPresent())
+    //   )
+    // );
+    // NamedCommands.registerCommand("Intake S5",
+    //   new GetCoral(m_robotDrive, m_handler, m_crane, m_fieldPoseUtil, CoralStationSubPose.FIVE));
+    // m_chooser.setDefaultOption("Empty Auto", Commands.none());
+    // m_chooser.addOption("Right Cross The Line", new PathPlannerAuto("Right Cross The Line"));
+    // m_chooser.addOption("Middle Cross The Line", new PathPlannerAuto("Middle Cross The Line"));
+    // m_chooser.addOption("Left Cross The Line", new PathPlannerAuto("Left Cross The Line"));
+    // m_chooser.addOption("Right 2A2", new PathPlannerAuto("Right 2A2"));
+    // m_chooser.addOption("Left 10B2", new PathPlannerAuto("Left 10B2"));
+    // m_chooser.addOption("Left 10B2 8B3", new PathPlannerAuto("Left 10B2 8B3"));
+    // m_chooser.addOption("Left 10B2 10B3", new PathPlannerAuto("Left 10B2 10B3"));
+    // m_chooser.addOption("Right 2A2 2A3", new PathPlannerAuto("Right 2A2 2A3"));
+    // m_chooser.addOption("Center 1", new PathPlannerAuto("Center 1"));
     SmartDashboard.putData(m_chooser);
-  }
+  } // end RC constructor
 
-  public void initializeAlliance() {
-    if (m_alliance.isEmpty() && DriverStation.isDSAttached()) {
-      m_alliance = DriverStation.getAlliance();
-      Alliance alliance = m_alliance.get();
-      m_fieldPoseUtil.initializeAlliance(alliance);
-      m_reverseFactor = alliance == Alliance.Blue ? 1.0 : -1.0;
-    }
-  }
+  // public void initializeAlliance() {
+  //   if (m_alliance.isEmpty() && DriverStation.isDSAttached()) {
+  //     m_alliance = DriverStation.getAlliance();
+  //     Alliance alliance = m_alliance.get();
+  //     m_fieldPoseUtil.initializeAlliance(alliance);
+  //     m_reverseFactor = alliance == Alliance.Blue ? 1.0 : -1.0;
+  //   }
+  // }
 
   public void initializePreloaded() {
     m_handler.initializePreloaded();
@@ -209,7 +209,7 @@ public class RobotContainer {
     m_speedFactor = speedFactor;
   }
 
-  private void configureBindings() {
+  private void configureBindings() { // 8 =
     new JoystickButton(m_driverController, OIConstants.kZeroGyro)
       .debounce(OIConstants.kDebounceSeconds)
       .onTrue(Commands.runOnce(() -> {
@@ -218,10 +218,10 @@ public class RobotContainer {
     ));
 
     // Use m_robotDrive requirement as synchronizer for m_fieldRelative.
-    new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
-      .debounce(OIConstants.kDebounceSeconds)
-      .onTrue(Commands.runOnce(() -> setFieldRelative(false), m_robotDrive))
-      .onFalse(Commands.runOnce(() -> setFieldRelative(true), m_robotDrive));
+    // new JoystickButton(m_driverController, OIConstants.kRobotRelativeButton)
+    //   .debounce(OIConstants.kDebounceSeconds)
+    //   .onTrue(Commands.runOnce(() -> setFieldRelative(false), m_robotDrive))
+    //   .onFalse(Commands.runOnce(() -> setFieldRelative(true), m_robotDrive));
 
     // Use m_robotDrive requirement as synchronizer for m_speedFactor.
     new JoystickButton(m_driverController, OIConstants.kSlowModeButton)

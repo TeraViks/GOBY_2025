@@ -528,7 +528,7 @@ public class Crane extends SubsystemBase {
         break;
       }
       case PIVOT_HOME: {
-        // Check if motor amperage is spiked due to a stall condition creating a short circuit.
+        // Check if motor amperage is spiked due to stall condition
         if (m_pivotMotor.getOutputCurrent()
             >= CraneConstants.kPivotMinStalledHomingAmperage) {
           double currentTime = Time.getTimeSeconds();

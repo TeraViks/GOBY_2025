@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.pathplanner.lib.config.PIDConstants;
+//import com.pathplanner.lib.config.PIDConstants;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
@@ -222,7 +222,7 @@ public final class Constants {
     public static final int kMotorID = 17;
     public static final double kIntakeSpeedCoral = 0.5;
     public static final double kEjectSpeedCoral = -0.4;
-    public static final double kSlowEjectSpeedCoral = -0.2; //TODO: Tune.
+    public static final double kSlowEjectSpeedCoral = -0.2; 
     public static final double kIntakeSpeedAlgae = -0.4;
     public static final double kEjectSpeedAlgae = 0.2;
     public static final double kTestSpeed = 0.0;
@@ -323,7 +323,7 @@ public final class Constants {
 
     public static final double kDebounceSeconds = 0.01;
 
-    public static final double kJoystickDeadband = 0.00;
+    public static final double kJoystickDeadband = 0.05;
   }
 
   public static final class AutoConstants {
@@ -332,8 +332,8 @@ public final class Constants {
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-    public static final PIDConstants kTranslationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
-    public static final PIDConstants kRotationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
+    // public static final PIDConstants kTranslationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
+    // public static final PIDConstants kRotationHolonomicPID = new PIDConstants(5.0, 0.0, 0.0);
 
     public static final double kFrameToRobotCenter = 0.381;
 
@@ -345,7 +345,7 @@ public final class Constants {
     public static final double kStationXOffset = -(0.415 + kFrameToRobotCenter);
     public static final double kStationSlotSpacing = 0.202; // Distance between slots.
 
-    public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter); // TODO: Tune.
+    public static final double kProcessorXOffset = -(0.222 + kFrameToRobotCenter);
 
     public static final Transform2d kL1ExtraReefOffset = new Transform2d(0.09, 0.0, Rotation2d.kZero);
     public static final Transform2d kAlgaeIntakeMove = new Transform2d(0.15, 0.0, Rotation2d.kZero);
@@ -353,7 +353,7 @@ public final class Constants {
   }
 
   public static final class CameraConstants {
-    public static final boolean kEnable = true;
+    public static final boolean kEnable = false;
     public static final double kMaxAmbiguity = 0.20;
     // Use single-tag estimate if any detected tags exceed max distance.
     public static final double kMaxTagDistance = 3.5;
